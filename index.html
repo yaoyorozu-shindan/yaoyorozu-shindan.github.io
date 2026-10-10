@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>八百万診断｜あなたの正体は神か、妖怪か</title>
+  <meta name="description" content="生年月日を入れるだけ。インド神話・日本神話・ギリシャ神話の神、妖怪、怪異、都市伝説…あなたの正体と相性のいい神社を無料で診断します。">
+  <meta property="og:title" content="八百万診断｜あなたの正体は神か、妖怪か">
+  <meta property="og:description" content="生年月日でわかる、あなたの正体と相性のいい神社。">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a href="./" class="logo">⛩️ 八百万診断</a>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>あなたの正体は、<br>神か、妖怪か。</h1>
+      <p>生年月日から属性を読み解き、神話の神・妖怪・怪異・都市伝説としての姿と、相性のいい神社を診断します。</p>
+    </section>
+
+    <form id="fortune-form" class="card form">
+      <label for="birthday">生年月日</label>
+      <input type="date" id="birthday" required min="1900-01-01">
+      <label for="nickname">ニックネーム（任意）</label>
+      <input type="text" id="nickname" maxlength="20" placeholder="例：ゆき">
+      <button type="submit">正体を診断する</button>
+    </form>
+
+    <section id="result" class="result" hidden></section>
+
+    <section class="card about">
+      <h2>八百万診断とは</h2>
+      <p>生まれた日の「日干（にっかん）」から、あなたの属性を木・火・土・金・水の五行と陰陽で判定。その属性にゆかりのあるインド神話・日本神話・ギリシャ神話の神々、妖怪、怪異、都市伝説の中から、あなたの「正体」を導き出すオリジナル診断です。正体は一生変わりませんが、今日の運勢は毎日変わります。</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>当サイトはアフィリエイト広告を利用しています。</p>
+    <p><a href="privacy.html">プライバシーポリシー・免責事項</a></p>
+    <p>診断結果は娯楽としてお楽しみください。</p>
+    <p>© <span id="year"></span> 八百万診断</p>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/fortune-data.js"></script>
+  <script src="js/images.js"></script>
+  <script src="js/fortune.js"></script>
+</body>
+</html>

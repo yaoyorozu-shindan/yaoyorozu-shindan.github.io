@@ -1,0 +1,215 @@
+:root {
+  --bg: #f6f3fb;
+  --card: #ffffff;
+  --text: #2b2540;
+  --muted: #6e6787;
+  --accent: #6b4fbb;
+  --accent-2: #c9a2e8;
+  --border: #e6e0f2;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: linear-gradient(180deg, #ece6f8 0%, var(--bg) 320px);
+  color: var(--text);
+  font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic UI", Meiryo, sans-serif;
+  line-height: 1.8;
+}
+
+a { color: var(--accent); }
+
+.site-header {
+  padding: 14px 16px;
+  text-align: center;
+}
+.logo {
+  font-weight: 700;
+  font-size: 1.15rem;
+  text-decoration: none;
+  letter-spacing: 0.08em;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 16px 40px;
+}
+
+.hero { text-align: center; margin: 12px 0 24px; }
+.hero h1 { font-size: 1.5rem; line-height: 1.5; margin: 0 0 8px; }
+.hero p { color: var(--muted); margin: 0; font-size: 0.95rem; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 16px rgba(80, 60, 140, 0.06);
+}
+.card h2, .card h3 { margin-top: 0; }
+
+.form { display: flex; flex-direction: column; gap: 6px; }
+.form label { font-size: 0.9rem; font-weight: 700; margin-top: 6px; }
+.form input {
+  font-size: 1rem;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-family: inherit;
+}
+.form button {
+  margin-top: 14px;
+  padding: 14px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), #9a6fd6);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.form button:hover { filter: brightness(1.08); }
+
+.stone-card { text-align: center; border-top: 6px solid var(--stone); }
+.stone-card h2 { color: var(--stone); font-size: 1.8rem; margin: 0; }
+.stone-card .sub { margin: 8px 0 0; color: var(--muted); }
+.type-title { font-weight: 700; margin: 4px 0 12px; }
+.gem {
+  width: 64px; height: 64px;
+  margin: 0 auto;
+  background: radial-gradient(circle at 30% 30%, #fff 0%, var(--stone) 45%, #000 140%);
+  transform: rotate(45deg);
+  border-radius: 12px;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--stone) 50%, transparent);
+}
+
+.luck-row { border-top: 1px solid var(--border); padding-top: 10px; margin-top: 10px; }
+.luck-row:first-of-type { border-top: none; margin-top: 0; padding-top: 0; }
+.luck-head { display: flex; justify-content: space-between; font-weight: 700; }
+.stars { color: #e0a915; letter-spacing: 0.1em; }
+.luck-row p { margin: 4px 0 0; font-size: 0.95rem; }
+
+.lucky dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; margin: 0 0 12px; }
+.lucky dt { color: var(--muted); }
+.lucky dd { margin: 0; font-weight: 700; }
+.advice { background: #f8f5fd; border-radius: 10px; padding: 10px 12px; margin: 12px 0 0; }
+
+.aff { position: relative; border: 1px dashed var(--border); border-radius: 10px; padding: 18px 12px 12px; }
+.pr {
+  position: absolute; top: -10px; left: 10px;
+  font-size: 0.7rem; background: #fff; color: var(--muted);
+  border: 1px solid var(--border); border-radius: 4px; padding: 0 6px;
+}
+.aff-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.aff-btn {
+  flex: 1 1 140px; text-align: center; text-decoration: none;
+  padding: 10px; border-radius: 8px; font-weight: 700; color: #fff;
+}
+.aff-btn.amazon { background: #ff9900; }
+.aff-btn.rakuten { background: #bf0000; }
+
+.share-btn {
+  display: block; text-align: center; text-decoration: none;
+  background: #111; color: #fff; font-weight: 700;
+  padding: 12px; border-radius: 999px; margin-bottom: 24px;
+}
+
+.about p { font-size: 0.92rem; color: var(--muted); margin-bottom: 0; }
+
+.site-footer {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--muted);
+  padding: 24px 16px 40px;
+}
+.site-footer p { margin: 4px 0; }
+
+.doc h1 { font-size: 1.4rem; }
+.doc h2 { font-size: 1.1rem; margin-top: 24px; }
+
+/* ---- 正体診断 ---- */
+.element-card { text-align: center; border-top: 6px solid var(--el); }
+.element-card h2 { color: var(--el); font-size: 2rem; margin: 0; }
+.element-card .sub { margin: 4px 0 0; color: var(--muted); }
+.element-icon { font-size: 2.6rem; line-height: 1; }
+.stem { font-weight: 700; margin: 0 0 12px; color: var(--muted); }
+.polarity { font-weight: 700; margin-bottom: 0; }
+
+.section-title { text-align: center; margin: 28px 0 12px; font-size: 1.2rem; }
+
+.id-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.id-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--el);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.id-card h4 { margin: 0; font-size: 1.3rem; color: var(--el); }
+.id-lead { margin: 0; font-size: 0.8rem; color: var(--muted); }
+.id-label { margin: 0; font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+.id-sub { margin: 0 0 6px; font-size: 0.82rem; color: var(--muted); }
+.id-desc { margin: 0; font-size: 0.9rem; }
+
+.shrine-card { border-top: 6px solid #c8102e; }
+.shrine-card h3 { margin: 4px 0 0; }
+.shrine-meta { color: var(--muted); font-size: 0.85rem; margin: 0 0 8px; }
+.map-btn {
+  display: inline-block; margin: 4px 0 12px; padding: 8px 16px;
+  border: 1px solid var(--border); border-radius: 999px; text-decoration: none; font-weight: 700;
+}
+
+/* ---- 結果の絵 ---- */
+.art { margin: -14px -16px 12px; }
+.id-card { overflow: hidden; }
+.art img, .art-svg {
+  display: block; width: 100%; aspect-ratio: 10 / 7;
+  object-fit: cover; object-position: center 20%;
+  background: #1e1a33;
+}
+.art figcaption { font-size: 0.65rem; line-height: 1.4; padding: 4px 16px 0; color: var(--muted); }
+.art figcaption a { color: inherit; text-decoration: none; }
+.art figcaption a:hover { text-decoration: underline; }
+.shrine-card { overflow: hidden; }
+.shrine-card .art { margin: -20px -20px 14px; }
+.shrine-card .art img, .shrine-card .art-svg { aspect-ratio: 16 / 9; }
+
+/* ---- 神社：観光スポット・宿 ---- */
+.travel-title { font-weight: 700; margin: 0 0 8px; }
+.spots { margin: 4px 0 16px; }
+.spots ul { list-style: none; margin: 0; padding: 0; }
+.spots li { padding: 8px 0; border-top: 1px solid var(--border); }
+.spots li:first-child { border-top: none; padding-top: 0; }
+.spots li a { display: block; font-weight: 700; }
+.spots li span { display: block; font-size: 0.88rem; color: var(--muted); }
+.travel { position: relative; margin-bottom: 12px; }
+.travel.aff { padding: 18px 12px 12px; }
+.aff-btn.jalan { background: #e65a1e; }
+
+/* ---- Wikipediaリンク ---- */
+.id-card { display: flex; flex-direction: column; }
+.id-desc { flex: 1; }
+.wiki-link { display: inline-block; margin-top: 10px; font-size: 0.82rem; font-weight: 700; text-decoration: none; }
+.wiki-link:hover { text-decoration: underline; }
+.shrine-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ---- あなたの石 ---- */
+.stones-card { position: relative; }
+.stones-card .pr { top: 12px; left: auto; right: 12px; }
+.stone-item { border-top: 1px solid var(--border); padding: 14px 0 4px; }
+.stones-card h3 + .stone-item { border-top: none; padding-top: 0; }
+.stone-head { display: flex; align-items: center; gap: 12px; }
+.stone-head h4 { margin: 0; font-size: 1.2rem; }
+.gem-svg { width: 56px; height: 45px; flex: none; filter: drop-shadow(0 3px 6px rgba(0,0,0,.15)); }
+.stone-meaning { margin: 8px 0 10px; font-size: 0.92rem; }
+.price-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.price-btns .aff-btn { font-size: 0.85rem; }
+.note { font-size: 0.75rem; color: var(--muted); margin: 8px 0 0; }
