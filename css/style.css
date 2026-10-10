@@ -113,8 +113,8 @@ a { color: var(--accent); }
 
 .share-btn {
   display: block; text-align: center; text-decoration: none;
-  background: #111; color: #fff; font-weight: 700;
-  padding: 12px; border-radius: 999px; margin-bottom: 24px;
+  background: #111; color: #fff; font-weight: 700; font-size: 1rem; font-family: inherit;
+  padding: 12px; border-radius: 999px; border: none; cursor: pointer;
 }
 
 .about p { font-size: 0.92rem; color: var(--muted); margin-bottom: 0; }
@@ -213,3 +213,14 @@ a { color: var(--accent); }
 .price-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
 .price-btns .aff-btn { font-size: 0.85rem; }
 .note { font-size: 0.75rem; color: var(--muted); margin: 8px 0 0; }
+
+/* ---- シェア ---- */
+.share-area { margin-bottom: 24px; }
+.share-title { text-align: center; font-weight: 700; margin: 0 0 8px; }
+.share-btns { display: flex; gap: 8px; }
+.share-btns .share-btn { flex: 1; }
+.share-btn.insta { background: linear-gradient(45deg, #f9a43c, #e1306c 50%, #833ab4); }
+.share-btn.save { background: var(--accent); margin-top: 8px; }
+.insta-preview { text-align: center; margin-top: 16px; }
+.insta-preview img { width: 60%; max-width: 280px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,.2); }
+.insta-preview p { font-size: 0.85rem; color: var(--muted); }

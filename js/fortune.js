@@ -306,8 +306,22 @@ function render(birthday, nickname) {
       <p class="advice">💡 ${daily.advice}</p>
     </div>
 
-    <a class="share-btn" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}" target="_blank" rel="noopener">結果をXでシェア</a>
+    <div class="share-area">
+      <p class="share-title">結果をシェアする</p>
+      <div class="share-btns">
+        <a class="share-btn x" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}" target="_blank" rel="noopener">Xでシェア</a>
+        <button type="button" class="share-btn insta" id="insta-share">インスタでシェア</button>
+      </div>
+      <div id="insta-preview" class="insta-preview" hidden></div>
+    </div>
   `;
+  const shareData = {
+    who: nickname ? `${nickname}さん` : "あなた",
+    element, polarity, stemKanji: stem.kanji, identities, shrine,
+    power: POWER_STONES[stem.element][stem.yang ? "yang" : "yin"],
+  };
+  document.getElementById("insta-share").addEventListener("click", () =>
+    shareToInstagram(shareData, document.getElementById("insta-preview"), shareText + "\n" + shareUrl));
   el.hidden = false;
   el.scrollIntoView({ behavior: "smooth" });
 }
