@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>八百万診断｜あなたの正体は神か、妖怪か</title>
-  <meta name="description" content="生年月日を入れるだけ。インド神話・日本神話・ギリシャ神話の神、妖怪、怪異、都市伝説…あなたの正体と相性のいい神社を無料で診断します。">
+  <meta name="description" content="生年月日を入れるだけ。インド神話・日本神話・ギリシャ神話の神、妖怪、怪異、都市伝説…あなたの正体と相性のいい神社を無料で診断。ふたりの相性診断も。">
   <meta property="og:title" content="八百万診断｜あなたの正体は神か、妖怪か">
   <meta property="og:description" content="生年月日でわかる、あなたの正体と相性のいい神社。">
   <meta property="og:type" content="website">
@@ -20,6 +20,7 @@
     <section class="hero">
       <h1>あなたの正体は、<br>神か、妖怪か。</h1>
       <p>生年月日から属性を読み解き、神話の神・妖怪・怪異・都市伝説としての姿と、相性のいい神社を診断します。</p>
+      <p class="hero-link"><a href="#compat">💞 ふたりの相性診断はこちら</a></p>
     </section>
 
     <form id="fortune-form" class="card form">
@@ -31,6 +32,32 @@
     </form>
 
     <section id="result" class="result" hidden></section>
+
+    <section id="compat" class="card compat-form-card">
+      <h2>💞 相性診断</h2>
+      <p class="compat-lead">ふたりの生年月日から、五行の関係で相性を占います。恋人・友達・家族・同僚、誰とでもOK。</p>
+      <form id="compat-form" class="form">
+        <div class="pair-inputs">
+          <fieldset>
+            <legend>あなた</legend>
+            <label for="bday-a">生年月日</label>
+            <input type="date" id="bday-a" required min="1900-01-01">
+            <label for="name-a">ニックネーム（任意）</label>
+            <input type="text" id="name-a" maxlength="20" placeholder="例：ゆき">
+          </fieldset>
+          <fieldset>
+            <legend>お相手</legend>
+            <label for="bday-b">生年月日</label>
+            <input type="date" id="bday-b" required min="1900-01-01">
+            <label for="name-b">ニックネーム（任意）</label>
+            <input type="text" id="name-b" maxlength="20" placeholder="例：はると">
+          </fieldset>
+        </div>
+        <button type="submit">相性を診断する</button>
+      </form>
+    </section>
+
+    <section id="compat-result" class="result" hidden></section>
 
     <section class="card about">
       <h2>八百万診断とは</h2>
@@ -50,5 +77,6 @@
   <script src="js/images.js"></script>
   <script src="js/share-image.js"></script>
   <script src="js/fortune.js"></script>
+  <script src="js/compat.js"></script>
 </body>
 </html>

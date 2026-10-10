@@ -224,3 +224,32 @@ a { color: var(--accent); }
 .insta-preview { text-align: center; margin-top: 16px; }
 .insta-preview img { width: 60%; max-width: 280px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,.2); }
 .insta-preview p { font-size: 0.85rem; color: var(--muted); }
+
+/* ---- 相性診断 ---- */
+.hero-link { margin-top: 10px !important; }
+.hero-link a { font-weight: 700; }
+.compat-form-card { margin-top: 24px; }
+.compat-form-card h2 { margin-bottom: 4px; }
+.compat-lead { color: var(--muted); font-size: 0.9rem; margin-top: 0; }
+.pair-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.pair-inputs fieldset { border: 1px solid var(--border); border-radius: 12px; padding: 8px 12px 12px; margin: 0; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.pair-inputs legend { font-weight: 700; padding: 0 6px; }
+.compat-card { text-align: center; position: relative; overflow: hidden; }
+.compat-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, var(--el), var(--el2)); }
+.pair { font-size: 1.2rem; font-weight: 700; margin: 0; }
+.pair-el { color: var(--muted); margin: 4px 0 0; }
+.score { font-size: 4rem; font-weight: 800; line-height: 1.1; margin: 8px 0 0;
+  background: linear-gradient(90deg, var(--el), var(--el2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.score small { font-size: 1.6rem; }
+.hearts { margin: 0 0 8px; letter-spacing: 0.15em; }
+.compat-desc { text-align: left; }
+.cbar { display: grid; grid-template-columns: 3em 1fr 3.2em; align-items: center; gap: 8px; margin-top: 8px; font-size: 0.9rem; }
+.cbar span { text-align: left; font-weight: 700; }
+.cbar b { text-align: right; }
+.cbar-track { height: 10px; background: var(--border); border-radius: 999px; overflow: hidden; }
+.cbar-fill { height: 100%; background: linear-gradient(90deg, var(--el), var(--el2)); border-radius: 999px; }
+.pair-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+.pair-table th { text-align: left; color: var(--muted); font-weight: 500; font-size: 0.8rem; padding: 8px 4px; white-space: nowrap; }
+.pair-table td { padding: 8px 4px; font-weight: 700; text-align: center; border-top: 1px solid var(--border); }
+.pair-table tr:first-child td { border-top: none; color: var(--muted); font-weight: 500; font-size: 0.85rem; }
+.pair-table td.x { color: var(--muted); font-weight: 400; width: 1.5em; }
