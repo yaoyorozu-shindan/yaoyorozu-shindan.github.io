@@ -269,6 +269,7 @@ function render(birthday, nickname) {
       <p class="stem">日干：${stem.kanji}</p>
       <p>${element.trait}</p>
       <p class="polarity">${element[stem.yang ? "yang" : "yin"]}</p>
+      <a class="read-more" href="articles/element-${stem.element}.html">「${element.name}」属性について詳しく読む →</a>
     </div>
 
     <h3 class="section-title">${who}の正体</h3>
