@@ -8,7 +8,7 @@ const SITE_CONFIG = {
   amazonTag: "",
 
   // 楽天アフィリエイトID（楽天アフィリエイトの「アフィリエイトID」。例: "1a2b3c4d.5e6f7a8b.1a2b3c4d.5e6f7a8b"）
-  rakutenAffiliateId: "",
+  rakutenAffiliateId: "11c8babe.a0490367.11c8babf.9411b51c",
 
   // じゃらん（バリューコマース経由）。バリューコマースでじゃらんnetと提携後、
   // 「MyLink」の広告タグに含まれる sid と pid の数字を入れます。
