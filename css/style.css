@@ -348,3 +348,10 @@ a { color: var(--accent); }
 .book-links span { color: var(--muted); flex-basis: 100%; }
 .book-links a { padding: 2px 10px; border-radius: 999px; background: #bf0000; color: #fff; text-decoration: none; font-weight: 700; }
 .pr-line { text-align: center; font-size: 0.72rem; color: var(--muted); margin: -6px 0 10px; }
+
+/* ---- 金運の日の運試し ---- */
+.lottery-card { position: relative; border: 2px solid #e8b923; background: linear-gradient(180deg, #fffbea, #fff); }
+.lottery-card .pr { top: 12px; left: auto; right: 12px; }
+.lottery-desc { font-size: 0.9rem; }
+.lottery-btn { display: block; text-align: center; padding: 12px; border-radius: 999px; font-weight: 700; text-decoration: none; color: #fff;
+  background: linear-gradient(135deg, #e8b923, #d98b1f); }

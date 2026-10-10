@@ -231,6 +231,25 @@ function bookLinks(name) {
     <a href="${link("001004")}" target="_blank" rel="${rel}">小説</a></div>`;
 }
 
+// 金運がいい日（★4以上）に出す、楽天toto（BIG・toto）の案内
+function lotteryCard(moneyScore) {
+  if (moneyScore < 4) return "";
+  const rid = SITE_CONFIG.rakutenAffiliateId;
+  const url = "https://toto.rakuten.co.jp/";
+  const href = rid ? `https://hb.afl.rakuten.co.jp/hgc/${rid}/?pc=${encodeURIComponent(url)}` : url;
+  const msg = moneyScore === 5
+    ? "今日は金運★5の絶好調デー！せっかくの追い風、夢を買ってみるのもアリかも。"
+    : "今日は金運が好調な日。ちょっとだけ運試しをしてみては？";
+  return `<div class="card lottery-card">
+    ${rid ? '<span class="pr">PR</span>' : ""}
+    <h3>💰 金運アップの日の運試し</h3>
+    <p>${msg}</p>
+    <p class="lottery-desc">楽天totoなら、最高6億円のBIGをネットで買えます。数字はコンピューターがランダムに選んでくれるので、選ぶ手間もありません。</p>
+    <a class="lottery-btn" href="${href}" target="_blank" rel="${rid ? "sponsored " : ""}noopener">楽天totoでBIGを見てみる</a>
+    <p class="note">※スポーツくじ（BIG・toto）は19歳以上の方が購入できます（楽天totoの利用には楽天カード・JCBカード・楽天銀行口座のいずれかが必要です）。占いは当せんを約束するものではありません。無理のない範囲で楽しみましょう。</p>
+  </div>`;
+}
+
 function wikiUrl(title) {
   return `https://ja.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, "_"))}`;
 }
@@ -317,6 +336,8 @@ function render(birthday, nickname) {
       <h3>${todayString().replace(/-/g, "/")} の運勢</h3>
       ${luckRows}
     </div>
+
+    ${lotteryCard(daily.scores.money)}
 
     <div class="card lucky">
       <h3>今日のラッキー</h3>
