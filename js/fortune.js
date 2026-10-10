@@ -93,6 +93,10 @@ const MOTIFS = {
     <rect x="48" y="52" width="104" height="8" fill="#fff"/>
     <g fill="#fff"><rect x="56" y="64" width="10" height="46"/><rect x="78" y="64" width="10" height="46"/><rect x="112" y="64" width="10" height="46"/><rect x="134" y="64" width="10" height="46"/></g>
     <rect x="44" y="112" width="112" height="10" fill="#fff"/>`,
+  // 雷神の槌と稲妻
+  norse: `<g fill="#fff"><rect x="62" y="30" width="76" height="34" rx="6"/><rect x="93" y="62" width="14" height="56" rx="4"/>
+      <rect x="88" y="114" width="24" height="10" rx="3"/></g>
+    <path d="M34 34l14 22h-9l12 24-24-28h10z M166 34l-14 22h9l-12 24 24-28h-10z" fill="#fff" fill-opacity=".6"/>`,
   // 闇に光る目
   yokai: `<path d="M50 120c0-50 22-84 50-84s50 34 50 84l-12-10-12 10-13-10-13 10-13-10-12 10-13-10z" fill="#fff" fill-opacity=".9"/>
     <ellipse cx="86" cy="72" rx="8" ry="11" fill="#2b2540"/><ellipse cx="114" cy="72" rx="8" ry="11" fill="#2b2540"/>
@@ -214,6 +218,19 @@ function stoneCard(birthday, stem) {
   </div>`;
 }
 
+// 関連する漫画・小説を楽天ブックスで探すリンク（g=001001: 漫画、g=001004: 小説・エッセイ）
+function bookLinks(name) {
+  const rid = SITE_CONFIG.rakutenAffiliateId;
+  const link = (g) => {
+    const url = `https://books.rakuten.co.jp/search?sitem=${encodeURIComponent(name)}&g=${g}`;
+    return rid ? `https://hb.afl.rakuten.co.jp/hgc/${rid}/?pc=${encodeURIComponent(url)}` : url;
+  };
+  const rel = rid ? "sponsored noopener" : "noopener";
+  return `<div class="book-links"><span>📚 ${name}が出てくる</span>
+    <a href="${link("001001")}" target="_blank" rel="${rel}">漫画</a>
+    <a href="${link("001004")}" target="_blank" rel="${rel}">小説</a></div>`;
+}
+
 function wikiUrl(title) {
   return `https://ja.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, "_"))}`;
 }
@@ -244,6 +261,7 @@ function render(birthday, nickname) {
         <p class="id-sub">${r.sub}</p>
         <p class="id-desc">${r.desc}</p>
         <a class="wiki-link" href="${wikiUrl(r.wiki)}" target="_blank" rel="noopener">Wikipediaで詳しく見る ↗</a>
+        ${bookLinks(r.name)}
       </div>`;
   }).join("");
 
@@ -256,7 +274,7 @@ function render(birthday, nickname) {
     </div>`).join("");
 
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shrine.name + " " + shrine.area)}`;
-  const shareText = `私の正体は…\nインド神話：${identities.india.name}\n日本神話：${identities.japan.name}\nギリシャ神話：${identities.greece.name}\n妖怪：${identities.yokai.name}\n都市伝説：${identities.legend.name}\n#八百万診断`;
+  const shareText = `私の正体は…\nインド神話：${identities.india.name}\n日本神話：${identities.japan.name}\nギリシャ神話：${identities.greece.name}\n北欧神話：${identities.norse.name}\n妖怪：${identities.yokai.name}\n都市伝説：${identities.legend.name}\n#八百万診断`;
   const shareUrl = SITE_CONFIG.siteUrl || location.href.split("#")[0];
 
   const el = document.getElementById("result");
@@ -273,6 +291,7 @@ function render(birthday, nickname) {
     </div>
 
     <h3 class="section-title">${who}の正体</h3>
+    ${SITE_CONFIG.rakutenAffiliateId ? '<p class="pr-line">PR：漫画・小説のリンクは楽天ブックスのアフィリエイトリンクです</p>' : ""}
     <div class="id-grid">${idCards}</div>
 
     <div class="card shrine-card">

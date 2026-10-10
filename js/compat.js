@@ -148,7 +148,7 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
     : " 陰陽も同じなので、テンポや価値観が近いふたりです。";
 
   const hearts = "💗".repeat(Math.round(c.total / 20)) + "🤍".repeat(5 - Math.round(c.total / 20));
-  const rows = ["japan", "greece", "yokai", "legend"].map((key) => {
+  const rows = ["japan", "greece", "norse", "yokai", "legend"].map((key) => {
     const cat = CATEGORIES.find((x) => x.key === key);
     return `<tr><th>${cat.label}</th><td>${c.A.identities[key].name}</td><td class="x">×</td><td>${c.B.identities[key].name}</td></tr>`;
   }).join("");
@@ -200,9 +200,19 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
       <p class="share-title">相性をシェアする</p>
       <div class="share-btns">
         <a class="share-btn x" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}" target="_blank" rel="noopener">Xでシェア</a>
+        <button type="button" class="share-btn insta" id="insta-share-compat">インスタでシェア</button>
       </div>
+      <div id="insta-preview-compat" class="insta-preview" hidden></div>
     </div>
   `;
+  const imgData = {
+    nameA: nameA ? `${nameA}さん` : "あなた", nameB: nameB ? `${nameB}さん` : "お相手",
+    elA, elB, labelA: label(c.A), labelB: label(c.B),
+    total: c.total, title: COMPAT_TEXT[c.type].title, sub: c.sub, shrine: s.name,
+    pairs: ["japan", "greece", "norse", "yokai"].map((key) => [CATEGORIES.find((x) => x.key === key).label, c.A.identities[key].name, c.B.identities[key].name]),
+  };
+  document.getElementById("insta-share-compat").addEventListener("click", () =>
+    shareToInstagram(imgData, document.getElementById("insta-preview-compat"), shareText + "\n" + shareUrl, buildCompatShareImage));
   el.hidden = false;
   el.scrollIntoView({ behavior: "smooth" });
 }

@@ -59,7 +59,7 @@ const ARTICLES = [
     file: `element-${el}.html`,
     title: `「${ELEMENTS[el].name}」属性の性格と特徴｜正体・相性・開運スポット`,
     short: `${ELEMENTS[el].icon} 「${ELEMENTS[el].name}」属性の性格と特徴`,
-    desc: `五行の「${ELEMENTS[el].name}」属性の人の性格、陽と陰の違い、神話の神や妖怪としての正体、相性のいい属性、おすすめの神社とパワーストーンを解説します。`,
+    desc: `五行の「${ELEMENTS[el].name}」属性の人の性格、陽と陰の違い、インド・日本・ギリシャ・北欧神話の神や妖怪としての正体、相性のいい属性、おすすめの神社とパワーストーンを解説します。`,
   })),
   { file: "compatibility.html", title: "五行でわかる相性の仕組み｜相生・相剋・比和と10タイプの相性表", short: "💞 五行でわかる相性の仕組み",
     desc: "相生・相剋・比和とは？五行（木・火・土・金・水）の関係から相性を読み解く方法と、10タイプの相性早見表を紹介します。" },
@@ -69,8 +69,8 @@ const ARTICLES = [
     desc: "五行と陰陽の10タイプ別に、相性のいい守護パワーストーンを紹介。石の意味と、身につけ方のポイントも解説します。" },
   { file: "shrines.html", title: "属性別おすすめ神社ガイド｜全国15社と周辺の観光スポット", short: "⛩️ 属性別おすすめ神社ガイド",
     desc: "木・火・土・金・水の属性ごとに相性のいい全国の神社15社を、ご祭神・ご利益・周辺の観光スポットとあわせて紹介します。" },
-  { file: "gods.html", title: "神話の神々図鑑｜インド神話・日本神話・ギリシャ神話の75柱", short: "🕉️ 神話の神々図鑑",
-    desc: "ガネーシャ、アマテラス、ゼウスなど、インド神話・日本神話・ギリシャ神話の神々75柱を、五行の属性別にわかりやすく紹介します。" },
+  { file: "gods.html", title: "神話の神々図鑑｜インド・日本・ギリシャ・北欧神話の100柱", short: "🕉️ 神話の神々図鑑",
+    desc: "ガネーシャ、アマテラス、ゼウス、オーディンなど、インド神話・日本神話・ギリシャ神話・北欧神話の神々100柱を、五行の属性別にわかりやすく紹介します。" },
   { file: "yokai.html", title: "妖怪・怪異・都市伝説図鑑｜河童から口裂け女まで75種", short: "👻 妖怪・怪異・都市伝説図鑑",
     desc: "河童・天狗などの妖怪、狐火・神隠しなどの怪異、口裂け女・きさらぎ駅などの都市伝説75種を、五行の属性別に紹介します。" },
   { file: "how-it-works.html", title: "八百万診断の仕組み｜日干（にっかん）とは？生年月日から属性を出す方法", short: "📖 八百万診断の仕組みと日干",
@@ -234,7 +234,7 @@ function elementArticle(el) {
 
     <h2 id="s3">神話の神としての正体</h2>
     <p>八百万診断では、${E.name}属性の人の「正体」を、${E.name}の気にゆかりのある神々の中から導き出します。あなたはどの神に近いでしょうか。</p>
-    ${identityTable(el, ["india", "japan", "greece"])}
+    ${identityTable(el, ["india", "japan", "greece", "norse"])}
 
     <h2 id="s4">妖怪・怪異・都市伝説としての正体</h2>
     ${identityTable(el, ["yokai", "kaii", "legend"])}
@@ -436,7 +436,7 @@ const bodies = {
   "birthstones.html": [birthstonesArticle(), true],
   "power-stones.html": [powerStonesArticle(), true],
   "shrines.html": [shrinesArticle(), true],
-  "gods.html": [zukan(["india", "japan", "greece"], "八百万診断に登場するインド神話・日本神話・ギリシャ神話の神々を、五行の属性別に紹介します。診断で出た神のことをもっと知りたいときや、ほかの属性の神々をのぞいてみたいときにどうぞ。"), false],
+  "gods.html": [zukan(["india", "japan", "greece", "norse"], "八百万診断に登場するインド神話・日本神話・ギリシャ神話・北欧神話の神々を、五行の属性別に紹介します。診断で出た神のことをもっと知りたいときや、ほかの属性の神々をのぞいてみたいときにどうぞ。"), false],
   "yokai.html": [zukan(["yokai", "kaii", "legend"], "八百万診断に登場する妖怪・怪異・都市伝説を、五行の属性別に紹介します。江戸時代の絵師・鳥山石燕の妖怪画など、昔の絵とあわせてお楽しみください。"), false],
   "how-it-works.html": [howItWorksArticle(), false],
 };
