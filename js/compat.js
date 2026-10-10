@@ -56,6 +56,78 @@ function compatibility(bdayA, bdayB) {
   return { A, B, type, from, to, polarityDiff, total, sub, shrine, shrineElement };
 }
 
+// ---- 1人の入力から「相性のいいタイプ」を出す ----
+
+const MATCH_RELATION = {
+  theyGenMe: { name: "相生", note: "あなたを育て、力を引き出してくれる人", order: 0 },
+  meGenThem: { name: "相生", note: "あなたが自然と支えたくなり、一緒にいると満たされる人", order: 1 },
+  same:      { name: "比和", note: "価値観が近く、気をつかわずにいられる人", order: 2 },
+  meCtrlThem:{ name: "相剋", note: "あなたがリードしがち。ぶつかりながら成長できる人", order: 3 },
+  theyCtrlMe:{ name: "相剋", note: "あなたにハッパをかけてくれる、刺激的な人", order: 4 },
+};
+
+// 自分以外も含む全10タイプ（五行×陰陽）との相性を、高い順に並べる
+function matchRanking(birthday) {
+  const me = dayStem(birthday);
+  const i = ELEMENT_ORDER.indexOf(me.element);
+  const list = [];
+  ELEMENT_ORDER.forEach((el, j) => {
+    [true, false].forEach((yang) => {
+      let rel;
+      if (i === j) rel = "same";
+      else if ((j + 1) % 5 === i) rel = "theyGenMe";
+      else if ((i + 1) % 5 === j) rel = "meGenThem";
+      else if ((i + 2) % 5 === j) rel = "meCtrlThem";
+      else rel = "theyCtrlMe";
+      const type = rel.includes("Gen") ? "gen" : rel === "same" ? "same" : "ctrl";
+      const score = { gen: 90, same: 78, ctrl: 62 }[type] + (yang !== me.yang ? 6 : 0);
+      list.push({ element: el, yang, rel, score });
+    });
+  });
+  list.sort((a, b) => b.score - a.score || MATCH_RELATION[a.rel].order - MATCH_RELATION[b.rel].order);
+  return list;
+}
+
+function matchLabel(m) {
+  return `${m.yang ? "陽" : "陰"}の${ELEMENTS[m.element].name}`;
+}
+
+// 相性ランキングのカード（個人の診断結果と、相性診断の「1人だけ入力」で共通）
+function bestMatchesHTML(birthday, who) {
+  const ranking = matchRanking(birthday);
+  const medal = ["🥇", "🥈", "🥉"];
+  const top = ranking.slice(0, 3).map((m, k) => {
+    const el = ELEMENTS[m.element];
+    const pool = RESULTS[m.element];
+    const pick = m.yang ? 0 : 1;
+    return `<div class="match-item" style="--mc:${el.color}">
+      <div class="match-head"><span class="medal">${medal[k]}</span>
+        <div><p class="match-type">${el.icon} ${matchLabel(m)}の人</p>
+        <p class="match-rel">${MATCH_RELATION[m.rel].name}・相性 ${m.score}%</p></div></div>
+      <p class="match-note">${MATCH_RELATION[m.rel].note}。</p>
+      <p class="match-eg">正体の例：${pool.japan[pick].name}、${pool.greece[pick].name}、${pool.yokai[pick].name} など</p>
+    </div>`;
+  }).join("");
+  const rest = ranking.slice(3).map((m, k) =>
+    `<li><span>${k + 4}位</span><b>${ELEMENTS[m.element].icon} ${matchLabel(m)}</b><em>${MATCH_RELATION[m.rel].name}</em><i>${m.score}%</i></li>`).join("");
+  return `<div class="card matches-card">
+    <h3>💞 ${who}と相性のいい人</h3>
+    <p class="match-lead">相手の属性は、その人の生年月日で診断するとわかります。</p>
+    ${top}
+    <details class="match-rest"><summary>4位以下も見る</summary><ol>${rest}</ol></details>
+    <button type="button" class="match-go" data-bday="${birthday}">相手の生年月日で相性を診断する</button>
+  </div>`;
+}
+
+// 「相手の生年月日で相性を診断する」ボタン：相性診断の欄へ移動して、自分の生年月日を入れておく
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".match-go");
+  if (!btn) return;
+  document.getElementById("bday-a").value = btn.dataset.bday;
+  document.getElementById("compat").scrollIntoView({ behavior: "smooth" });
+  setTimeout(() => document.getElementById("bday-b").focus(), 500);
+});
+
 function compatBar(label, value) {
   return `<div class="cbar"><span>${label}</span><div class="cbar-track"><div class="cbar-fill" style="width:${value}%"></div></div><b>${value}%</b></div>`;
 }
@@ -148,7 +220,15 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
   } catch (e) {}
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    if (!a.value || !b.value) return;
+    if (!a.value) return;
+    if (!b.value) {
+      const out = document.getElementById("compat-result");
+      const nA = na.value.trim();
+      out.innerHTML = bestMatchesHTML(a.value, nA ? `${escapeHtml(nA)}さん` : "あなた");
+      out.hidden = false;
+      out.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
     renderCompat(a.value, na.value.trim(), b.value, nb.value.trim());
   });
 })();

@@ -291,6 +291,8 @@ function render(birthday, nickname) {
 
     ${stoneCard(birthday, stem)}
 
+    ${typeof bestMatchesHTML === "function" ? bestMatchesHTML(birthday, who) : ""}
+
     <div class="card">
       <h3>${todayString().replace(/-/g, "/")} の運勢</h3>
       ${luckRows}
