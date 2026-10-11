@@ -77,11 +77,24 @@ function matchRanking(birthday) {
       else rel = "theyCtrlMe";
       const type = rel.includes("Gen") ? "gen" : rel === "same" ? "same" : "ctrl";
       const score = { gen: 90, same: 78, ctrl: 62 }[type] + (yang !== me.yang ? 6 : 0);
-      list.push({ element: el, yang, rel, score });
+      const stem = j * 2 + (yang ? 0 : 1);
+      const kango = Math.abs(stem - me.index) === 5;
+      const pair = STEM_PAIRS[me.index <= stem ? `${me.index}-${stem}` : `${stem}-${me.index}`];
+      list.push({ element: el, yang, rel, score, stem, kango, title: pair.title });
     });
   });
-  list.sort((a, b) => b.score - a.score || MATCH_RELATION[a.rel].order - MATCH_RELATION[b.rel].order);
+  // 同じ点数なら、干合（惹かれ合う組み合わせ）を上に
+  list.sort((a, b) => b.score - a.score || b.kango - a.kango || MATCH_RELATION[a.rel].order - MATCH_RELATION[b.rel].order);
   return list;
+}
+
+// 自分の本当の正体と「伝説の組み合わせ」になる相手（正体と、その正体の日干）
+function legendPartners(ti) {
+  if (!ti) return [];
+  return LEGEND_PAIRS.filter((p) => p.a === ti.name || p.b === ti.name).map((p) => {
+    const partner = TRUE_IDENTITIES.find((t) => t.name === (p.a === ti.name ? p.b : p.a));
+    return { name: partner.name, stem: partner.stem, title: p.title };
+  });
 }
 
 function matchLabel(m) {
@@ -89,26 +102,36 @@ function matchLabel(m) {
 }
 
 // 相性ランキングのカード（個人の診断結果と、相性診断の「1人だけ入力」で共通）
-function bestMatchesHTML(birthday, who) {
+// ti：自分の本当の正体（わかれば「伝説の組み合わせ」の相手も出す）
+function bestMatchesHTML(birthday, who, ti) {
   const ranking = matchRanking(birthday);
+  const legends = legendPartners(ti);
   const medal = ["🥇", "🥈", "🥉"];
+  const kangoTag = (m) => (m.kango ? '<span class="kango">💞 干合</span>' : "");
+  const legendFor = (m) => legends.filter((l) => l.stem === m.stem);
   const top = ranking.slice(0, 3).map((m, k) => {
     const el = ELEMENTS[m.element];
-    const pool = RESULTS[m.element];
-    const pick = m.yang ? 0 : 1;
+    const examples = TRUE_IDENTITIES.filter((t) => t.stem === m.stem).slice(0, 3).map((t) => t.name);
     return `<div class="match-item" style="--mc:${el.color}">
       <div class="match-head"><span class="medal">${medal[k]}</span>
-        <div><p class="match-type">${el.icon} ${matchLabel(m)}の人</p>
-        <p class="match-rel">${MATCH_RELATION[m.rel].name}・相性 ${m.score}%</p></div></div>
-      <p class="match-note">${MATCH_RELATION[m.rel].note}。</p>
-      <p class="match-eg">正体の例：${pool.japan[pick].name}、${pool.greece[pick].name}、${pool.yokai[pick].name} など</p>
+        <div><p class="match-type">${el.icon} ${matchLabel(m)}（${SC_STEMS[m.stem]}）の人</p>
+        <p class="match-rel">${MATCH_RELATION[m.rel].name}・相性 ${m.score}%${kangoTag(m)}</p></div></div>
+      <p class="match-title">「${m.title}」</p>
+      <p class="match-note">${MATCH_RELATION[m.rel].note}。${m.kango ? "四柱推命で強く惹かれ合うとされる「干合」で、恋愛はとくに好相性。" : ""}</p>
+      ${legendFor(m).map((l) => `<p class="match-legend">✨ 正体が${l.name}の人なら、伝説の組み合わせ「${l.title}」</p>`).join("")}
+      <p class="match-eg">正体の例：${examples.join("、")} など</p>
     </div>`;
   }).join("");
   const rest = ranking.slice(3).map((m, k) =>
-    `<li><span>${k + 4}位</span><b>${ELEMENTS[m.element].icon} ${matchLabel(m)}</b><em>${MATCH_RELATION[m.rel].name}</em><i>${m.score}%</i></li>`).join("");
+    `<li><span>${k + 4}位</span><b>${ELEMENTS[m.element].icon} ${matchLabel(m)}（${SC_STEMS[m.stem]}）</b><em>${MATCH_RELATION[m.rel].name}</em><i>${m.score}%</i>
+      <small>「${m.title}」${legendFor(m).map((l) => `・✨ ${l.name}なら伝説の組み合わせ`).join("")}</small></li>`).join("");
   return `<div class="card matches-card">
     <h3>💞 ${who}と相性のいい人</h3>
-    <p class="match-lead">相手の属性は、その人の生年月日で診断するとわかります。</p>
+    <p class="match-lead">相手のタイプ（日干）は、その人の生年月日で診断するとわかります。</p>
+    ${legends.length ? `<div class="legend-pair">
+      <p class="legend-badge">✨ ${ti.name}と「伝説の組み合わせ」になる相手</p>
+      <ul>${legends.map((l) => `<li><b>${l.name}</b>（${SC_STEMS[l.stem]}の人に多い正体）…「${l.title}」</li>`).join("")}</ul>
+    </div>` : ""}
     ${top}
     <details class="match-rest"><summary>4位以下も見る</summary><ol>${rest}</ol></details>
     <button type="button" class="match-go" data-bday="${birthday}">相手の生年月日で相性を診断する</button>
@@ -169,11 +192,16 @@ function legendPair(tiA, tiB) {
   return LEGEND_PAIRS.find((p) => (p.a === tiA.name && p.b === tiB.name) || (p.a === tiB.name && p.b === tiA.name)) || null;
 }
 
-function renderCompat(bdayA, nameA, bdayB, nameB) {
-  const c = compatibility(bdayA, bdayB);
+// 「あなた」の本当の正体。保存済みの生年月日と同じなら、出生時刻・出生地も使ってくわしく判定
+function ownTrueIdentity(bday) {
   let savedB = "", savedTime = "", savedPlace = "";
   try { savedB = localStorage.getItem("birthday") || ""; savedTime = localStorage.getItem("birthtime") || ""; savedPlace = localStorage.getItem("birthplace") || ""; } catch (e) {}
-  const tiA = savedB === bdayA ? trueIdentityFor(bdayA, savedTime, savedPlace) : trueIdentityFor(bdayA);
+  return savedB === bday ? trueIdentityFor(bday, savedTime, savedPlace) : trueIdentityFor(bday);
+}
+
+function renderCompat(bdayA, nameA, bdayB, nameB) {
+  const c = compatibility(bdayA, bdayB);
+  const tiA = ownTrueIdentity(bdayA);
   const tiB = trueIdentityFor(bdayB);
   const nA = nameA ? `${escapeHtml(nameA)}さん` : "あなた";
   const nB = nameB ? `${escapeHtml(nameB)}さん` : "お相手";
@@ -275,7 +303,7 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
     if (!b.value) {
       const out = document.getElementById("compat-result");
       const nA = na.value.trim();
-      out.innerHTML = bestMatchesHTML(a.value, nA ? `${escapeHtml(nA)}さん` : "あなた");
+      out.innerHTML = bestMatchesHTML(a.value, nA ? `${escapeHtml(nA)}さん` : "あなた", ownTrueIdentity(a.value));
       out.hidden = false;
       out.scrollIntoView({ behavior: "smooth" });
       return;

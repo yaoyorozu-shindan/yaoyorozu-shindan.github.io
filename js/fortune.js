@@ -543,7 +543,7 @@ function render(birthday, nickname, birthtime, birthplace) {
 
     ${stoneCard(birthday, stem)}
 
-    ${typeof bestMatchesHTML === "function" ? bestMatchesHTML(birthday, who) : ""}
+    ${typeof bestMatchesHTML === "function" ? bestMatchesHTML(birthday, who, ti.identity) : ""}
 
     <div class="card" id="today-card">
       <h3>${todayString().replace(/-/g, "/")} の運勢</h3>
