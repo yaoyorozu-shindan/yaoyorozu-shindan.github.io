@@ -264,6 +264,8 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
       ${affiliateLinks("ペアブレスレット 天然石", "ペアの天然石を探す")}
     </div>
 
+    ${consultCard("相性診断でわかるのは、ふたりの気質の組み合わせです。ふたりの関係について具体的に相談したいときは、プロの占い師に話を聞いてもらうのもひとつの方法です。")}
+
     <div class="share-area">
       <p class="share-title">相性をシェアする</p>
       <div class="share-btns">

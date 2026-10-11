@@ -264,6 +264,22 @@ function bookLinks(name) {
     <a href="${link("001004")}" target="_blank" rel="${rel}">小説</a></div>`;
 }
 
+// プロの占い師への相談（A8.net、js/config.js の consult）。金運・お金の話のそばには置かない
+function consultCard(lead) {
+  const list = (SITE_CONFIG.consult || []).filter((c) => c.href);
+  if (!list.length) return "";
+  return `<div class="card consult-card aff">
+    <span class="pr">PR</span>
+    <h3>💬 もっと深く占ってもらうなら</h3>
+    <p>${lead}</p>
+    <ul class="consult-list">${list.map((c) => `<li>
+      <a href="${c.href}" target="_blank" rel="sponsored noopener nofollow">${c.label}</a><small>${c.note}</small>
+      <img src="${c.pixel}" width="1" height="1" alt="" loading="lazy">
+    </li>`).join("")}</ul>
+    <p class="note">※キャンペーンの内容は変わることがあります。くわしくはリンク先でご確認ください。</p>
+  </div>`;
+}
+
 // 金運がいい日（★4以上）に出す、楽天toto（BIG・toto）の案内
 function lotteryCard(moneyScore) {
   if (moneyScore < 4) return "";
@@ -664,6 +680,8 @@ function render(birthday, nickname, birthtime, birthplace) {
     ${stoneCard(birthday, stem)}
 
     ${typeof bestMatchesHTML === "function" ? bestMatchesHTML(birthday, who, ti.identity) : ""}
+
+    ${consultCard("この診断でわかるのは、生まれ持った気質の傾向です。恋愛や人間関係の具体的な悩みは、プロの占い師に話を聞いてもらうのもひとつの方法です。")}
 
     <div class="card" id="today-card">
       <h3>${todayString().replace(/-/g, "/")} の運勢</h3>
