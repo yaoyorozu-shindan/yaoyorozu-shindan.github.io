@@ -22,82 +22,138 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-// data: { who, element, polarity, stemKanji, identities, shrine, power }
-function buildShareImage(data) {
-  const W = 1080, H = 1920;
-  const canvas = document.createElement("canvas");
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext("2d");
-
-  // 背景
-  const bg = ctx.createLinearGradient(0, 0, W * 0.4, H);
-  bg.addColorStop(0, data.element.color);
-  bg.addColorStop(1, "#1e1a33");
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, W, H);
-  ctx.fillStyle = "rgba(255,255,255,0.06)";
-  [[920, 260, 300], [120, 1500, 380], [980, 1650, 160]].forEach(([x, y, r]) => {
-    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
-  });
-  ctx.fillStyle = "rgba(255,255,255,0.08)";
-  ctx.font = `700 520px ${SHARE_FONT}`;
-  ctx.textAlign = "right";
-  ctx.fillText(data.element.name, W - 30, 760);
-
-  // 見出し：本当の正体を主役に
-  ctx.textAlign = "center";
-  ctx.fillStyle = "rgba(255,255,255,0.75)";
-  ctx.font = `700 44px ${SHARE_FONT}`;
-  ctx.fillText("⛩️ 八百万診断", W / 2, 150);
-  ctx.fillStyle = "#fff";
-  fitText(ctx, `${data.who}の本当の正体は——`, W / 2, 260, 900, 54, 700);
-  fitText(ctx, data.trueName || "", W / 2, 420, 960, 140, 800);
-  ctx.fillStyle = "rgba(255,255,255,0.9)";
-  // 漢字の名前なら読みがなを名前の下に入れ、キャッチコピーを少し下げる
-  if (data.trueKana) fitText(ctx, data.trueKana, W / 2, 475, 960, 36, 700);
-  fitText(ctx, data.trueCatch ? `「${data.trueCatch}」` : "", W / 2, data.trueKana ? 540 : 510, 960, 48, 700);
-  ctx.fillStyle = "rgba(255,255,255,0.75)";
-  ctx.font = `500 40px ${SHARE_FONT}`;
-  ctx.fillText(`${data.element.icon} ${data.polarity}の${data.element.name}（日干：${data.stemKanji}）`, W / 2, 600);
-
-  // 正体の一覧
-  const rows = [
-    ...CATEGORIES.map((c) => [c.label, data.identities[c.key].name]),
-    ["相性のいい神社", data.shrine.name],
-    ["守護パワーストーン", data.power.name],
-  ];
-  const top = 670, rowH = Math.min(96, Math.floor(940 / rows.length)), left = 110, right = W - 110;
-  ctx.fillStyle = "rgba(255,255,255,0.12)";
-  roundRect(ctx, 70, top, W - 140, rows.length * rowH + 50, 36);
-  ctx.fill();
-  rows.forEach(([label, name], i) => {
-    const y = top + 25 + i * rowH + Math.round(rowH * 0.65);
-    if (i > 0) {
-      ctx.fillStyle = "rgba(255,255,255,0.15)";
-      ctx.fillRect(left, y - Math.round(rowH * 0.69), right - left, 2);
+// 改行しながら中央に描画。長い名前・コピーも枠の中に収める。
+function shareTextLines(ctx, text, width, size, maxLines, weight = 500) {
+  let lines;
+  do {
+    ctx.font = `${weight} ${size}px ${SHARE_FONT}`;
+    lines = [''];
+    for (const char of Array.from(text)) {
+      if (char === '\n') { lines.push(''); continue; }
+      const last = lines.length - 1;
+      if (ctx.measureText(lines[last] + char).width > width && lines[last]) lines.push(char);
+      else lines[last] += char;
     }
-    ctx.textAlign = "left";
-    ctx.fillStyle = "rgba(255,255,255,0.7)";
-    ctx.font = `500 34px ${SHARE_FONT}`;
-    ctx.fillText(label, left, y);
-    ctx.textAlign = "right";
-    ctx.fillStyle = "#fff";
-    fitText(ctx, name, right, y, 560, 52, 700);
-  });
-
-  // フッター
-  ctx.textAlign = "center";
-  ctx.fillStyle = "#fff";
-  ctx.font = `700 48px ${SHARE_FONT}`;
-  ctx.fillText("あなたの正体も診断してみて！", W / 2, 1720);
-  ctx.fillStyle = "rgba(255,255,255,0.8)";
-  ctx.font = `500 40px ${SHARE_FONT}`;
-  ctx.fillText((SITE_CONFIG.siteUrl || location.origin).replace(/^https?:\/\//, "").replace(/\/$/, ""), W / 2, 1795);
-  ctx.fillText("#八百万診断", W / 2, 1860);
-
-  return new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+    if (lines.length <= maxLines || size <= 12) break;
+    size -= 2;
+  } while (true);
+  return { lines, size };
 }
 
+function drawShareLines(ctx, text, x, y, width, size, maxLines, weight = 500) {
+  const fitted = shareTextLines(ctx, text, width, size, maxLines, weight);
+  fitted.lines.forEach((line, i) => ctx.fillText(line, x, y + i * fitted.size * 1.4));
+  return fitted.lines.length * fitted.size * 1.4;
+}
+
+// CORSに対応した画像だけを描く。失敗時も保存できる光輪の絵を用意する。
+function loadSharePortrait(src) {
+  if (!src) return Promise.resolve(null);
+  return new Promise(resolve => {
+    const image = new Image();
+    let settled = false;
+    const finish = value => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      image.onload = image.onerror = null;
+      resolve(value);
+    };
+    const timer = setTimeout(() => finish(null), 4500);
+    image.crossOrigin = 'anonymous';
+    image.referrerPolicy = 'no-referrer';
+    image.onload = () => finish(image);
+    image.onerror = () => finish(null);
+    image.src = src;
+  });
+}
+
+async function buildShareImage(data) {
+  const asset = typeof IMAGES !== 'undefined' ? IMAGES[data.trueName] : null;
+  const image = await loadSharePortrait(asset && asset.src);
+  const W = 1080, H = 1920;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  const color = data.element.color;
+  const gold = '#efdaaa';
+  // 深い夜色と属性の光。外枠はストーリーズの上下UIから離して置く。
+  ctx.fillStyle = '#090d1d'; ctx.fillRect(0, 0, W, H);
+  const glow = ctx.createRadialGradient(540, 710, 40, 540, 710, 850);
+  glow.addColorStop(0, color); glow.addColorStop(.55, color + '66'); glow.addColorStop(1, '#090d1d00');
+  ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = '#efdaaa66'; ctx.lineWidth = 2;
+  roundRect(ctx, 54, 92, 972, 1720, 38); ctx.stroke();
+  ctx.strokeStyle = '#efdaaa26';
+  roundRect(ctx, 68, 106, 944, 1692, 30); ctx.stroke();
+  // 3重の光輪と、小さな星の装飾。
+  [402, 428, 460].forEach((radius, i) => {
+    ctx.beginPath(); ctx.arc(540, 710, radius, 0, Math.PI * 2);
+    ctx.strokeStyle = i === 1 ? '#efdaaa80' : '#efdaaa38';
+    ctx.lineWidth = i === 1 ? 3 : 1; ctx.stroke();
+  });
+  for (let i = 0; i < 56; i++) {
+    const angle = i * 2.39996, radius = 420 + i % 6 * 27;
+    const x = 540 + Math.cos(angle) * radius, y = 710 + Math.sin(angle) * radius;
+    ctx.fillStyle = i % 3 === 0 ? gold : '#ffffff75';
+    const r = i % 3 === 0 ? 4 : 2;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.textAlign = 'center';
+  ctx.fillStyle = gold;
+  ctx.font = `700 44px ${SHARE_FONT}`; ctx.fillText('八 百 万 診 断', 540, 198);
+  ctx.fillStyle = '#edf0fa';
+  fitText(ctx, `${data.who}の本当の正体は`, 540, 284, 880, 38, 500);
+  // 大きな画像。元の絵を切らず、縦横比を保って額の中に収める。
+  ctx.save();
+  roundRect(ctx, 186, 356, 708, 708, 100); ctx.clip();
+  ctx.fillStyle = '#101628'; ctx.fillRect(186, 356, 708, 708);
+  if (image) {
+    const scale = Math.min(708 / image.naturalWidth, 708 / image.naturalHeight);
+    const w = image.naturalWidth * scale, h = image.naturalHeight * scale;
+    ctx.drawImage(image, 540 - w / 2, 710 - h / 2, w, h);
+  } else {
+    const mist = ctx.createRadialGradient(540, 710, 10, 540, 710, 360);
+    mist.addColorStop(0, color); mist.addColorStop(1, '#101628');
+    ctx.fillStyle = mist; ctx.fillRect(186, 356, 708, 708);
+    ctx.fillStyle = gold; ctx.font = `500 240px ${SHARE_FONT}`;
+    ctx.fillText(data.element.name, 540, 786);
+    ctx.font = `500 28px ${SHARE_FONT}`; ctx.fillText('神話と伝承に宿る、あなたの姿', 540, 910);
+  }
+  ctx.restore();
+  ctx.strokeStyle = '#efdaaaa0'; ctx.lineWidth = 3;
+  roundRect(ctx, 186, 356, 708, 708, 100); ctx.stroke();
+  // 画像の下に大きな名前。情報は主役に必要なものだけ。
+  ctx.fillStyle = gold;
+  fitText(ctx, data.trueName || '', 540, 1198, 900, 116, 800);
+  const kanaY = 1256;
+  if (data.trueKana) {
+    ctx.fillStyle = '#d2ccdf'; fitText(ctx, data.trueKana, 540, kanaY, 860, 28, 500);
+  }
+  const catchY = 1320;
+  ctx.fillStyle = '#fff5e3';
+  drawShareLines(ctx, data.trueCatch ? `「${data.trueCatch}」` : '', 540, catchY, 864, 42, 2, 700);
+  ctx.fillStyle = '#efdaaa'; ctx.font = `700 32px ${SHARE_FONT}`;
+  ctx.fillText(`${data.polarity}の${data.element.name}  ·  日干 ${data.stemKanji}`, 540, 1470);
+  // 保存先でも作者・ライセンス・出典を確認できるよう、画像内に残す。
+  if (image && asset) {
+    ctx.fillStyle = '#c0bacd';
+    const creditY = 1530;
+    const height = drawShareLines(ctx, '画像：' + asset.credit, 540, creditY, 876, 22, 2);
+    const source = new URL(asset.page || asset.src, location.href).href;
+    drawShareLines(ctx, '出典：' + source, 540, creditY + height + 4, 876, 18, 4);
+  }
+  ctx.strokeStyle = '#efdaaa50'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(240, 1656); ctx.lineTo(840, 1656); ctx.stroke();
+  ctx.fillStyle = '#fff5e3'; ctx.font = `700 38px ${SHARE_FONT}`;
+  ctx.fillText('あなたは、100の正体のどれ？', 540, 1716);
+  ctx.fillStyle = '#d8d0e5'; ctx.font = `500 28px ${SHARE_FONT}`;
+  ctx.fillText((SITE_CONFIG.siteUrl || location.origin).replace(/^https?:\/\//, '').replace(/\/$/, ''), 540, 1766);
+  // ハッシュタグは画面下端の操作ボタンと重ならない位置へ。
+  ctx.fillStyle = gold; ctx.font = `700 32px ${SHARE_FONT}`;
+  ctx.fillText('#八百万診断', 540, 1850);
+  return new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Image export failed')), 'image/png'));
+}
 // 画像を先に用意し、次のタップで共有する（Safariの操作判定を保つ）。
 async function shareToInstagram(data, previewEl, text, builder) {
   const request = {};
