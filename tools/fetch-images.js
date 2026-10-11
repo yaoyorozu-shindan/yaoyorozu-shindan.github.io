@@ -7,6 +7,23 @@ eval(fs.readFileSync(site + "/js/true-identity-a.js", "utf8") + fs.readFileSync(
 // 絵として合わない画像は使わない（系図・動画・ロゴ・無関係な風景など）
 const SKIP_FILES = ["Descendants_of_Izanami_alone.svg", "Gongenyama_Mt_Kimotsuki_Kagoshima.jpg", "Mayoiga_8086294422_ff2f173cf1_k.jpg",
   "Children_born_from_the_Challenge_of_Amaterasu_and_Susanoo.svg", "Sol_de_Mayo-Bandera_de_Argentina.svg", "Kinkaku-ji_04.jpg"];
+// Wikipedia の記事の画像が使えない・合わないときに、Commons の画像を名前ごとに指定する
+const PICK_FILES = {
+  "鳳凰": "Yu_Sheng_-_Fenghuang_-_18th-century.jpg",
+  "ブリギッド": "Thecomingofbrideduncan1917.jpg",
+  "ティアマト": "Marduk_Tiamat_Battle_from_Enuma_Elish_-_repaired_version.png",
+  "ルー": "Lugh_spear_Millar.jpg",
+  "アプロディーテー": "Aphrodite_Naples_Fréjus_-_Musée_du_Louvre_AGER_Ma_335_;_MR_369_;_N_530.jpg",
+};
+// サイト内に置いたオリジナル画像（AIで作った絵など）。Wikimedia より優先する
+// src は img/ からのパス、credit は画像の下に出る文字
+const LOCAL_IMAGES = {
+};
+const commonsThumb = (file) => {
+  const f = file.replace(/ /g, "_"), h = require("crypto").createHash("md5").update(f).digest("hex");
+  const enc = encodeURIComponent(f);
+  return `https://thumb.wikimedia.org/wikipedia/commons/thumb/${h[0]}/${h.slice(0, 2)}/${enc}/500px-${enc}${/.(svg)$/i.test(f) ? ".png" : ""}`;
+};
 const entries = [];
 for (const v of Object.values(R)) for (const arr of Object.values(v)) for (const e of arr) entries.push(e);
 for (const e of T) entries.push(e);
@@ -37,7 +54,9 @@ async function getJson(u) {
     }
     await sleep(3000);
   }
-  const files = [...new Set(Object.values(byWiki).map((x) => "File:" + x.file))];
+  const byName = {};
+  for (const [name, file] of Object.entries(PICK_FILES)) byName[name] = { file, src: commonsThumb(file) };
+  const files = [...new Set([...Object.values(byWiki), ...Object.values(byName)].map((x) => "File:" + x.file))];
   const meta = {};
   for (let i = 0; i < files.length; i += 45) {
     const u = "https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=imageinfo&iiprop=extmetadata|url&titles=" + encodeURIComponent(files.slice(i, i + 45).join("|"));
@@ -55,7 +74,12 @@ async function getJson(u) {
   const lines = [];
   let missingMeta = 0;
   for (const e of entries) {
-    const x = byWiki[e.wiki];
+    if (LOCAL_IMAGES[e.name]) {
+      const l = LOCAL_IMAGES[e.name];
+      lines.push(`  ${JSON.stringify(e.name)}: ${JSON.stringify({ src: l.src, credit: l.credit, page: l.src })},`);
+      continue;
+    }
+    const x = byName[e.name] || byWiki[e.wiki];
     if (!x) continue;
     const m = meta[x.file];
     if (!m || !m.license) { missingMeta++; console.log("NO LICENSE:", e.name, x.file); continue; }

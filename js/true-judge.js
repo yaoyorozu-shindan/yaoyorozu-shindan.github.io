@@ -43,3 +43,8 @@ function judgeTrueIdentity(birthday, fp, wc, zw) {
     detailed: !!(zw && wc && wc.asc),
   };
 }
+
+// 正体の名前（漢字なら上に読みがなを付ける）
+function nameRuby(t) {
+  return t.kana ? `<ruby>${t.name}<rt>${t.kana}</rt></ruby>` : t.name;
+}

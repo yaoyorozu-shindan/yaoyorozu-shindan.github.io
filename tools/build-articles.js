@@ -47,8 +47,9 @@ function travelButtons(s) {
 function figure(name, small) {
   const img = IMAGES[name];
   if (!img) return "";
-  return `<figure class="a-fig${small ? " small" : ""}"><img src="${img.src}" alt="${name}" loading="lazy" referrerpolicy="no-referrer">
-      <figcaption><a href="${img.page}" target="_blank" rel="noopener">画像: ${img.credit}</a></figcaption></figure>`;
+  const up = (u) => (/^https?:/.test(u) ? u : "../" + u); // サイト内の画像は記事フォルダから1つ上
+  return `<figure class="a-fig${small ? " small" : ""}"><img src="${up(img.src)}" alt="${name}" loading="lazy" referrerpolicy="no-referrer">
+      <figcaption><a href="${up(img.page)}" target="_blank" rel="noopener">画像: ${img.credit}</a></figcaption></figure>`;
 }
 
 const label = (el, yang) => `${yang ? "陽" : "陰"}の${ELEMENTS[el].name}`;
@@ -417,12 +418,12 @@ function trueIdentitiesArticle() {
     return `
     <h2 id="stem-${i}">${ELEMENTS[el].icon} ${k}（${yomi}）の正体10体</h2>
     <p>${k}は${label(el, i % 2 === 0)}。イメージは「${img}」です。日干が${k}の人は、次の10体のどれかが本当の正体になります。</p>
-    <p class="ti-index">${list.map(({ t, n }) => `<a href="#ti-${n + 1}">${t.name}</a>`).join("／")}</p>
+    <p class="ti-index">${list.map(({ t, n }) => `<a href="#ti-${n + 1}">${t.name}${t.kana ? `（${t.kana}）` : ""}</a>`).join("／")}</p>
     ${list.map(({ t, n }) => `
     <section class="ti-entry" id="ti-${n + 1}">
       ${figure(t.name, true)}
       <p class="ti-origin">${t.origin}・${t.type}</p>
-      <h3>${t.name}</h3>
+      <h3>${t.kana ? `<ruby>${t.name}<rt>${t.kana}</rt></ruby>` : t.name}</h3>
       <p class="ti-catch">「${t.catch}」</p>
       <p>${t.essence}</p>
       <dl class="ti-dl">

@@ -150,7 +150,7 @@ function pairCard(tiA, tiB, nA, nB, c) {
   const side = (ti, n) => `<div class="pair-ti">
       ${artFor(ti.name, "true", ELEMENTS[SC_ELEMENTS[Math.floor(ti.stem / 2)]])}
       <p class="pair-ti-who">${n}の正体</p>
-      <p class="pair-ti-name">${ti.name}</p>
+      <p class="pair-ti-name">${nameRuby(ti)}</p>
       <p class="pair-ti-catch">${ti.catch}</p>
     </div>`;
   const byKey = { A: tiA, B: tiB };

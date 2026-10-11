@@ -53,7 +53,9 @@ function buildShareImage(data) {
   fitText(ctx, `${data.who}の本当の正体は——`, W / 2, 260, 900, 54, 700);
   fitText(ctx, data.trueName || "", W / 2, 420, 960, 140, 800);
   ctx.fillStyle = "rgba(255,255,255,0.9)";
-  fitText(ctx, data.trueCatch ? `「${data.trueCatch}」` : "", W / 2, 510, 960, 48, 700);
+  // 漢字の名前なら読みがなを名前の下に入れ、キャッチコピーを少し下げる
+  if (data.trueKana) fitText(ctx, data.trueKana, W / 2, 475, 960, 36, 700);
+  fitText(ctx, data.trueCatch ? `「${data.trueCatch}」` : "", W / 2, data.trueKana ? 540 : 510, 960, 48, 700);
   ctx.fillStyle = "rgba(255,255,255,0.75)";
   ctx.font = `500 40px ${SHARE_FONT}`;
   ctx.fillText(`${data.element.icon} ${data.polarity}の${data.element.name}（日干：${data.stemKanji}）`, W / 2, 600);

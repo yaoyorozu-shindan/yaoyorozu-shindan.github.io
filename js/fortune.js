@@ -387,7 +387,7 @@ function trueIdentityCard(ti, who, element) {
     <p class="ti-lead">${who}の本当の正体は——</p>
     ${artFor(c.name, "true", element)}
     <p class="ti-origin">${c.origin}・${c.type}</p>
-    <h2 class="ti-name">${c.name}</h2>
+    <h2 class="ti-name">${nameRuby(c)}</h2>
     <p class="ti-catch">「${c.catch}」</p>
     <div class="ti-body">
       ${sec("🔮", "本質", c.essence)}
@@ -533,7 +533,7 @@ function render(birthday, nickname, birthtime, birthplace) {
   `;
   const shareData = {
     who: nickname ? `${nickname}さん` : "あなた",
-    trueName: ti.identity.name, trueCatch: ti.identity.catch,
+    trueName: ti.identity.name, trueKana: ti.identity.kana || "", trueCatch: ti.identity.catch,
     element, polarity, stemKanji: stem.kanji, identities, shrine,
     power: POWER_STONES[stem.element][stem.yang ? "yang" : "yin"],
   };
