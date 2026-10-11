@@ -365,3 +365,25 @@ a { color: var(--accent); }
   background: linear-gradient(135deg, var(--accent), #9a6fd6); }
 .welcome-btns button.sub { background: #fff; color: var(--accent); border: 2px solid var(--accent-2); }
 .element-card + .share-area { margin: 16px 0; }
+
+/* ---- くわしく診断の入力 ---- */
+.detail-input { margin-top: 10px; border: 1px dashed var(--accent-2); border-radius: 10px; padding: 8px 12px; }
+.detail-input summary { cursor: pointer; font-weight: 700; color: var(--accent); font-size: 0.92rem; }
+.detail-input[open] { display: flex; flex-direction: column; gap: 6px; }
+.detail-note { font-size: 0.8rem; color: var(--muted); margin: 6px 0 0; }
+.detail-input select { font-size: 1rem; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; font-family: inherit; background: #fff; }
+
+/* ---- 命式 ---- */
+.meishiki { width: 100%; border-collapse: separate; border-spacing: 6px; table-layout: fixed; text-align: center; }
+.meishiki th { font-size: 0.8rem; color: var(--muted); font-weight: 700; }
+.meishiki tbody td { background: color-mix(in srgb, var(--c) 14%, #fff); border: 2px solid var(--c); border-radius: 10px; padding: 6px 0; }
+.meishiki tbody td b { display: block; font-size: 1.6rem; line-height: 1.2; color: var(--c); }
+.meishiki tbody td small { font-size: 0.7rem; color: var(--muted); }
+.meishiki td.empty { background: #f4f2f8 !important; border: 2px dashed var(--border) !important; color: var(--muted); }
+.meishiki tfoot td { font-size: 0.85rem; font-weight: 700; color: var(--muted); }
+.meishiki-card h4 { margin: 14px 0 6px; }
+.gx-row { display: grid; grid-template-columns: 3.5em 1fr 1.5em; align-items: center; gap: 8px; margin: 6px 0; font-size: 0.9rem; }
+.gx-row b { text-align: right; }
+.gx-track { height: 12px; background: var(--border); border-radius: 999px; overflow: hidden; }
+.gx-fill { height: 100%; border-radius: 999px; }
+.gx-advice { font-size: 0.92rem; }

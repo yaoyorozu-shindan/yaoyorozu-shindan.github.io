@@ -250,6 +250,40 @@ function lotteryCard(moneyScore) {
   </div>`;
 }
 
+// 四柱推命の命式と五行バランスのカード
+const ELEMENT_LUCK = {
+  wood: { color: "緑・青", dir: "東" }, fire: { color: "赤・オレンジ", dir: "南" }, earth: { color: "黄・ベージュ", dir: "中央（家の中心）" },
+  metal: { color: "白・金・銀", dir: "西" }, water: { color: "黒・紺", dir: "北" },
+};
+function meishikiCard(fp) {
+  const cols = [["時柱", fp.pillars.hour], ["日柱", fp.pillars.day], ["月柱", fp.pillars.month], ["年柱", fp.pillars.year]];
+  const cell = (p, key) => p ? `<td style="--c:${ELEMENTS[key === "stem" ? p.stemElement : p.branchElement].color}"><b>${key === "stem" ? SC_STEMS[p.stem] : SC_BRANCHES[p.branch]}</b><small>${ELEMENTS[key === "stem" ? p.stemElement : p.branchElement].name}</small></td>` : `<td class="empty">—</td>`;
+  const max = Math.max(...Object.values(fp.balance));
+  const order = ["wood", "fire", "earth", "metal", "water"];
+  const bars = order.map((el) => `<div class="gx-row"><span>${ELEMENTS[el].icon} ${ELEMENTS[el].name}</span>
+      <div class="gx-track"><div class="gx-fill" style="width:${(fp.balance[el] / fp.total) * 100}%;background:${ELEMENTS[el].color}"></div></div><b>${fp.balance[el]}</b></div>`).join("");
+  const strong = order.filter((el) => fp.balance[el] === max);
+  const lacking = order.filter((el) => fp.balance[el] === 0);
+  const name = (els) => els.map((el) => `「${ELEMENTS[el].name}」`).join("");
+  let advice = `いちばん多いのは${name(strong)}の気。${strong.map((el) => ELEMENTS[el].trait.split("。")[0]).join("。")}。`;
+  if (lacking.length) {
+    advice += ` 一方で${name(lacking)}の気が見当たりません。${lacking.map((el) => `${ELEMENTS[el].name}の気は、${ELEMENT_LUCK[el].color}の小物や${ELEMENT_LUCK[el].dir}の方角で補うとよいとされます`).join("。")}。`;
+  } else {
+    advice += " 五行がすべてそろっている、バランスのよい命式です。";
+  }
+  return `<div class="card meishiki-card">
+    <h3>📜 四柱推命の命式</h3>
+    <table class="meishiki"><thead><tr>${cols.map(([l]) => `<th>${l}</th>`).join("")}</tr></thead>
+      <tbody><tr>${cols.map(([, p]) => cell(p, "stem")).join("")}</tr><tr>${cols.map(([, p]) => cell(p, "branch")).join("")}</tr></tbody>
+      <tfoot><tr>${cols.map(([, p]) => `<td>${p ? p.kanji : ""}</td>`).join("")}</tr></tfoot></table>
+    <h4>五行バランス</h4>
+    <div class="gx">${bars}</div>
+    <p class="gx-advice">${advice}</p>
+    ${fp.hasTime ? "" : '<p class="note">※出生時刻を入れると「時柱」も出て、五行バランスがより正確になります（「くわしく診断する」から入力）。</p>'}
+    <p class="note">※節入り（月の切り替わり）の前後数十分に生まれた方は、月柱が前後する場合があります。</p>
+  </div>`;
+}
+
 function wikiUrl(title) {
   return `https://ja.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, "_"))}`;
 }
@@ -262,7 +296,8 @@ function spotList(shrine) {
   return `<div class="spots"><p class="travel-title">📍 周辺の観光スポット</p><ul>${items}</ul></div>`;
 }
 
-function render(birthday, nickname) {
+function render(birthday, nickname, birthtime) {
+  const fp = fourPillars(birthday, birthtime || "");
   const dx = diagnose(birthday);
   const daily = dailyFortune(birthday, todayString());
   const { element, stem, identities, shrine } = dx;
@@ -317,6 +352,8 @@ function render(birthday, nickname) {
       </div>
       <div id="insta-preview" class="insta-preview" hidden></div>
     </div>
+
+    ${meishikiCard(fp)}
 
     <h3 class="section-title">${who}の正体</h3>
     ${SITE_CONFIG.rakutenAffiliateId ? '<p class="pr-line">PR：漫画・小説のリンクは楽天ブックスのアフィリエイトリンクです</p>' : ""}
@@ -377,25 +414,30 @@ document.getElementById("year").textContent = new Date().getFullYear();
 const form = document.getElementById("fortune-form");
 const birthdayInput = document.getElementById("birthday");
 const nicknameInput = document.getElementById("nickname");
+const birthtimeInput = document.getElementById("birthtime");
+const birthplaceInput = document.getElementById("birthplace");
 birthdayInput.max = todayString();
 
 // 入力内容は本人のブラウザ内にだけ保存（サーバーには送らない）
 try {
   birthdayInput.value = localStorage.getItem("birthday") || "";
   nicknameInput.value = localStorage.getItem("nickname") || "";
+  birthtimeInput.value = localStorage.getItem("birthtime") || "";
+  birthplaceInput.value = localStorage.getItem("birthplace") || "";
+  if (birthtimeInput.value || birthplaceInput.value) document.getElementById("detail-input").open = true;
 } catch (e) {}
 
 // 前に診断したことがある人には「おかえりなさい」バナーを出す
 (function () {
-  let saved = "", name = "";
-  try { saved = localStorage.getItem("birthday") || ""; name = localStorage.getItem("nickname") || ""; } catch (e) {}
+  let saved = "", name = "", time = "";
+  try { saved = localStorage.getItem("birthday") || ""; name = localStorage.getItem("nickname") || ""; time = localStorage.getItem("birthtime") || ""; } catch (e) {}
   if (!saved) return;
   const box = document.getElementById("welcome-back");
   const who = name ? `${escapeHtml(name)}さん` : "";
   box.querySelector(".welcome-msg").innerHTML = `おかえりなさい${who ? "、" + who : ""}！<br><small>今日の運勢は毎日変わります。</small>`;
   box.hidden = false;
   const show = (targetId) => {
-    render(saved, name);
+    render(saved, name, time);
     setTimeout(() => document.getElementById(targetId).scrollIntoView({ behavior: "smooth", block: "start" }), 50);
   };
   document.getElementById("wb-today").addEventListener("click", () => show("today-card"));
@@ -410,6 +452,8 @@ form.addEventListener("submit", (e) => {
   try {
     localStorage.setItem("birthday", birthday);
     localStorage.setItem("nickname", nickname);
+    localStorage.setItem("birthtime", birthtimeInput.value);
+    localStorage.setItem("birthplace", birthplaceInput.value);
   } catch (e) {}
-  render(birthday, nickname);
+  render(birthday, nickname, birthtimeInput.value);
 });
