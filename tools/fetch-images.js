@@ -17,7 +17,16 @@ const PICK_FILES = {
 };
 // サイト内に置いたオリジナル画像（AIで作った絵など）。Wikimedia より優先する
 // src は img/ からのパス、credit は画像の下に出る文字
+const AI_CREDIT = "AI生成イラスト（八百万診断オリジナル）";
 const LOCAL_IMAGES = {
+  "ダグザ": { src: "img/true/dagda.jpg", credit: AI_CREDIT },
+  "オオヤマクイ": { src: "img/true/oyamakui.jpg", credit: AI_CREDIT },
+  "スセリビメ": { src: "img/true/suseribime.jpg", credit: AI_CREDIT },
+  "ケサランパサラン": { src: "img/true/kesaranpasaran.jpg", credit: AI_CREDIT },
+  "インティ": { src: "img/true/inti.jpg", credit: AI_CREDIT },
+  "共工": { src: "img/true/kyoko.jpg", credit: AI_CREDIT },
+  "瀬織津姫": { src: "img/true/seoritsuhime.jpg", credit: AI_CREDIT },
+  "イチキシマヒメ": { src: "img/true/ichikishimahime.jpg", credit: AI_CREDIT },
 };
 const commonsThumb = (file) => {
   const f = file.replace(/ /g, "_"), h = require("crypto").createHash("md5").update(f).digest("hex");

@@ -54,6 +54,7 @@ js/date-select.js  生年月日の入力を「年・月・日」を選ぶ形に�
 js/*.js            各占いのロジック（上の表）
 articles/          記事（tools/build-articles.js で自動生成。直接編集しない）
 img/ogp.png        SNSでリンクを貼ったときの画像
+img/true/          AIで作った正体の絵（900px幅のJPEGに縮小して置く）
 tools/             更新用のスクリプト
 ```
 
@@ -78,7 +79,7 @@ tools/             更新用のスクリプト
 ## 6. これからのアイデア（優先度順の目安）
 - ~~相性診断に「ふたりの本当の正体」の組み合わせを出す~~（完了）
 - ~~記事「本当の正体100体の図鑑」を追加~~（完了：`articles/true-identities.html`。診断結果から該当の正体へリンク）
-- 絵のない正体の画像：5体は Commons の絵を指定済み（`tools/fetch-images.js` の `PICK_FILES`）。残り8体は ChatGPT で作成中（お願い文は `tools/ai-image-prompts.md`。できた絵は `img/true/` に置き、`LOCAL_IMAGES` に登録）
+- ~~絵のない正体13体の画像~~（完了：5体は Commons の絵を `tools/fetch-images.js` の `PICK_FILES` で指定、8体は ChatGPT で作成して `img/true/` に置き `LOCAL_IMAGES` に登録。お願い文の例は `tools/ai-image-prompts.md`）
 - 7カテゴリの候補にも短所を追加
 - ゆかりの地・パワースポット巡り（神話・怪異の伝承地を地図で）
 - 姓名判断、宿曜占星術、一日一回の易（断易）
