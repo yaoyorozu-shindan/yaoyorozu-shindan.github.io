@@ -640,3 +640,16 @@ a { color: var(--accent); }
 .ks-sub { font-size: 0.9rem; }
 .ks-year { margin: 12px 0; padding: 12px 14px; border-radius: 12px; background: #fff7e0; }
 .ks-theme { margin: 2px 0 6px; font-size: 1.15rem; font-weight: 800; }
+
+/* ---- 結果の折りたたみ ---- */
+.fold-guide { margin: 18px 0 6px; text-align: center; font-size: 0.85rem; color: var(--muted); }
+.fold { margin: 10px 0; border: 1px solid var(--border); border-radius: 16px; background: var(--card); overflow: hidden; }
+.fold > summary { list-style: none; cursor: pointer; padding: 14px 44px 14px 16px; position: relative; display: flex; flex-direction: column; gap: 2px; }
+.fold > summary::-webkit-details-marker { display: none; }
+.fold > summary::after { content: "＋"; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-weight: 800; color: var(--accent); }
+.fold[open] > summary::after { content: "－"; }
+.fold[open] > summary { border-bottom: 1px solid var(--border); }
+.fold-title { font-weight: 800; font-size: 1.05rem; }
+.fold-preview { font-size: 0.82rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fold-body { padding: 4px 10px 10px; background: var(--bg); }
+.fold-body > .card:first-child, .fold-body > .section-title:first-child { margin-top: 10px; }

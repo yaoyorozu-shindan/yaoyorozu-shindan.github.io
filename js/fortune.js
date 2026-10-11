@@ -605,6 +605,14 @@ function spotList(shrine) {
   return `<div class="spots"><p class="travel-title">📍 周辺の観光スポット</p><ul>${items}</ul></div>`;
 }
 
+// 結果の折りたたみ（id：開くときの目印、preview：閉じていても見える一言）
+function fold(id, title, preview, inner, open) {
+  return `<details class="fold" id="${id}"${open ? " open" : ""}>
+    <summary><span class="fold-title">${title}</span><span class="fold-preview">${preview}</span></summary>
+    <div class="fold-body">${inner}</div>
+  </details>`;
+}
+
 function render(birthday, nickname, birthtime, birthplace) {
   const fp = fourPillars(birthday, birthtime || "", utcOffsetHours(birthplace, birthday, birthtime));
   const wc = typeof Astronomy !== "undefined" ? westernChart(birthday, birthtime || "", birthplace || "") : null;
@@ -660,53 +668,16 @@ function render(birthday, nickname, birthtime, birthplace) {
       <div id="insta-preview" class="insta-preview" hidden></div>
     </div>
 
-    <div class="card element-card">
-      <div class="element-icon" aria-hidden="true">${element.icon}</div>
-      <p class="sub">${who}の属性は</p>
-      <h2>${polarity}の${element.name}</h2>
-      <p class="stem">日干：${stem.kanji}</p>
-      <p>${element.trait}</p>
-      <p class="polarity">${element[stem.yang ? "yang" : "yin"]}</p>
-      <a class="read-more" href="articles/element-${stem.element}.html">「${element.name}」属性について詳しく読む →</a>
-    </div>
+    <p class="fold-guide">気になるところを開いてください 👇</p>
 
-
-    ${meishikiCard(fp)}
-
-    ${wc ? horoscopeCard(wc) : ""}
-
-    ${ziweiCard(zw)}
-
-    ${sukuyoCard(birthday, zw)}
-
-    ${typeof kyuseiCardHTML === "function" ? kyuseiCardHTML(birthday, fp) : ""}
-
+    ${fold("fold-worlds", "🌏 別の世界に生まれていたら…", `${identities.japan.name}・${identities.greece.name}・${identities.yokai.name} ほか`, `
     <h3 class="section-title">別の世界に生まれていたら…</h3>
     <p class="section-sub">神話や伝承の7つの世界での、${who}の姿</p>
     ${SITE_CONFIG.rakutenAffiliateId ? '<p class="pr-line">PR：漫画・小説のリンクは楽天ブックスのアフィリエイトリンクです</p>' : ""}
     <div class="id-grid">${idCards}</div>
+    `, true)}
 
-    <div class="card shrine-card">
-      ${artFor(shrine.name, "shrine", element)}
-      <p class="id-label">相性のいい神社</p>
-      <h3>⛩️ ${shrine.name}</h3>
-      <p class="shrine-meta">${shrine.area}／ご祭神：${shrine.deity}</p>
-      <p>${shrine.desc}</p>
-      <div class="shrine-btns">
-        <a class="map-btn" href="${mapUrl}" target="_blank" rel="noopener">地図で見る</a>
-        <a class="map-btn" href="${wikiUrl(shrine.wiki)}" target="_blank" rel="noopener">Wikipedia ↗</a>
-      </div>
-      ${spotList(shrine)}
-      ${travelLinks(shrine)}
-      ${affiliateLinks("御朱印帳", "御朱印帳を探す")}
-    </div>
-
-    ${stoneCard(birthday, stem)}
-
-    ${typeof bestMatchesHTML === "function" ? bestMatchesHTML(birthday, who, ti.identity) : ""}
-
-    ${consultCard("この診断でわかるのは、生まれ持った気質の傾向です。恋愛や人間関係の具体的な悩みは、プロの占い師に話を聞いてもらうのもひとつの方法です。")}
-
+    ${fold("fold-today", "🔮 今日の運勢・易・ラッキー", `総合運 ${stars(daily.scores.overall)}`, `
     <div class="card" id="today-card">
       <h3>${todayString().replace(/-/g, "/")} の運勢</h3>
       ${luckRows}
@@ -725,7 +696,54 @@ function render(birthday, nickname, birthtime, birthplace) {
       ${affiliateLinks(daily.luckyItem.keyword, "探す")}
       <p class="advice">💡 ${daily.advice}</p>
     </div>
+    `)}
 
+    ${fold("fold-detail", "🔭 占いのくわしい結果", "属性・四柱推命・西洋占星術・紫微斗数・宿曜・九星気学", `
+    <div class="card element-card">
+      <div class="element-icon" aria-hidden="true">${element.icon}</div>
+      <p class="sub">${who}の属性は</p>
+      <h2>${polarity}の${element.name}</h2>
+      <p class="stem">日干：${stem.kanji}</p>
+      <p>${element.trait}</p>
+      <p class="polarity">${element[stem.yang ? "yang" : "yin"]}</p>
+      <a class="read-more" href="articles/element-${stem.element}.html">「${element.name}」属性について詳しく読む →</a>
+    </div>
+
+    ${meishikiCard(fp)}
+
+    ${wc ? horoscopeCard(wc) : ""}
+
+    ${ziweiCard(zw)}
+
+    ${sukuyoCard(birthday, zw)}
+
+    ${typeof kyuseiCardHTML === "function" ? kyuseiCardHTML(birthday, fp) : ""}
+    `)}
+
+    ${fold("fold-shrine", "⛩️ 相性のいい神社と守護石", shrine.name, `
+    <div class="card shrine-card">
+      ${artFor(shrine.name, "shrine", element)}
+      <p class="id-label">相性のいい神社</p>
+      <h3>⛩️ ${shrine.name}</h3>
+      <p class="shrine-meta">${shrine.area}／ご祭神：${shrine.deity}</p>
+      <p>${shrine.desc}</p>
+      <div class="shrine-btns">
+        <a class="map-btn" href="${mapUrl}" target="_blank" rel="noopener">地図で見る</a>
+        <a class="map-btn" href="${wikiUrl(shrine.wiki)}" target="_blank" rel="noopener">Wikipedia ↗</a>
+      </div>
+      ${spotList(shrine)}
+      ${travelLinks(shrine)}
+      ${affiliateLinks("御朱印帳", "御朱印帳を探す")}
+    </div>
+
+    ${stoneCard(birthday, stem)}
+    `)}
+
+    ${fold("fold-match", "💞 相性のいい人", "あなたと相性のいいタイプ", `
+    ${typeof bestMatchesHTML === "function" ? bestMatchesHTML(birthday, who, ti.identity) : ""}
+    `)}
+
+    ${consultCard("この診断でわかるのは、生まれ持った気質の傾向です。恋愛や人間関係の具体的な悩みは、プロの占い師に話を聞いてもらうのもひとつの方法です。")}
   `;
   const shareData = {
     who: nickname ? `${nickname}さん` : "あなた",
@@ -794,7 +812,10 @@ try {
   box.hidden = false;
   const show = (targetId) => {
     render(saved, name, time, place);
-    setTimeout(() => document.getElementById(targetId).scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+    const target = document.getElementById(targetId);
+    const folded = target.closest("details");
+    if (folded) folded.open = true; // 折りたたみの中なら開いてから移動
+    setTimeout(() => target.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
   };
   document.getElementById("wb-today").addEventListener("click", () => show("today-card"));
   document.getElementById("wb-result").addEventListener("click", () => show("result"));
