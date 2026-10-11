@@ -485,6 +485,53 @@ function startIdentityReveal(root) {
   observer.observe(stage);
 }
 
+// 得点が加わった情報だけで、正体への道筋を説明する。
+function trueIdentityWhy(ti) {
+  const c = ti.identity;
+  const el = ELEMENTS[SC_ELEMENTS[Math.floor(c.stem / 2)]];
+  const polarity = c.stem % 2 === 0 ? '陽' : '陰';
+  const stemMotifs = [
+    '大樹のように、まっすぐ伸びる成長と開拓の気質',
+    '草花のように、しなやかにつながる柔軟な気質',
+    '太陽のように、周りを明るく照らす情熱の気質',
+    '灯火のように、身近な人をあたためる気質',
+    '山のように、どっしりと支える安定の気質',
+    '畑のように、受け止めて育む包容の気質',
+    '鋼のように、道を切り開く決断の気質',
+    '宝石のように、繊細に磨き上げる気質',
+    '大海のように、広く動いていく自由な気質',
+    '雨や露のように、静かに染みわたる気質',
+  ];
+  const westTraits = {
+    fire: '情熱や行動力', earth: '安定や着実さ',
+    air: '好奇心や自由な発想', water: '共感や心の深さ',
+  };
+  const signals = ti.signals || [];
+  const west = signals.some(signal => signal.kind === 'west');
+  const ziwei = signals.some(signal => signal.kind === 'ziwei');
+  const layers = [
+    ...(west ? [`西洋占星術の「${WEST_NAME[c.west]}」に結びつく${westTraits[c.west]}`] : []),
+    ...(ziwei ? ['紫微斗数の命宮の星が示す本質の手がかり'] : []),
+  ];
+  const story = layers.length
+    ? `生まれた日の「${polarity}の${el.name}」を土台に、${layers.join('と')}が重なりました。この重なりを「${c.catch}」という姿にたとえて、${c.name}を選んでいます。`
+    : `生まれた日の「${polarity}の${el.name}」を土台に、同じ日干の10候補から${c.name}を選んでいます。今回は星の情報による加点がなく、生年月日で決まる順番が決め手になりました。`;
+  const matches = signals.map(signal => `<li><span class="why-signal-label">${escapeHtml(signal.label)}</span><b>${escapeHtml(signal.detail)}</b><small>${escapeHtml(signal.role)}として読まれ、この正体の設定と重なりました。</small></li>`).join('');
+  return `<section class="ti-why-story" aria-label="正体の判定理由">
+    <p class="why-eyebrow">あなたの正体への道筋</p>
+    <h3>あなたが${escapeHtml(c.name)}になった理由</h3>
+    <p class="why-story">${escapeHtml(story)}</p>
+    <div class="why-root"><span>${el.icon} 生まれた日の土台</span><b>${SC_STEMS[c.stem]} · ${polarity}の${el.name}</b><p>${stemMotifs[c.stem]}として読まれます。まず、この日干に対応する10候補にしぼります。</p></div>
+    ${matches ? `<p class="why-matches-title">この正体と重なった星の手がかり</p><ul class="why-signals">${matches}</ul>` : ''}
+    ${ti.tied ? '<p class="why-tie">同じ最高得点の候補が複数あったため、最後は生年月日で決まる順番で選んでいます。同じ入力なら、毎回同じ正体になります。</p>' : ''}
+    <details class="ti-why"><summary>判定の詳しい情報を見る</summary>
+      <ul>${ti.reasons.map(r => `<li>${escapeHtml(r)}</li>`).join('')}</ul>
+      <p class="note">同じ日干の10候補の中で、星の情報との重なりを得点にし、最も高い候補を選ぶ、八百万診断オリジナルの判定です。</p>
+      <p class="ti-near">ほかに近い正体：${ti.runnersUp.map(r => escapeHtml(r.name)).join('、')}</p>
+    </details>
+  </section>`;
+}
+
 // 本当の正体（主役）のカード
 function trueIdentityCard(ti, who, element) {
   const c = ti.identity;
@@ -502,11 +549,7 @@ function trueIdentityCard(ti, who, element) {
       ${sec("💞", "恋愛・人間関係", c.love)}
       ${sec("💼", "仕事・才能", c.work)}
     </div>
-    <details class="ti-why"><summary>なぜこの正体？（判定の理由）</summary>
-      <ul>${ti.reasons.map((r) => `<li>${r}</li>`).join("")}</ul>
-      <p class="note">同じ日干の10候補の中から、西洋占星術と紫微斗数の結果がいちばん重なる存在を選んでいます。</p>
-      <p class="ti-near">ほかに近い正体：${ti.runnersUp.map((r) => r.name).join("、")}</p>
-    </details>
+    ${trueIdentityWhy(ti)}
     <a class="read-more" href="articles/true-identities.html#ti-${TRUE_IDENTITIES.indexOf(c) + 1}">🌟 本当の正体図鑑 — 100の正体で、ほかの正体も見る →</a>
     ${ti.detailed ? "" : '<p class="ti-more">🔭 出生時刻と出生地を入れると、紫微斗数やアセンダントも加わり、<b>より精密な正体</b>がわかります（「くわしく診断する」から）。</p>'}
     ${placeBlock(c.name)}

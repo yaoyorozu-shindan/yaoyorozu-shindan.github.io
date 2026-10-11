@@ -14,22 +14,23 @@ function judgeTrueIdentity(birthday, fp, wc, zw) {
   const scored = candidates.map((c) => {
     let score = 0;
     const reasons = [];
+    const signals = [];
     if (wc) {
       const sun = ZODIAC[wc.sun.sign];
-      if (sun.el === c.west) { score += JUDGE_POINTS.sun; reasons.push(`太陽星座が${sun.name}（${WEST_NAME[sun.el]}）`); }
+      if (sun.el === c.west) { score += JUDGE_POINTS.sun; reasons.push(`太陽星座が${sun.name}（${WEST_NAME[sun.el]}）`); signals.push({ kind: "west", label: "太陽星座", detail: `${sun.name}の「${WEST_NAME[sun.el]}」`, role: "表に現れる自分らしさ", points: JUDGE_POINTS.sun }); }
       const moon = ZODIAC[wc.moon.sign];
-      if (!wc.moonUncertain && moon.el === c.west) { score += JUDGE_POINTS.moon; reasons.push(`月星座が${moon.name}（${WEST_NAME[moon.el]}）`); }
+      if (!wc.moonUncertain && moon.el === c.west) { score += JUDGE_POINTS.moon; reasons.push(`月星座が${moon.name}（${WEST_NAME[moon.el]}）`); signals.push({ kind: "west", label: "月星座", detail: `${moon.name}の「${WEST_NAME[moon.el]}」`, role: "心の内側や素の自分", points: JUDGE_POINTS.moon }); }
       if (wc.asc) {
         const asc = ZODIAC[wc.asc.sign];
-        if (asc.el === c.west) { score += JUDGE_POINTS.asc; reasons.push(`アセンダントが${asc.name}（${WEST_NAME[asc.el]}）`); }
+        if (asc.el === c.west) { score += JUDGE_POINTS.asc; reasons.push(`アセンダントが${asc.name}（${WEST_NAME[asc.el]}）`); signals.push({ kind: "west", label: "アセンダント", detail: `${asc.name}の「${WEST_NAME[asc.el]}」`, role: "人に伝わる第一印象", points: JUDGE_POINTS.asc }); }
       }
-      if (westTop.includes(c.west)) { score += JUDGE_POINTS.westTop; reasons.push(`ホロスコープで「${WEST_NAME[c.west]}」の元素が強い`); }
+      if (westTop.includes(c.west)) { score += JUDGE_POINTS.westTop; reasons.push(`ホロスコープで「${WEST_NAME[c.west]}」の元素が強い`); signals.push({ kind: "west", label: "星全体のバランス", detail: `「${WEST_NAME[c.west]}」が最も強い元素のひとつ`, role: "星全体に見られる傾向", points: JUDGE_POINTS.westTop }); }
     }
     if (zw) {
       const hit = zw.mainStars.filter((s) => c.stars.includes(s));
-      if (hit.length) { score += JUDGE_POINTS.ziwei * hit.length; reasons.push(`紫微斗数の命宮の主星が${hit.map((s) => s + "星").join("・")}`); }
+      if (hit.length) { score += JUDGE_POINTS.ziwei * hit.length; reasons.push(`紫微斗数の命宮の主星が${hit.map((s) => s + "星").join("・")}`); signals.push({ kind: "ziwei", label: "命宮の主星", detail: hit.map(s => s + "星").join("・"), role: "紫微斗数で読む本質の手がかり", points: JUDGE_POINTS.ziwei * hit.length }); }
     }
-    return { c, score, reasons, tie: hashString(birthday + "|true|" + c.name) };
+    return { c, score, reasons, signals, tie: hashString(birthday + "|true|" + c.name) };
   });
   scored.sort((a, b) => b.score - a.score || a.tie - b.tie);
 
@@ -38,6 +39,8 @@ function judgeTrueIdentity(birthday, fp, wc, zw) {
   return {
     identity: best.c,
     score: best.score,
+    signals: best.signals,
+    tied: scored.filter(s => s.score === best.score).length > 1,
     reasons: [`四柱推命の日干が「${stemName}」（${stem % 2 === 0 ? "陽" : "陰"}の${ELEMENTS[SC_ELEMENTS[Math.floor(stem / 2)]].name}）`, ...best.reasons],
     runnersUp: scored.slice(1, 3).map((s) => s.c),
     detailed: !!(zw && wc && wc.asc),
