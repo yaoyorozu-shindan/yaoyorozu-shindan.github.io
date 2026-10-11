@@ -211,6 +211,7 @@ function sukuyoPairCard(bdayA, bdayB, nA, nB, type) {
     <p class="sk-pair">${nA}：<b>${a.name}</b>　×　${nB}：<b>${b.name}</b></p>
     <p class="sk-name">${p.name}</p>
     <p>${p.text}</p>
+    <p><a href="articles/sukuyo.html">宿曜の6種類の相性と、五行との違いを読む</a></p>
     <p class="sk-mix">${mix}</p>
     <p class="note">宿曜の相性は、ふたりの本命宿の距離で決まる「三九の秘法」で出しています。上の相性％は五行で出したもので、宿曜とは別の見方です。</p>
   </div>`;

@@ -73,6 +73,7 @@ function kyuseiCardHTML(birthday, fp) {
   const t = kyuseiThisYear(k.honmei);
   return `<div class="card kyusei-card">
     <h3>⭐ 九星気学 ── 生まれ年から見たあなた</h3>
+    <p><a href="articles/kyusei.html">本命星・月命星・今年の運勢の読み方</a></p>
     <p class="ks-label">本命星（生まれ持った性質）</p>
     <p class="ks-name">${H.name}</p>
     <p>${H.text}</p>

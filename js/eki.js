@@ -174,6 +174,7 @@ function ekiCardHTML() {
 }
 function ekiButtonHTML() {
   return `<h3>☯ 今日の易</h3>
+    <p><a href="articles/eki.html">卦と金色の線の読み方</a></p>
     <p>心を静めて、今日いちばん気になることを思い浮かべてから押してください。易は一日一回。引いた卦は今日いっぱい変わりません。</p>
     <button type="button" id="eki-draw" class="eki-btn">☯ 今日の易を引く</button>`;
 }
@@ -183,6 +184,7 @@ function ekiResultHTML(s, fresh) {
   // 上の線から順に描く（易の線は下から数えるので逆順）
   const bars = lines.map((v, i) => `<span class="eki-bar ${v ? "yang" : "yin"}${i === s.line ? " moving" : ""}"></span>`).reverse().join("");
   return `<h3>☯ 今日の易</h3>
+    <p><a href="articles/eki.html">卦と金色の線の読み方</a></p>
     <div class="eki-result${fresh ? " fresh" : ""}">
       <div class="eki-hex" aria-hidden="true">${bars}</div>
       <p class="eki-name"><ruby>${name}<rt>${read}</rt></ruby></p>

@@ -415,6 +415,7 @@ function sukuyoCard(birthday, zw) {
     <h3>🌙 宿曜占星術 ── 月から見たもうひとつのあなた</h3>
     <p class="sk-lead">本当の正体とは別の角度から見た、あなたの一面「本命宿」</p>
     <p class="sk-name"><ruby>${s.name}<rt>${s.read}</rt></ruby></p>
+    <p><a href="articles/sukuyo.html">本命宿と宿曜の相性の読み方</a></p>
     <p class="sk-key">「${s.key}」</p>
     <p>${s.text}</p>
     <p class="note">旧暦 ${L.isLeap ? "閏" : ""}${L.month}月${L.day}日生まれ（日本の旧暦）。宿曜は、空を27に分けた「宿」のどこに月があったかで占う、弘法大師空海が日本に伝えたとされる占いです。</p>
