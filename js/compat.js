@@ -132,8 +132,42 @@ function compatBar(label, value) {
   return `<div class="cbar"><span>${label}</span><div class="cbar-track"><div class="cbar-fill" style="width:${value}%"></div></div><b>${value}%</b></div>`;
 }
 
+// ふたりそれぞれの本当の正体（生年月日だけで判定。「あなた」に保存済みの出生時刻があれば、くわしく判定）
+function trueIdentityFor(birthday, time, place) {
+  const fp = fourPillars(birthday, time || "");
+  const wc = typeof Astronomy !== "undefined" ? westernChart(birthday, time || "", place || "") : null;
+  const zw = typeof Astronomy !== "undefined" && time ? ziweiChart(birthday, time) : null;
+  return judgeTrueIdentity(birthday, fp, wc, zw).identity;
+}
+
+const PAIR_TEXT = {
+  same: (a, b) => `同じ気を持つ${a.name}と${b.name}。並び立てば向かうところ敵なしの、息ぴったりの名コンビです。`,
+  gen: (giver, receiver) => `${giver.name}の力が${receiver.name}をさらに輝かせる、まるで神話のような名コンビ。お互いがいることで、どちらも本来の力を発揮できます。`,
+  ctrl: (strong, weak) => `${strong.name}と${weak.name}は、ぶつかり合うことで互いを鍛え合う、宿命のライバルのような関係。認め合えたとき、最強のタッグになります。`,
+};
+
+function pairCard(tiA, tiB, nA, nB, c) {
+  const side = (ti, n) => `<div class="pair-ti">
+      ${artFor(ti.name, "true", ELEMENTS[SC_ELEMENTS[Math.floor(ti.stem / 2)]])}
+      <p class="pair-ti-who">${n}の正体</p>
+      <p class="pair-ti-name">${ti.name}</p>
+      <p class="pair-ti-catch">${ti.catch}</p>
+    </div>`;
+  const byKey = { A: tiA, B: tiB };
+  const text = c.type === "same" ? PAIR_TEXT.same(tiA, tiB) : PAIR_TEXT[c.type](byKey[c.from], byKey[c.to]);
+  return `<div class="card pair-card">
+    <h3>ふたりの本当の正体</h3>
+    <div class="pair-ti-row">${side(tiA, nA)}<span class="pair-x">×</span>${side(tiB, nB)}</div>
+    <p class="pair-text">${text}</p>
+  </div>`;
+}
+
 function renderCompat(bdayA, nameA, bdayB, nameB) {
   const c = compatibility(bdayA, bdayB);
+  let savedB = "", savedTime = "", savedPlace = "";
+  try { savedB = localStorage.getItem("birthday") || ""; savedTime = localStorage.getItem("birthtime") || ""; savedPlace = localStorage.getItem("birthplace") || ""; } catch (e) {}
+  const tiA = savedB === bdayA ? trueIdentityFor(bdayA, savedTime, savedPlace) : trueIdentityFor(bdayA);
+  const tiB = trueIdentityFor(bdayB);
   const nA = nameA ? `${escapeHtml(nameA)}さん` : "あなた";
   const nB = nameB ? `${escapeHtml(nameB)}さん` : "お相手";
   const elA = ELEMENTS[c.A.stem.element], elB = ELEMENTS[c.B.stem.element];
@@ -153,7 +187,7 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
     return `<tr><th>${cat.label}</th><td>${c.A.identities[key].name}</td><td class="x">×</td><td>${c.B.identities[key].name}</td></tr>`;
   }).join("");
 
-  const shareText = `${nameA || "わたし"}（${label(c.A)}）× ${nameB || "お相手"}（${label(c.B)}）の相性は ${c.total}%！\n${COMPAT_TEXT[c.type].title}\n#八百万診断 #相性診断`;
+  const shareText = `${nameA || "わたし"}（${tiA.name}）× ${nameB || "お相手"}（${tiB.name}）の相性は ${c.total}%！\n${COMPAT_TEXT[c.type].title}\n#八百万診断 #相性診断`;
   const shareUrl = SITE_CONFIG.siteUrl || location.href.split("#")[0];
   const s = c.shrine;
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.name + " " + s.area)}`;
@@ -173,6 +207,8 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
       ${compatBar("友情", c.sub.friend)}
       ${compatBar("仕事", c.sub.work)}
     </div>
+
+    ${pairCard(tiA, tiB, nA, nB, c)}
 
     <div class="card">
       <h3>ふたりを例えると…</h3>
@@ -209,6 +245,7 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
     nameA: nameA ? `${nameA}さん` : "あなた", nameB: nameB ? `${nameB}さん` : "お相手",
     elA, elB, labelA: label(c.A), labelB: label(c.B),
     total: c.total, title: COMPAT_TEXT[c.type].title, sub: c.sub, shrine: s.name,
+    trueA: tiA.name, trueB: tiB.name,
     pairs: ["japan", "greece", "norse", "yokai"].map((key) => [CATEGORIES.find((x) => x.key === key).label, c.A.identities[key].name, c.B.identities[key].name]),
   };
   document.getElementById("insta-share-compat").addEventListener("click", () =>

@@ -444,3 +444,16 @@ a { color: var(--accent); }
 .ti-card .wiki-link { display: block; text-align: center; }
 .ti-card .book-links { justify-content: center; }
 .section-sub { text-align: center; color: var(--muted); font-size: 0.85rem; margin: -6px 0 12px; }
+
+/* ---- ふたりの本当の正体 ---- */
+.pair-card h3 { text-align: center; }
+.pair-ti-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
+.pair-ti { text-align: center; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; padding-bottom: 8px; }
+.pair-ti .art { margin: 0 0 6px; }
+.pair-ti .art img, .pair-ti .art-svg { aspect-ratio: 1 / 1; }
+.pair-ti .art figcaption { display: none; }
+.pair-ti-who { margin: 0; font-size: 0.75rem; color: var(--muted); }
+.pair-ti-name { margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--accent); }
+.pair-ti-catch { margin: 2px 6px 0; font-size: 0.75rem; }
+.pair-x { font-size: 1.6rem; color: var(--muted); }
+.pair-text { margin: 12px 0 0; font-size: 0.92rem; }

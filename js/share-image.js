@@ -149,8 +149,10 @@ function buildCompatShareImage(data) {
     ctx.fillText(el.icon, colX[i], 330);
     fitText(ctx, name, colX[i], 430, 420, 56, 800);
     ctx.fillStyle = "rgba(255,255,255,0.8)";
-    ctx.font = `500 40px ${SHARE_FONT}`;
-    ctx.fillText(lab, colX[i], 495);
+    ctx.font = `500 36px ${SHARE_FONT}`;
+    ctx.fillText(lab, colX[i], 485);
+    const trueName = i === 0 ? data.trueA : data.trueB;
+    if (trueName) { ctx.fillStyle = "#fff"; fitText(ctx, `正体：${trueName}`, colX[i], 545, 440, 42, 800); }
   });
   ctx.fillStyle = "#fff";
   ctx.font = `300 80px ${SHARE_FONT}`;
