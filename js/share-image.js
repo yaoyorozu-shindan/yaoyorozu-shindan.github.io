@@ -156,6 +156,12 @@ async function buildShareImage(data) {
 }
 // 画像を先に用意し、次のタップで共有する（Safariの操作判定を保つ）。
 async function shareToInstagram(data, previewEl, text, builder) {
+  // 入力内容・投稿文・共有先は送らず、操作名と診断の種類だけを記録する。
+  const content = previewEl.closest("#compat-result") ? "compat" : "identity";
+  const record = (event) => {
+    try { if (typeof window.track === "function") window.track(event, { content }); } catch (error) {}
+  };
+  record("share_image_request");
   const request = {};
   previewEl.shareRequest = request;
   if (previewEl.shareImageUrl) {
@@ -169,7 +175,10 @@ async function shareToInstagram(data, previewEl, text, builder) {
     blob = await (builder || buildShareImage)(data);
     if (!blob) throw new Error('Image creation failed');
   } catch (error) {
-    if (previewEl.shareRequest === request) previewEl.innerHTML = '<p role="status">画像を作れませんでした。もう一度お試しください。</p>';
+    if (previewEl.shareRequest === request && previewEl.isConnected) {
+      record("share_image_error");
+      previewEl.innerHTML = '<p role="status">画像を作れませんでした。もう一度お試しください。</p>';
+    }
     return;
   }
   if (previewEl.shareRequest !== request || !previewEl.isConnected) return;
@@ -192,6 +201,9 @@ async function shareToInstagram(data, previewEl, text, builder) {
       <button type="button" class="share-btn insta copy-caption">投稿文をコピー</button>
       <p class="caption-status" role="status">コピーした文章を、Instagramのキャプション欄やストーリーズの文字入力に貼り付けてください。</p>
     </div>`;
+  record("share_image_ready");
+  // 保存ボタンのクリック。端末への保存完了や画像の長押し保存は確認できない。
+  previewEl.querySelector('.save').addEventListener('click', () => record("share_image_save_click"));
   const caption = previewEl.querySelector('.post-caption');
   caption.value = text || '';
   const copyButton = previewEl.querySelector('.copy-caption');
@@ -201,8 +213,10 @@ async function shareToInstagram(data, previewEl, text, builder) {
     try {
       if (!navigator.clipboard || !navigator.clipboard.writeText) throw new Error('Clipboard unavailable');
       await navigator.clipboard.writeText(caption.value);
+      record("share_caption_copy");
       copyStatus.textContent = '投稿文をコピーしました。Instagramの投稿画面で貼り付けてください。';
     } catch (error) {
+      record("share_caption_copy_error");
       caption.focus();
       caption.select();
       caption.setSelectionRange(0, caption.value.length);
@@ -214,11 +228,16 @@ async function shareToInstagram(data, previewEl, text, builder) {
     const status = previewEl.querySelector('.share-status');
     button.addEventListener('click', async () => {
       button.disabled = true;
+      record("share_menu_request");
       try {
         // 他の非同期処理を挟まず、タップ直後に画像だけを渡す。
         await navigator.share({ files: [file] });
+        // APIから正常に戻っただけ。共有先や投稿完了を意味しない。
+        record("share_menu_return");
         status.textContent = 'Instagramが見つからなかった場合は、画像を保存して投稿してください。';
       } catch (error) {
+        // AbortError はキャンセルのほか、共有先がない場合も含む。
+        record(error.name === 'AbortError' ? "share_menu_abort" : "share_menu_error");
         status.textContent = error.name === 'AbortError'
           ? '共有を閉じました。もう一度共有するか、画像を保存できます。'
           : '共有メニューを開けませんでした。画像を保存してInstagramから投稿してください。';

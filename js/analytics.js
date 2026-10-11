@@ -25,8 +25,10 @@
   document.addEventListener("click", (e) => {
     const a = e.target.closest("a, button");
     if (!a) return;
-    if (a.classList.contains("share-btn")) {
-      window.track("share", { method: a.classList.contains("x") ? "x" : "instagram", content: a.closest("#compat-result") ? "compat" : "identity" });
+    // X投稿画面へのクリックのみ。投稿完了は確認できない。
+    // インスタ関連は share-image.js の各処理で記録し、二重に数えない。
+    if (a.classList.contains("share-btn") && a.classList.contains("x")) {
+      window.track("share_x_click", { content: a.closest("#compat-result") ? "compat" : "identity" });
     } else if (a.id === "eki-draw") {
       window.track("eki_draw");
     } else if (a.tagName === "A" && /\bsponsored\b/.test(a.rel)) {
