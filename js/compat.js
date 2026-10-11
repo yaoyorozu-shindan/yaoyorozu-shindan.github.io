@@ -250,6 +250,8 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
   const shareText = `${nameA || "わたし"}（${tiA.name}）× ${nameB || "お相手"}（${tiB.name}）の相性は ${c.total}%！\n「${c.stemPair.title}」\n#八百万診断 #相性診断`;
   const shareUrl = SITE_CONFIG.siteUrl || location.href.split("#")[0];
   const s = c.shrine;
+  // 宿曜の相性の名前（折りたたみを閉じていても見えるように）
+  const sukuyoName = typeof Astronomy !== "undefined" ? sukuyoPair(sukuyoOf(bdayA), sukuyoOf(bdayB)).name : "";
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.name + " " + s.area)}`;
 
   const el = document.getElementById("compat-result");
@@ -271,8 +273,20 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
 
     ${pairCard(tiA, tiB, nA, nB, c)}
 
-    ${sukuyoPairCard(bdayA, bdayB, nA, nB, c.type)}
+    <div class="share-area">
+      <p class="share-title">相性をシェアする</p>
+      <div class="share-btns">
+        <a class="share-btn x" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}" target="_blank" rel="noopener">Xでシェア</a>
+        <button type="button" class="share-btn insta" id="insta-share-compat">インスタ用画像を作る</button>
+      </div>
+      <div id="insta-preview-compat" class="insta-preview" hidden></div>
+    </div>
 
+    <p class="fold-guide">気になるところを開いてください 👇</p>
+
+    ${sukuyoName ? fold("fold-c-sukuyo", "🌙 宿曜占星術でみる相性", sukuyoName, sukuyoPairCard(bdayA, bdayB, nA, nB, c.type)) : ""}
+
+    ${fold("fold-c-worlds", "🌏 ふたりを例えると…", "7つの世界でのふたりの組み合わせ", `
     <div class="card">
       <h3>ふたりを例えると…</h3>
       <table class="pair-table">
@@ -280,7 +294,9 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
         ${rows}
       </table>
     </div>
+    `)}
 
+    ${fold("fold-c-shrine", "⛩️ ふたりで行きたい神社", s.name, `
     <div class="card shrine-card">
       ${artFor(s.name, "shrine", ELEMENTS[c.shrineElement])}
       <p class="id-label">ふたりで行きたい神社</p>
@@ -294,17 +310,9 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
       ${travelLinks(s)}
       ${affiliateLinks("ペアブレスレット 天然石", "ペアの天然石を探す")}
     </div>
+    `)}
 
     ${consultCard("相性診断でわかるのは、ふたりの気質の組み合わせです。ふたりの関係について具体的に相談したいときは、プロの占い師に話を聞いてもらうのもひとつの方法です。")}
-
-    <div class="share-area">
-      <p class="share-title">相性をシェアする</p>
-      <div class="share-btns">
-        <a class="share-btn x" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}" target="_blank" rel="noopener">Xでシェア</a>
-        <button type="button" class="share-btn insta" id="insta-share-compat">インスタ用画像を作る</button>
-      </div>
-      <div id="insta-preview-compat" class="insta-preview" hidden></div>
-    </div>
   `;
   const pairLegend = legendPair(tiA, tiB);
   const imgData = {
