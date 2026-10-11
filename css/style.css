@@ -610,3 +610,24 @@ a { color: var(--accent); }
 .sk-key { margin: 0 0 8px; font-weight: 800; }
 .sk-pair { margin: 4px 0 0; font-size: 0.95rem; }
 .sk-mix { margin: 10px 0 4px; padding: 10px 12px; border-radius: 10px; background: #eef1fb; font-weight: 700; font-size: 0.92rem; text-align: left; }
+
+/* ---- 一日一回の易 ---- */
+.eki-card { text-align: center; }
+.eki-card > p, .eki-result > p:not(.eki-name):not(.eki-sub) { text-align: left; }
+.eki-btn { margin-top: 8px; padding: 14px 28px; border: none; border-radius: 999px; font-size: 1.05rem; font-weight: 800; color: #fff; background: linear-gradient(135deg, #2b2540, #6b4fbb); cursor: pointer; }
+.eki-hex { display: inline-flex; flex-direction: column; gap: 7px; margin: 8px 0 4px; }
+.eki-bar { display: block; width: 120px; height: 12px; border-radius: 3px; background: #2b2540; }
+.eki-bar.yin { background: linear-gradient(90deg, #2b2540 0 44%, transparent 44% 56%, #2b2540 56% 100%); }
+.eki-bar.moving { background-color: transparent; box-shadow: 0 0 10px rgba(212, 160, 23, 0.8); }
+.eki-bar.yang.moving { background: #d4a017; }
+.eki-bar.yin.moving { background: linear-gradient(90deg, #d4a017 0 44%, transparent 44% 56%, #d4a017 56% 100%); }
+.eki-name { margin: 6px 0 0; font-size: 2rem; font-weight: 800; }
+.eki-name rt { font-size: 0.35em; }
+.eki-sub { margin: 0 0 8px; font-size: 0.82rem; color: var(--muted); }
+.eki-yao { padding: 10px 12px; border-radius: 10px; background: #fff7e0; }
+.eki-result.fresh .eki-bar { animation: eki-in 0.5s both; }
+.eki-result.fresh .eki-bar:nth-child(6) { animation-delay: 0s; } .eki-result.fresh .eki-bar:nth-child(5) { animation-delay: .15s; }
+.eki-result.fresh .eki-bar:nth-child(4) { animation-delay: .3s; } .eki-result.fresh .eki-bar:nth-child(3) { animation-delay: .45s; }
+.eki-result.fresh .eki-bar:nth-child(2) { animation-delay: .6s; } .eki-result.fresh .eki-bar:nth-child(1) { animation-delay: .75s; }
+@keyframes eki-in { from { opacity: 0; transform: scaleX(0.2); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .eki-result.fresh .eki-bar { animation: none; } }

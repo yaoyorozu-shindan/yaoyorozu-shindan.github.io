@@ -710,6 +710,8 @@ function render(birthday, nickname, birthtime, birthplace) {
       ${luckRows}
     </div>
 
+    ${typeof ekiCardHTML === "function" ? ekiCardHTML() : ""}
+
     ${lotteryCard(daily.scores.money)}
 
     <div class="card lucky">
