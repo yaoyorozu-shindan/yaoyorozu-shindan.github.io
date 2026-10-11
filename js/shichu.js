@@ -3,7 +3,8 @@
 // ・年の区切りは立春、月の区切りは二十四節気の「節」（立春・啓蟄・清明…）で決まる。
 //   どちらも太陽の黄経（太陽が空のどこにあるか）で判定する。
 // ・出生時刻がわからないときは正午として計算し、時柱は出さない。
-// ・時刻は日本時間。23時台は「子の刻」とし、時柱の干は翌日の日干から求める。
+// ・時刻は生まれた場所の時計の時刻。節入りの判定だけ、時差（offset、日本はUTC+9）で世界時に直して比べる。
+// ・23時台は「子の刻」とし、時柱の干は翌日の日干から求める。
 
 const SC_STEMS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
 const SC_STEM_READ = ["きのえ", "きのと", "ひのえ", "ひのと", "つちのえ", "つちのと", "かのえ", "かのと", "みずのえ", "みずのと"];
@@ -15,9 +16,9 @@ const stemElement = (i) => SC_ELEMENTS[Math.floor(i / 2)];
 // 十二支の五行（本気）：子=水、丑=土、寅=木、卯=木、辰=土、巳=火、午=火、未=土、申=金、酉=金、戌=土、亥=水
 const BRANCH_ELEMENT = ["water", "earth", "wood", "wood", "earth", "fire", "fire", "earth", "metal", "metal", "earth", "water"];
 
-// 日本時間の日時 → ユリウス日（世界時）
-function julianDay(y, m, d, hourJst) {
-  const ms = Date.UTC(y, m - 1, d, 0, 0, 0) + (hourJst - 9) * 3600000;
+// 現地の日時 → ユリウス日（世界時）。offset は UTC との時差（時間）
+function julianDay(y, m, d, hourLocal, offset = 9) {
+  const ms = Date.UTC(y, m - 1, d, 0, 0, 0) + (hourLocal - offset) * 3600000;
   return ms / 86400000 + 2440587.5;
 }
 
@@ -42,13 +43,13 @@ const pillar = (stem, branch) => ({
   branchElement: BRANCH_ELEMENT[branch],
 });
 
-// birthday: "YYYY-MM-DD"、time: "HH:MM" または空
-function fourPillars(birthday, time) {
+// birthday: "YYYY-MM-DD"、time: "HH:MM" または空、offset: 出生地の UTC との時差（時間）
+function fourPillars(birthday, time, offset = 9) {
   const [y, m, d] = birthday.split("-").map(Number);
   const hasTime = !!time;
   const [hh, mm] = hasTime ? time.split(":").map(Number) : [12, 0];
   const hour = hh + mm / 60;
-  const lambda = sunLongitude(julianDay(y, m, d, hour));
+  const lambda = sunLongitude(julianDay(y, m, d, hour, offset));
 
   // 年柱：立春（黄経315度）より前なら前の年として数える
   const beforeRisshun = m <= 2 && lambda >= 270 && lambda < 315;

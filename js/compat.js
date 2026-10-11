@@ -154,7 +154,7 @@ function compatBar(label, value, note) {
 
 // ふたりそれぞれの本当の正体（生年月日だけで判定。「あなた」に保存済みの出生時刻があれば、くわしく判定）
 function trueIdentityFor(birthday, time, place) {
-  const fp = fourPillars(birthday, time || "");
+  const fp = fourPillars(birthday, time || "", utcOffsetHours(place, birthday, time));
   const wc = typeof Astronomy !== "undefined" ? westernChart(birthday, time || "", place || "") : null;
   const zw = typeof Astronomy !== "undefined" && time ? ziweiChart(birthday, time) : null;
   return judgeTrueIdentity(birthday, fp, wc, zw).identity;

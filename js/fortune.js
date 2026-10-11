@@ -366,7 +366,12 @@ function horoscopeCard(wc) {
   const notes = [];
   if (wc.moonUncertain) notes.push(`※生まれた日のうちに月の星座が${ZODIAC[wc.moonUncertain[0]].name}から${ZODIAC[wc.moonUncertain[1]].name}へ移っています。出生時刻を入れると正確にわかります。`);
   if (!wc.hasTime) notes.push("※出生時刻を入れると、アセンダント（ASC）とMCも出ます。");
-  else if (!wc.hasPlace) notes.push("※出生地（都道府県）を選ぶと、アセンダント（ASC）とMCも出ます。海外の場合は表示されません。");
+  else if (!wc.hasPlace) notes.push("※出生地を選ぶと、アセンダント（ASC）とMCも出ます。海外生まれの場合は、国・都市まで選んでください。");
+  if (wc.city) {
+    const off = wc.offset, sign = off < 0 ? "−" : "＋", abs = Math.abs(off);
+    const h = Math.floor(abs), m = Math.round((abs - h) * 60);
+    notes.push(`※出生地：${wc.city.name}（${wc.city.country}）。生まれた日の現地時間（UTC${sign}${h}${m ? ":" + String(m).padStart(2, "0") : ""}${wc.hasTime ? "" : "、正午として"}）で計算しています。`);
+  }
   return `<div class="card horoscope-card">
     <h3>🌌 西洋占星術のホロスコープ</h3>
     ${horoscopeWheel(wc)}
@@ -451,7 +456,7 @@ function spotList(shrine) {
 }
 
 function render(birthday, nickname, birthtime, birthplace) {
-  const fp = fourPillars(birthday, birthtime || "");
+  const fp = fourPillars(birthday, birthtime || "", utcOffsetHours(birthplace, birthday, birthtime));
   const wc = typeof Astronomy !== "undefined" ? westernChart(birthday, birthtime || "", birthplace || "") : null;
   const zw = typeof Astronomy !== "undefined" && birthtime ? ziweiChart(birthday, birthtime) : null;
   const ti = judgeTrueIdentity(birthday, fp, wc, zw);
@@ -584,14 +589,34 @@ const birthdayInput = document.getElementById("birthday");
 const nicknameInput = document.getElementById("nickname");
 const birthtimeInput = document.getElementById("birthtime");
 const birthplaceInput = document.getElementById("birthplace");
+const birthcityInput = document.getElementById("birthcity");
+const birthcityWrap = document.getElementById("birthcity-wrap");
 birthdayInput.max = todayString();
+
+// 海外を選んだら、国・都市の欄を出す（国ごとにまとめて並べる）
+birthcityInput.innerHTML = '<option value="">都市を選んでください</option>' +
+  [...new Set(WORLD_CITIES.map((c) => c[0]))].map((country) =>
+    `<optgroup label="${country}">${WORLD_CITIES.filter((c) => c[0] === country).map((c) => `<option>${c[1]}</option>`).join("")}</optgroup>`).join("");
+const showCity = () => (birthcityWrap.hidden = birthplaceInput.value !== "海外");
+birthplaceInput.addEventListener("change", showCity);
+
+// 出生地の値：都道府県名、または "海外:都市名"（都市未選択なら "海外"）
+function getBirthplace() {
+  return birthplaceInput.value === "海外" && birthcityInput.value ? "海外:" + birthcityInput.value : birthplaceInput.value;
+}
+function setBirthplace(v) {
+  const [pref, city] = (v || "").split(":");
+  birthplaceInput.value = pref;
+  birthcityInput.value = city || "";
+  showCity();
+}
 
 // 入力内容は本人のブラウザ内にだけ保存（サーバーには送らない）
 try {
   birthdayInput.value = localStorage.getItem("birthday") || "";
   nicknameInput.value = localStorage.getItem("nickname") || "";
   birthtimeInput.value = localStorage.getItem("birthtime") || "";
-  birthplaceInput.value = localStorage.getItem("birthplace") || "";
+  setBirthplace(localStorage.getItem("birthplace") || "");
   if (birthtimeInput.value || birthplaceInput.value) document.getElementById("detail-input").open = true;
 } catch (e) {}
 
@@ -624,7 +649,7 @@ form.addEventListener("submit", (e) => {
     localStorage.setItem("birthday", birthday);
     localStorage.setItem("nickname", nickname);
     localStorage.setItem("birthtime", birthtimeInput.value);
-    localStorage.setItem("birthplace", birthplaceInput.value);
+    localStorage.setItem("birthplace", getBirthplace());
   } catch (e) {}
-  render(birthday, nickname, birthtimeInput.value, birthplaceInput.value);
+  render(birthday, nickname, birthtimeInput.value, getBirthplace());
 });

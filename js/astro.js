@@ -1,7 +1,7 @@
 // 西洋占星術：太陽・月・惑星の星座、アセンダント（ASC）、MC、4元素のバランス
 // 天体の位置は Astronomy Engine（js/vendor/astronomy.browser.min.js、MITライセンス）で計算する。
 // ・出生時刻がないときは正午で計算し、ASC・MCは出さない（月は1日で星座が変わることがあるので注意書きを出す）。
-// ・出生地は都道府県庁の所在地の緯度・経度を使う。海外の場合はASC・MCを出さない。
+// ・出生地は都道府県庁の所在地の緯度・経度を使う。海外は js/world-cities.js の都市を使い、時差もその都市に合わせる。
 
 const ZODIAC = [
   { name: "牡羊座", glyph: "♈", el: "fire",  text: "情熱的で行動が早い開拓者。思い立ったらすぐ動き、先頭に立つ勇気があります。" },
@@ -76,12 +76,13 @@ function angles(date, lat, lon) {
   return { asc: norm360(asc), mc: norm360(mc) };
 }
 
-// birthday "YYYY-MM-DD"、time "HH:MM" または空、place 都道府県名・"海外"・空
+// birthday "YYYY-MM-DD"、time "HH:MM" または空、place 都道府県名・"海外:都市名"・"海外"・空
 function westernChart(birthday, time, place) {
   const [y, m, d] = birthday.split("-").map(Number);
   const [hh, mm] = time ? time.split(":").map(Number) : [12, 0];
-  const jst = (h, mi) => new Date(Date.UTC(y, m - 1, d, h - 9, mi));
-  const date = jst(hh, mm);
+  const offset = utcOffsetHours(place, birthday, time);
+  const local = (h, mi) => new Date(Date.UTC(y, m - 1, d, h, mi) - offset * 3600000);
+  const date = local(hh, mm);
 
   const planets = PLANETS.map((p) => {
     const lon = norm360(bodyLongitude(p.key, date));
@@ -91,12 +92,13 @@ function westernChart(birthday, time, place) {
   // 時刻がないときの月：その日の0時と24時で星座が変わるか
   let moonUncertain = null;
   if (!time) {
-    const a = signOf(bodyLongitude("Moon", jst(0, 0))), b = signOf(bodyLongitude("Moon", jst(23, 59)));
+    const a = signOf(bodyLongitude("Moon", local(0, 0))), b = signOf(bodyLongitude("Moon", local(23, 59)));
     if (a !== b) moonUncertain = [a, b];
   }
 
   let asc = null, mc = null;
-  const coords = PREF_COORDS[place];
+  const city = worldCity(place);
+  const coords = PREF_COORDS[place] || (city && [city.lat, city.lon]);
   if (time && coords) {
     const ag = angles(date, coords[0], coords[1]);
     asc = { lon: ag.asc, sign: signOf(ag.asc), deg: Math.floor(ag.asc % 30) };
@@ -108,5 +110,5 @@ function westernChart(birthday, time, place) {
   planets.forEach((p) => (balance[ZODIAC[p.sign].el] += p.key === "Sun" || p.key === "Moon" ? 2 : 1));
   if (asc) balance[ZODIAC[asc.sign].el] += 2;
 
-  return { planets, sun: planets[0], moon: planets[1], asc, mc, moonUncertain, balance, hasTime: !!time, hasPlace: !!coords };
+  return { planets, sun: planets[0], moon: planets[1], asc, mc, moonUncertain, balance, hasTime: !!time, hasPlace: !!coords, city, offset };
 }
