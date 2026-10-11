@@ -564,7 +564,7 @@ function render(birthday, nickname, birthtime, birthplace) {
     </div>`).join("");
 
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shrine.name + " " + shrine.area)}`;
-  const shareText = `私の本当の正体は「${ti.identity.name}」！\n${ti.identity.catch}\n\n別の世界では…\nインド神話：${identities.india.name}\n日本神話：${identities.japan.name}\nギリシャ神話：${identities.greece.name}\n北欧神話：${identities.norse.name}\n妖怪：${identities.yokai.name}\n都市伝説：${identities.legend.name}\n#八百万診断`;
+  const shareText = `私の本当の正体は「${ti.identity.name}」！\n${ti.identity.catch}\n\n別の世界では…\nインド神話：${identities.india.name}\n日本神話：${identities.japan.name}\nギリシャ神話：${identities.greece.name}\n北欧神話：${identities.norse.name}\n妖怪：${identities.yokai.name}\n怪異：${identities.kaii.name}\n都市伝説：${identities.legend.name}\n#八百万診断`;
   const shareUrl = SITE_CONFIG.siteUrl || location.href.split("#")[0];
 
   const el = document.getElementById("result");

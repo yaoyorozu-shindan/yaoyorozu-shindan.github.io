@@ -186,7 +186,29 @@ async function shareToInstagram(data, previewEl, text, builder) {
       <a class="share-btn save" href="${url}" download="yaoyorozu-shindan.png">画像を保存する</a>
     </div>
     <p class="share-status" role="status">${canShare ? 'Instagramアプリは、共有先で選んだ後に開きます。' : 'このブラウザでは画像の共有に対応していません。保存して投稿してください。'}</p>
-    <p>iPhoneで保存画面が開いた場合は、画像を開いて共有ボタンから「画像を保存」を選んでください。画像の長押しでも保存できます。</p>`;
+    <p>iPhoneで保存画面が開いた場合は、画像を開いて共有ボタンから「画像を保存」を選んでください。画像の長押しでも保存できます。</p>
+    <div class="insta-caption">
+      <label>Instagram用の投稿文<textarea class="post-caption" readonly rows="12" spellcheck="false"></textarea></label>
+      <button type="button" class="share-btn insta copy-caption">投稿文をコピー</button>
+      <p class="caption-status" role="status">コピーした文章を、Instagramのキャプション欄やストーリーズの文字入力に貼り付けてください。</p>
+    </div>`;
+  const caption = previewEl.querySelector('.post-caption');
+  caption.value = text || '';
+  const copyButton = previewEl.querySelector('.copy-caption');
+  const copyStatus = previewEl.querySelector('.caption-status');
+  copyButton.addEventListener('click', async () => {
+    copyButton.disabled = true;
+    try {
+      if (!navigator.clipboard || !navigator.clipboard.writeText) throw new Error('Clipboard unavailable');
+      await navigator.clipboard.writeText(caption.value);
+      copyStatus.textContent = '投稿文をコピーしました。Instagramの投稿画面で貼り付けてください。';
+    } catch (error) {
+      caption.focus();
+      caption.select();
+      caption.setSelectionRange(0, caption.value.length);
+      copyStatus.textContent = '自動でコピーできませんでした。文章を長押しするか、選択した文章をコピーしてください。';
+    } finally { copyButton.disabled = false; }
+  });
   if (canShare) {
     const button = previewEl.querySelector('.image-share');
     const status = previewEl.querySelector('.share-status');

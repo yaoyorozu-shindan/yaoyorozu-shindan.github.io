@@ -563,3 +563,9 @@ a { color: var(--accent); }
 @keyframes portrait-arrive { 0%,20% { opacity: 0; transform: scale(.65); filter: brightness(2); } 55%,100% { opacity: 1; transform: scale(1); filter: brightness(1); } }
 @keyframes name-arrive { 0%,40% { opacity: 0; transform: translateY(20px) scale(.9); } 65%,100% { opacity: 1; transform: translateY(0) scale(1); } }
 @media (prefers-reduced-motion: reduce) { .identity-cinema, .reveal-replay { display: none; } }
+/* Instagramに貼り付ける投稿文 */
+.insta-caption { margin-top: 20px; text-align: left; padding: 16px; background: #faf8fd; border: 1px solid var(--border); border-radius: 14px; }
+.insta-caption label { display: block; font-size: .9rem; font-weight: 700; }
+.post-caption { display: block; box-sizing: border-box; width: 100%; margin: 10px 0 12px; padding: 12px; border: 1px solid var(--border); border-radius: 10px; background: #fff; color: var(--text, #272333); font-family: inherit; font-size: 16px; line-height: 1.6; resize: vertical; }
+.copy-caption { width: 100%; }
+.caption-status { margin-bottom: 0; }
