@@ -600,3 +600,13 @@ a { color: var(--accent); }
 .share-page .ti-name { font-size: 2.6rem; margin: 4px 0 0; color: var(--el); }
 .share-page .ti-name rt { font-size: 0.32em; }
 .share-page .a-fig img { object-position: center top; max-height: 380px; }
+
+/* ---- 宿曜占星術 ---- */
+.sukuyo-card { text-align: center; }
+.sukuyo-card > p:not(.sk-name):not(.sk-key):not(.sk-lead):not(.sk-pair) { text-align: left; }
+.sk-lead { margin: 0; font-size: 0.85rem; color: var(--muted); }
+.sk-name { margin: 6px 0 0; font-size: 2.2rem; font-weight: 800; color: #3b4a8c; }
+.sk-name rt { font-size: 0.35em; font-weight: 700; }
+.sk-key { margin: 0 0 8px; font-weight: 800; }
+.sk-pair { margin: 4px 0 0; font-size: 0.95rem; }
+.sk-mix { margin: 10px 0 4px; padding: 10px 12px; border-radius: 10px; background: #eef1fb; font-weight: 700; font-size: 0.92rem; text-align: left; }

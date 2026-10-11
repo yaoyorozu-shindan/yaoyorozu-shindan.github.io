@@ -7,24 +7,25 @@
 const ZW_BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
 const ZW_STEMS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
 
-// 中国標準時の日付番号（1970-01-01 = 0）
+// 旧暦をどの時間帯で計算するか（UTCとの時差）。紫微斗数は中国標準時（UTC+8）、宿曜は日本時間（UTC+9）
 const ZW_TZ = 8;
-const jstDay = (date) => Math.floor((date.getTime() + ZW_TZ * 3600000) / 86400000);
-const jstMidnight = (dayNum) => new Date(dayNum * 86400000 - ZW_TZ * 3600000);
+// その時間帯での日付番号（1970-01-01 = 0）と、その日の0時
+const localDay = (date, tz) => Math.floor((date.getTime() + tz * 3600000) / 86400000);
+const localMidnight = (dayNum, tz) => new Date(dayNum * 86400000 - tz * 3600000);
 const sunLon = (date) => Astronomy.SunPosition(date).elon;
 
 const zwCache = {};
-function winterSolsticeDay(year) {
-  const k = "ws" + year;
-  if (!(k in zwCache)) zwCache[k] = jstDay(Astronomy.SearchSunLongitude(270, new Date(Date.UTC(year, 11, 10)), 20).date);
+function winterSolsticeDay(year, tz) {
+  const k = "ws" + year + "|" + tz;
+  if (!(k in zwCache)) zwCache[k] = localDay(Astronomy.SearchSunLongitude(270, new Date(Date.UTC(year, 11, 10)), 20).date, tz);
   return zwCache[k];
 }
-function newMoonDays(fromDay, toDay) {
+function newMoonDays(fromDay, toDay, tz) {
   const out = [];
-  let t = jstMidnight(fromDay);
+  let t = localMidnight(fromDay, tz);
   while (true) {
     const nm = Astronomy.SearchMoonPhase(0, t, 40);
-    const dn = jstDay(nm.date);
+    const dn = localDay(nm.date, tz);
     if (dn > toDay) break;
     out.push(dn);
     t = new Date(nm.date.getTime() + 86400000);
@@ -32,23 +33,23 @@ function newMoonDays(fromDay, toDay) {
   return out;
 }
 // 冬至を含む月（11月）の始まりの日
-function month11Start(year, moons) {
-  const ws = winterSolsticeDay(year);
+function month11Start(year, moons, tz) {
+  const ws = winterSolsticeDay(year, tz);
   return moons.filter((d) => d <= ws).pop();
 }
 
-// 新暦（日本時間の年月日）→ 旧暦 { year, month, day, isLeap }
-function toLunar(y, m, d) {
+// 新暦（年月日）→ 旧暦 { year, month, day, isLeap }。tz は旧暦を計算する時間帯（省略すると紫微斗数用の UTC+8）
+function toLunar(y, m, d, tz = ZW_TZ) {
   const target = Math.floor(Date.UTC(y, m - 1, d) / 86400000);
-  const moons = newMoonDays(target - 800, target + 400);
+  const moons = newMoonDays(target - 800, target + 400, tz);
   let Y = y;
-  if (target < month11Start(Y - 1, moons)) Y -= 1;
-  else if (target >= month11Start(Y, moons)) Y += 1;
-  const a = month11Start(Y - 1, moons), b = month11Start(Y, moons);
+  if (target < month11Start(Y - 1, moons, tz)) Y -= 1;
+  else if (target >= month11Start(Y, moons, tz)) Y += 1;
+  const a = month11Start(Y - 1, moons, tz), b = month11Start(Y, moons, tz);
   const months = moons.filter((dn) => dn >= a && dn < b);
   const hasZhongqi = (i) => {
     const s = months[i], e = i + 1 < months.length ? months[i + 1] : b;
-    return Math.floor(sunLon(jstMidnight(s)) / 30) !== Math.floor(sunLon(jstMidnight(e)) / 30);
+    return Math.floor(sunLon(localMidnight(s, tz)) / 30) !== Math.floor(sunLon(localMidnight(e, tz)) / 30);
   };
   let leapIndex = -1;
   if (months.length === 13) for (let i = 1; i < months.length; i++) if (!hasZhongqi(i)) { leapIndex = i; break; }

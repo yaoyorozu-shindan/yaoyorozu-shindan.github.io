@@ -187,6 +187,35 @@ function pairCard(tiA, tiB, nA, nB, c) {
   </div>`;
 }
 
+// 宿曜占星術の相性（三九の秘法）。五行の相性とは別の見方として紹介する
+// 五行の関係（same / gen / ctrl）× 宿曜の相性の傾向 → ふたつを合わせたひとこと
+const SUKUYO_MIX = {
+  same: { good: "💞 ダブルで好相性！似た者同士の安心感に、宿曜の強いご縁が重なっています。",
+          mild: "五行でも宿曜でも、気が合って居心地のいい関係。なれ合いにならないよう、たまには新しい刺激を。",
+          tough: "五行では似た者同士、宿曜では違いの大きい関係。似ているところと違うところ、両方を楽しめるふたりです。" },
+  gen:  { good: "💞 ダブルで好相性！五行でも宿曜でも、支え合い高め合える最高のめぐり合わせです。",
+          mild: "五行では支え合う関係、宿曜では気楽な友だちのような関係。肩の力を抜いて長く付き合えるふたりです。",
+          tough: "五行では支え合う関係、宿曜では刺激し合う関係。安心感とドキドキの両方があるふたりです。" },
+  ctrl: { good: "五行では刺激し合う関係、宿曜では栄え合う関係。ぶつかっても最後は不思議とうまくいく、縁の深いふたりです。",
+          mild: "五行では刺激し合う関係、宿曜では気楽な関係。言いたいことを言い合えて、後に引きずらないふたりです。",
+          tough: "五行でも宿曜でも、刺激の強い関係。ぶつかり合うぶん、乗り越えたときの絆は誰よりも強くなります。" },
+};
+const SUKUYO_TONE = { 栄親: "good", 業胎: "good", 命: "good", 友衰: "mild", 安壊: "tough", 危成: "tough" };
+
+function sukuyoPairCard(bdayA, bdayB, nA, nB, type) {
+  if (typeof Astronomy === "undefined") return "";
+  const a = sukuyoOf(bdayA), b = sukuyoOf(bdayB), p = sukuyoPair(a, b);
+  const mix = SUKUYO_MIX[type][SUKUYO_TONE[p.key]];
+  return `<div class="card sukuyo-card">
+    <h3>🌙 宿曜占星術でみる相性</h3>
+    <p class="sk-pair">${nA}：<b>${a.name}</b>　×　${nB}：<b>${b.name}</b></p>
+    <p class="sk-name">${p.name}</p>
+    <p>${p.text}</p>
+    <p class="sk-mix">${mix}</p>
+    <p class="note">宿曜の相性は、ふたりの本命宿の距離で決まる「三九の秘法」で出しています。上の相性％は五行で出したもので、宿曜とは別の見方です。</p>
+  </div>`;
+}
+
 // 神話・伝承でゆかりのあるふたりなら、その組み合わせを返す
 function legendPair(tiA, tiB) {
   return LEGEND_PAIRS.find((p) => (p.a === tiA.name && p.b === tiB.name) || (p.a === tiB.name && p.b === tiA.name)) || null;
@@ -241,6 +270,8 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
     </div>
 
     ${pairCard(tiA, tiB, nA, nB, c)}
+
+    ${sukuyoPairCard(bdayA, bdayB, nA, nB, c.type)}
 
     <div class="card">
       <h3>ふたりを例えると…</h3>

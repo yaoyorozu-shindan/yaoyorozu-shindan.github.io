@@ -404,6 +404,24 @@ function horoscopeCard(wc) {
 
 // 紫微斗数のカード（命盤と命宮の主星）
 const PALACE_NAMES = ["命宮", "兄弟宮", "夫妻宮", "子女宮", "財帛宮", "疾厄宮", "遷移宮", "交友宮", "官禄宮", "田宅宮", "福徳宮", "父母宮"];
+// 宿曜占星術の本命宿（js/sukuyo.js）。本当の正体とは別の角度から見た一面として出す
+// zw：紫微斗数の結果（旧暦の日付が宿曜とずれたときに説明するため）
+function sukuyoCard(birthday, zw) {
+  if (typeof Astronomy === "undefined") return "";
+  const s = sukuyoOf(birthday), L = s.lunar;
+  const Z = zw && zw.lunar;
+  const shifted = Z && (Z.month !== L.month || Z.day !== L.day || Z.isLeap !== L.isLeap);
+  return `<div class="card sukuyo-card">
+    <h3>🌙 宿曜占星術 ── 月から見たもうひとつのあなた</h3>
+    <p class="sk-lead">本当の正体とは別の角度から見た、あなたの一面「本命宿」</p>
+    <p class="sk-name"><ruby>${s.name}<rt>${s.read}</rt></ruby></p>
+    <p class="sk-key">「${s.key}」</p>
+    <p>${s.text}</p>
+    <p class="note">旧暦 ${L.isLeap ? "閏" : ""}${L.month}月${L.day}日生まれ（日本の旧暦）。宿曜は、空を27に分けた「宿」のどこに月があったかで占う、弘法大師空海が日本に伝えたとされる占いです。</p>
+    ${shifted ? `<p class="note">※紫微斗数の命盤とは旧暦の日付が1日ずれています。紫微斗数は中国の暦、宿曜は日本の暦で計算するのがそれぞれの本来の形のためです（23時台生まれは、紫微斗数では翌日として扱います）。</p>` : ""}
+  </div>`;
+}
+
 function ziweiCard(zw) {
   if (!zw) {
     return `<div class="card ziwei-card"><h3>🌟 紫微斗数</h3>
@@ -658,6 +676,8 @@ function render(birthday, nickname, birthtime, birthplace) {
     ${wc ? horoscopeCard(wc) : ""}
 
     ${ziweiCard(zw)}
+
+    ${sukuyoCard(birthday, zw)}
 
     <h3 class="section-title">別の世界に生まれていたら…</h3>
     <p class="section-sub">神話や伝承の7つの世界での、${who}の姿</p>
