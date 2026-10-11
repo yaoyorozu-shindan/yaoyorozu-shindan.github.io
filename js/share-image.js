@@ -140,7 +140,7 @@ async function buildShareImage(data) {
     ctx.fillStyle = '#c0bacd';
     const creditY = 1530;
     const height = drawShareLines(ctx, '画像：' + asset.credit, 540, creditY, 876, 22, 2);
-    const source = new URL(asset.page || asset.src, location.href).href;
+    const source = new URL(asset.page || asset.src, SITE_CONFIG.siteUrl || location.href).href;
     drawShareLines(ctx, '出典：' + source, 540, creditY + height + 4, 876, 18, 4);
   }
   ctx.strokeStyle = '#efdaaa50'; ctx.lineWidth = 1;
@@ -227,104 +227,93 @@ async function shareToInstagram(data, previewEl, text, builder) {
   }
   previewEl.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
 }
-// ---- 相性診断のシェア画像（1080×1920）----
-// data: { nameA, nameB, elA, elB, labelA, labelB, total, title, sub: {love, friend, work}, pairs: [[ラベル, A, B]], shrine }
-function buildCompatShareImage(data) {
-  const W = 1080, H = 1920;
-  const canvas = document.createElement("canvas");
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext("2d");
-
-  // 背景：ふたりの属性カラーを混ぜたグラデーション
-  const bg = ctx.createLinearGradient(0, 0, W, H);
-  bg.addColorStop(0, data.elA.color);
-  bg.addColorStop(0.55, "#2a2045");
-  bg.addColorStop(1, data.elB.color);
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, W, H);
-  ctx.fillStyle = "rgba(255,255,255,0.06)";
-  [[150, 300, 260], [950, 1500, 320]].forEach(([x, y, r]) => { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); });
-
-  ctx.textAlign = "center";
-  ctx.fillStyle = "rgba(255,255,255,0.75)";
-  ctx.font = `700 44px ${SHARE_FONT}`;
-  ctx.fillText("💞 八百万診断 相性診断", W / 2, 160);
-
-  // ふたりの名前と属性
-  const colX = [W * 0.27, W * 0.73];
-  [[data.nameA, data.elA, data.labelA], [data.nameB, data.elB, data.labelB]].forEach(([name, el, lab], i) => {
-    ctx.fillStyle = "#fff";
-    ctx.font = `100px ${SHARE_FONT}`;
-    ctx.fillText(el.icon, colX[i], 330);
-    fitText(ctx, name, colX[i], 430, 420, 56, 800);
-    ctx.fillStyle = "rgba(255,255,255,0.8)";
-    ctx.font = `500 36px ${SHARE_FONT}`;
-    ctx.fillText(lab, colX[i], 485);
-    const trueName = i === 0 ? data.trueA : data.trueB;
-    if (trueName) { ctx.fillStyle = "#fff"; fitText(ctx, `正体：${trueName}`, colX[i], 545, 440, 42, 800); }
+// ---- ふたりの本当の正体が主役の相性シェア画像（1080×1920）----
+async function buildCompatShareImage(data) {
+  const assets = [data.trueA, data.trueB].map(name => typeof IMAGES !== 'undefined' ? IMAGES[name] : null);
+  const portraits = await Promise.all(assets.map(asset => loadSharePortrait(asset && asset.src)));
+  const canvas = document.createElement('canvas');
+  canvas.width = 1080; canvas.height = 1920;
+  const ctx = canvas.getContext('2d');
+  const gold = '#efdaaa';
+  ctx.fillStyle = '#090d1d'; ctx.fillRect(0, 0, 1080, 1920);
+  [data.elA, data.elB].forEach((el, i) => {
+    const x = i === 0 ? 300 : 780;
+    const glow = ctx.createRadialGradient(x, 600, 20, x, 600, 760);
+    glow.addColorStop(0, el.color + 'cc'); glow.addColorStop(.6, el.color + '50'); glow.addColorStop(1, '#090d1d00');
+    ctx.fillStyle = glow; ctx.fillRect(0, 0, 1080, 1920);
+    [252, 277, 300].forEach((r, j) => {
+      ctx.beginPath(); ctx.arc(x, 590, r, 0, Math.PI * 2);
+      ctx.lineWidth = j === 1 ? 2 : 1; ctx.strokeStyle = j === 1 ? '#efdaaa70' : '#efdaaa30'; ctx.stroke();
+    });
   });
-  ctx.fillStyle = "#fff";
-  ctx.font = `300 80px ${SHARE_FONT}`;
-  ctx.fillText("×", W / 2, 400);
-
-  // 相性％
-  ctx.font = `800 230px ${SHARE_FONT}`;
-  const numW = ctx.measureText(String(data.total)).width;
-  ctx.font = `800 90px ${SHARE_FONT}`;
-  const pctW = ctx.measureText("%").width;
-  const startX = W / 2 - (numW + pctW) / 2;
-  ctx.textAlign = "left";
-  ctx.font = `800 230px ${SHARE_FONT}`;
-  ctx.fillText(String(data.total), startX, 760);
-  ctx.font = `800 90px ${SHARE_FONT}`;
-  ctx.fillText("%", startX + numW + 6, 760);
-  ctx.textAlign = "center";
-  fitText(ctx, data.title, W / 2, 850, 900, 58, 700);
-
-  // 恋愛・友情・仕事のバー
-  const bars = [["恋愛", data.sub.love], ["友情", data.sub.friend], ["仕事", data.sub.work]];
-  bars.forEach(([lab, v], i) => {
-    const y = 950 + i * 70;
-    ctx.textAlign = "left";
-    ctx.fillStyle = "#fff";
-    ctx.font = `700 36px ${SHARE_FONT}`;
-    ctx.fillText(lab, 130, y + 12);
-    ctx.fillStyle = "rgba(255,255,255,0.2)";
-    roundRect(ctx, 240, y - 14, 600, 28, 14); ctx.fill();
-    ctx.fillStyle = "#fff";
-    roundRect(ctx, 240, y - 14, Math.max(28, 600 * v / 100), 28, 14); ctx.fill();
-    ctx.textAlign = "right";
-    ctx.fillText(`${v}%`, 950, y + 12);
+  for (let i=0; i<56; i++) {
+    const x = 95 + (i * 137 % 890), y = 250 + (i * 193 % 1210);
+    ctx.fillStyle = i % 3 ? '#ffffff60' : gold;
+    ctx.beginPath(); ctx.arc(x,y,i % 3 ? 2 : 3.5,0,Math.PI*2); ctx.fill();
+  }
+  ctx.strokeStyle = '#efdaaa66'; ctx.lineWidth = 2;
+  roundRect(ctx,54,92,972,1740,38); ctx.stroke();
+  ctx.strokeStyle = '#efdaaa26';
+  roundRect(ctx,68,106,944,1712,30); ctx.stroke();
+  ctx.textAlign = 'center'; ctx.fillStyle = gold;
+  ctx.font = `700 44px ${SHARE_FONT}`; ctx.fillText('八 百 万 診 断',540,198);
+  ctx.fillStyle = '#fff5e3'; ctx.font = `700 42px ${SHARE_FONT}`;
+  ctx.fillText('ふたりの本当の正体',540,270);
+  const sides = [
+    {x:112,cx:303,name:data.nameA,trueName:data.trueA,kana:data.kanaA,catch:data.catchA,el:data.elA,label:data.labelA},
+    {x:586,cx:777,name:data.nameB,trueName:data.trueB,kana:data.kanaB,catch:data.catchB,el:data.elB,label:data.labelB},
+  ];
+  sides.forEach((side,i) => {
+    ctx.fillStyle = '#e0dbe9'; fitText(ctx,side.name,side.cx,328,370,34,700);
+    ctx.save(); roundRect(ctx,side.x,366,382,466,65); ctx.clip();
+    ctx.fillStyle = '#101628'; ctx.fillRect(side.x,366,382,466);
+    const image = portraits[i];
+    if (image) {
+      const scale = Math.min(382/image.naturalWidth,466/image.naturalHeight);
+      const w=image.naturalWidth*scale,h=image.naturalHeight*scale;
+      ctx.drawImage(image,side.cx-w/2,599-h/2,w,h);
+    } else {
+      const mist=ctx.createRadialGradient(side.cx,599,10,side.cx,599,250);
+      mist.addColorStop(0,side.el.color);mist.addColorStop(1,'#101628');
+      ctx.fillStyle=mist;ctx.fillRect(side.x,366,382,466);
+      ctx.fillStyle=gold;ctx.font=`500 150px ${SHARE_FONT}`;ctx.fillText(side.el.name,side.cx,656);
+    }
+    ctx.restore();ctx.lineWidth=2;ctx.strokeStyle='#efdaaaa0';
+    roundRect(ctx,side.x,366,382,466,65);ctx.stroke();
+    ctx.fillStyle=gold;fitText(ctx,side.trueName || '',side.cx,914,386,64,800);
+    if(side.kana){ctx.fillStyle='#cfc8df';fitText(ctx,side.kana,side.cx,952,370,24,500);}
+    ctx.fillStyle='#efdaaa';fitText(ctx,side.label,side.cx,997,370,27,700);
+    ctx.fillStyle='#fff5e3';drawShareLines(ctx,side.catch || '',side.cx,1050,370,29,2,500);
   });
-
-  // ふたりを例えると
-  const top = 1125, rowH = 112;
-  ctx.fillStyle = "rgba(255,255,255,0.12)";
-  roundRect(ctx, 70, top, W - 140, data.pairs.length * rowH + 100, 36); ctx.fill();
-  ctx.textAlign = "center";
-  ctx.fillStyle = "rgba(255,255,255,0.85)";
-  ctx.font = `700 38px ${SHARE_FONT}`;
-  ctx.fillText("ふたりを例えると…", W / 2, top + 62);
-  data.pairs.forEach(([lab, a, b], i) => {
-    const y = top + 160 + i * rowH;
-    ctx.fillStyle = "rgba(255,255,255,0.65)";
-    ctx.font = `500 28px ${SHARE_FONT}`;
-    ctx.fillText(lab, W / 2, y - 50);
-    ctx.fillStyle = "#fff";
-    ctx.textAlign = "right"; fitText(ctx, a, W / 2 - 40, y, 360, 44, 700);
-    ctx.textAlign = "center"; ctx.font = `400 36px ${SHARE_FONT}`; ctx.fillText("×", W / 2, y);
-    ctx.textAlign = "left"; fitText(ctx, b, W / 2 + 40, y, 360, 44, 700);
-    ctx.textAlign = "center";
+  ctx.fillStyle=gold;ctx.font=`300 52px ${SHARE_FONT}`;ctx.fillText('×',540,606);
+  // 相性％を中央に大きく。恋愛・友情・仕事は読みやすい3列に。
+  ctx.fillStyle='#d9d2e4';ctx.font=`700 28px ${SHARE_FONT}`;ctx.fillText('ふたりの相性',540,1160);
+  ctx.fillStyle='#fff3d6';ctx.font=`800 166px ${SHARE_FONT}`;ctx.fillText(`${data.total}%`,540,1322);
+  ctx.fillStyle=gold;ctx.font=`700 26px ${SHARE_FONT}`;
+  ctx.fillText(data.legendTitle ? '伝説の組み合わせ' : 'ふたりを例えると',540,1380);
+  ctx.fillStyle='#fff5e3';
+  drawShareLines(ctx,data.legendTitle ? `「${data.legendTitle}」` : data.title,540,1435,840,40,2,700);
+  const bars=[['恋愛',data.sub.love],['友情',data.sub.friend],['仕事',data.sub.work]];
+  bars.forEach(([label,value],i)=>{
+    const x=270+i*270;
+    ctx.fillStyle='#cec6dd';ctx.font=`500 24px ${SHARE_FONT}`;ctx.fillText(label,x,1522);
+    ctx.fillStyle=gold;ctx.font=`800 40px ${SHARE_FONT}`;ctx.fillText(`${value}%`,x,1570);
   });
-
-  // フッター
-  ctx.fillStyle = "#fff";
-  ctx.font = `700 40px ${SHARE_FONT}`;
-  fitText(ctx, `ふたりで行きたい神社：${data.shrine}`, W / 2, 1745, 940, 40, 700);
-  ctx.fillStyle = "rgba(255,255,255,0.8)";
-  ctx.font = `500 38px ${SHARE_FONT}`;
-  ctx.fillText((SITE_CONFIG.siteUrl || location.origin).replace(/^https?:\/\//, "").replace(/\/$/, ""), W / 2, 1815);
-  ctx.fillText("#八百万診断 #相性診断", W / 2, 1870);
-
-  return new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+  // ふたりの画像の作者・ライセンス・出典を、それぞれ保存画像内に残す。
+  let creditY=1616;
+  assets.forEach((asset,i)=>{
+    if(!portraits[i] || !asset)return;
+    ctx.fillStyle='#bdb6cc';
+    const height=drawShareLines(ctx,`${i===0?'左':'右'}の画像：${asset.credit}`,540,creditY,878,18,2);
+    const source=new URL(asset.page || asset.src,SITE_CONFIG.siteUrl || location.href).href;
+    const sourceHeight=drawShareLines(ctx,'出典：'+source,540,creditY+height,878,14,3);
+    creditY+=height+sourceHeight+10;
+  });
+  ctx.fillStyle='#fff5e3';ctx.font=`700 30px ${SHARE_FONT}`;
+  ctx.fillText('あなたとあの人は、どんな組み合わせ？',540,1788);
+  ctx.fillStyle='#d8d0e5';ctx.font=`500 24px ${SHARE_FONT}`;
+  ctx.fillText((SITE_CONFIG.siteUrl || location.origin).replace(/^https?:\/\//,'').replace(/\/$/,''),540,1825);
+  ctx.fillStyle=gold;ctx.font=`700 28px ${SHARE_FONT}`;
+  ctx.fillText('#八百万診断  #相性診断',540,1870);
+  return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('Image export failed')),'image/png'));
 }

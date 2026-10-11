@@ -273,11 +273,15 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
       <div id="insta-preview-compat" class="insta-preview" hidden></div>
     </div>
   `;
+  const pairLegend = legendPair(tiA, tiB);
   const imgData = {
     nameA: nameA ? `${nameA}さん` : "あなた", nameB: nameB ? `${nameB}さん` : "お相手",
     elA, elB, labelA: label(c.A), labelB: label(c.B),
     total: c.total, title: `「${c.stemPair.title}」`, sub: c.sub, shrine: s.name,
     trueA: tiA.name, trueB: tiB.name,
+    kanaA: tiA.kana || '', kanaB: tiB.kana || '',
+    catchA: tiA.catch, catchB: tiB.catch,
+    legendTitle: pairLegend ? pairLegend.title : '',
     pairs: ["japan", "greece", "norse", "yokai"].map((key) => [CATEGORIES.find((x) => x.key === key).label, c.A.identities[key].name, c.B.identities[key].name]),
   };
   document.getElementById("insta-share-compat").addEventListener("click", () =>
