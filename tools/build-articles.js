@@ -580,9 +580,84 @@ fs.writeFileSync(path.join(OUT, "index.html"), page({
   body: indexPage(), hasAd: false,
 }));
 
+// ---- 正体ごとのシェア用ページ（t/番号.html）----
+// Xなどでシェアしたとき、リンクのカードにその正体の画像（img/ogp/t番号.jpg）と名前が出るようにする。
+// 番号は TRUE_IDENTITIES の並び順（1〜100）。並びを変えるとURLが変わるので、正体は末尾に足すこと。
+// カード画像は tools/make-ogp-images.ps1 で作る（材料は tools/ogp-manifest.json に書き出す）
+const T_DIR = path.join(ROOT, "t");
+fs.mkdirSync(T_DIR, { recursive: true });
+const manifest = [];
+TRUE_IDENTITIES.forEach((t, i) => {
+  const n = i + 1, el = ORDER[Math.floor(t.stem / 2)], img = IMAGES[t.name];
+  const url = `${SITE}t/${n}.html`, ogImage = `${SITE}img/ogp/t${n}.jpg`;
+  const title = `本当の正体は「${t.name}」｜${t.catch}`;
+  const desc = `${t.origin}の${t.type}「${t.name}」。${t.essence}`.slice(0, 120);
+  const nameHtml = t.kana ? `<ruby>${t.name}<rt>${t.kana}</rt></ruby>` : t.name;
+  manifest.push({ n, name: t.name, kana: t.kana || "", catch: t.catch, origin: `${t.origin}・${t.type}`,
+    color: ELEMENTS[el].color, img: img ? img.src : "", credit: img ? img.credit : "" });
+  fs.writeFileSync(path.join(T_DIR, `${n}.html`), `<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${title}｜八百万診断</title>
+  <meta name="description" content="${desc}">
+  <link rel="canonical" href="${url}">
+  <meta property="og:title" content="${title}">
+  <meta property="og:description" content="あなたの正体は神か、妖怪か。生年月日で無料診断。">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="${url}">
+  <meta property="og:site_name" content="八百万診断">
+  <meta property="og:image" content="${ogImage}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="${ogImage}">
+  <link rel="stylesheet" href="../css/style.css?v=${VERSION}">
+</head>
+<body>
+  <header class="site-header">
+    <a href="../" class="logo">⛩️ 八百万診断</a>
+    <nav class="site-nav"><a href="../">正体診断</a><a href="../#compat">相性診断</a><a href="../articles/">読みもの</a></nav>
+  </header>
+  <main class="container">
+    <article class="card article share-page" style="--el:${ELEMENTS[el].color}">
+      <p class="share-lead">シェアされた「本当の正体」</p>
+      ${figure(t.name)}
+      <p class="ti-origin">${t.origin}・${t.type}</p>
+      <h1 class="ti-name">${nameHtml}</h1>
+      <p class="ti-catch">「${t.catch}」</p>
+      <a class="cta-btn" href="../">⛩️ あなたの正体も診断する（無料）</a>
+      <h2>本質</h2><p>${t.essence}</p>
+      <dl class="ti-dl">
+        <dt>✨ 長所</dt><dd>${t.good}</dd>
+        <dt>⚠️ 短所</dt><dd>${t.weak}</dd>
+        <dt>💞 恋愛・人間関係</dt><dd>${t.love}</dd>
+        <dt>💼 仕事・才能</dt><dd>${t.work}</dd>
+      </dl>
+      ${placeLine(t.name).replace('href="places.html', 'href="../articles/places.html')}
+      <div class="cta">
+        <p>生年月日から、四柱推命・西洋占星術・紫微斗数で「100の正体」のどれかを診断します。</p>
+        <a class="cta-btn" href="../">⛩️ あなたの正体を診断する</a>
+        <a class="cta-btn sub" href="../articles/true-identities.html#ti-${n}">🌟 本当の正体図鑑でほかの正体を見る</a>
+      </div>
+    </article>
+  </main>
+  <footer class="site-footer">
+    <p>当サイトはアフィリエイト広告を利用しています。</p>
+    <p><a href="../privacy.html">プライバシーポリシー・免責事項</a></p>
+    <p>診断結果は娯楽としてお楽しみください。</p>
+    <p>© 2026 八百万診断</p>
+  </footer>
+</body>
+</html>
+`);
+});
+fs.writeFileSync(path.join(ROOT, "tools", "ogp-manifest.json"), JSON.stringify(manifest, null, 1));
+
 // サイトマップ
 const today = new Date().toISOString().slice(0, 10);
-const urls = ["", "privacy.html", "articles/", ...ARTICLES.map((a) => "articles/" + a.file)];
+const urls = ["", "privacy.html", "articles/", ...ARTICLES.map((a) => "articles/" + a.file), ...TRUE_IDENTITIES.map((_, i) => `t/${i + 1}.html`)];
 fs.writeFileSync(path.join(ROOT, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map((u) => `  <url><loc>${SITE}${u}</loc><lastmod>${today}</lastmod></url>`).join("\n")}

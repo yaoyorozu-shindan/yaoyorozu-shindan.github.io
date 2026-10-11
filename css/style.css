@@ -593,3 +593,10 @@ a { color: var(--accent); }
 .consult-list a { display: block; padding: 12px 14px; border-radius: 12px; background: linear-gradient(135deg, #6b4fbb, #9a6fd6); color: #fff; font-weight: 700; text-decoration: none; text-align: center; }
 .consult-list small { display: block; text-align: center; color: var(--muted); font-size: 0.78rem; margin-top: 2px; }
 .consult-list img { position: absolute; width: 1px; height: 1px; opacity: 0; }
+
+/* ---- 正体ごとのシェア用ページ（t/番号.html） ---- */
+.share-page .share-lead, .share-page .ti-origin, .share-page .ti-name, .share-page .ti-catch { text-align: center; }
+.share-page .share-lead { margin: 0 0 8px; font-weight: 700; color: var(--muted); }
+.share-page .ti-name { font-size: 2.6rem; margin: 4px 0 0; color: var(--el); }
+.share-page .ti-name rt { font-size: 0.32em; }
+.share-page .a-fig img { object-position: center top; max-height: 380px; }
