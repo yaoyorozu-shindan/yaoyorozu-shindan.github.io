@@ -234,7 +234,8 @@ async function buildCompatShareImage(data) {
   const canvas = document.createElement('canvas');
   canvas.width = 1080; canvas.height = 1920;
   const ctx = canvas.getContext('2d');
-  const gold = '#efdaaa';
+  const legendary = !!data.legendTitle;
+  const gold = legendary ? '#ffe3a0' : '#efdaaa';
   ctx.fillStyle = '#090d1d'; ctx.fillRect(0, 0, 1080, 1920);
   [data.elA, data.elB].forEach((el, i) => {
     const x = i === 0 ? 300 : 780;
@@ -246,6 +247,21 @@ async function buildCompatShareImage(data) {
       ctx.lineWidth = j === 1 ? 2 : 1; ctx.strokeStyle = j === 1 ? '#efdaaa70' : '#efdaaa30'; ctx.stroke();
     });
   });
+  if (legendary) {
+    // 伝説の縁だけに、金の後光と放射状の光を重ねる。
+    ctx.save();
+    const halo=ctx.createRadialGradient(540,590,80,540,590,880);
+    halo.addColorStop(0,'#fff1ad70');halo.addColorStop(.42,'#d39b3640');halo.addColorStop(1,'#d39b3600');
+    ctx.fillStyle=halo;ctx.fillRect(0,0,1080,1920);
+    ctx.translate(540,590);
+    for(let i=0;i<32;i++){
+      ctx.rotate(Math.PI/16);
+      const ray=ctx.createLinearGradient(0,-140,0,-970);
+      ray.addColorStop(0,'#ffe5a600');ray.addColorStop(.35,'#ffe5a630');ray.addColorStop(1,'#ffe5a600');
+      ctx.fillStyle=ray;ctx.beginPath();ctx.moveTo(-3,-140);ctx.lineTo(-28,-970);ctx.lineTo(28,-970);ctx.lineTo(3,-140);ctx.fill();
+    }
+    ctx.restore();
+  }
   for (let i=0; i<56; i++) {
     const x = 95 + (i * 137 % 890), y = 250 + (i * 193 % 1210);
     ctx.fillStyle = i % 3 ? '#ffffff60' : gold;
@@ -255,6 +271,17 @@ async function buildCompatShareImage(data) {
   roundRect(ctx,54,92,972,1740,38); ctx.stroke();
   ctx.strokeStyle = '#efdaaa26';
   roundRect(ctx,68,106,944,1712,30); ctx.stroke();
+  if(legendary){
+    ctx.save();ctx.strokeStyle=gold;ctx.lineWidth=3;ctx.shadowColor='#ffc85a';ctx.shadowBlur=14;
+    roundRect(ctx,54,92,972,1740,38);ctx.stroke();
+    // 四隅の装飾。上下左右を反転して同じ意匠を揃える。
+    [[84,122,1,1],[996,122,-1,1],[84,1802,1,-1],[996,1802,-1,-1]].forEach(([x,y,sx,sy])=>{
+      ctx.save();ctx.translate(x,y);ctx.scale(sx,sy);ctx.beginPath();
+      ctx.moveTo(0,108);ctx.lineTo(0,22);ctx.quadraticCurveTo(0,0,22,0);ctx.lineTo(108,0);
+      ctx.moveTo(12,76);ctx.bezierCurveTo(58,72,64,24,25,25);ctx.bezierCurveTo(8,25,16,58,43,43);ctx.stroke();
+      ctx.fillStyle=gold;ctx.beginPath();ctx.moveTo(70,13);ctx.lineTo(79,24);ctx.lineTo(70,35);ctx.lineTo(61,24);ctx.closePath();ctx.fill();ctx.restore();
+    });ctx.restore();
+  }
   ctx.textAlign = 'center'; ctx.fillStyle = gold;
   ctx.font = `700 44px ${SHARE_FONT}`; ctx.fillText('八 百 万 診 断',540,198);
   ctx.fillStyle = '#fff5e3'; ctx.font = `700 42px ${SHARE_FONT}`;
@@ -280,6 +307,8 @@ async function buildCompatShareImage(data) {
     }
     ctx.restore();ctx.lineWidth=2;ctx.strokeStyle='#efdaaaa0';
     roundRect(ctx,side.x,366,382,466,65);ctx.stroke();
+    if(legendary){ctx.save();ctx.strokeStyle=gold;ctx.lineWidth=3;ctx.shadowColor='#ffcb65';ctx.shadowBlur=22;
+      roundRect(ctx,side.x-7,359,396,480,70);ctx.stroke();ctx.restore();}
     ctx.fillStyle=gold;fitText(ctx,side.trueName || '',side.cx,914,386,64,800);
     if(side.kana){ctx.fillStyle='#cfc8df';fitText(ctx,side.kana,side.cx,952,370,24,500);}
     ctx.fillStyle='#efdaaa';fitText(ctx,side.label,side.cx,997,370,27,700);
@@ -288,11 +317,26 @@ async function buildCompatShareImage(data) {
   ctx.fillStyle=gold;ctx.font=`300 52px ${SHARE_FONT}`;ctx.fillText('×',540,606);
   // 相性％を中央に大きく。恋愛・友情・仕事は読みやすい3列に。
   ctx.fillStyle='#d9d2e4';ctx.font=`700 28px ${SHARE_FONT}`;ctx.fillText('ふたりの相性',540,1160);
-  ctx.fillStyle='#fff3d6';ctx.font=`800 166px ${SHARE_FONT}`;ctx.fillText(`${data.total}%`,540,1322);
-  ctx.fillStyle=gold;ctx.font=`700 26px ${SHARE_FONT}`;
-  ctx.fillText(data.legendTitle ? '伝説の組み合わせ' : 'ふたりを例えると',540,1380);
-  ctx.fillStyle='#fff5e3';
-  drawShareLines(ctx,data.legendTitle ? `「${data.legendTitle}」` : data.title,540,1435,840,40,2,700);
+  ctx.save();
+  if(legendary){ctx.shadowColor='#ffbb45';ctx.shadowBlur=34;}
+  ctx.fillStyle=legendary ? gold : '#fff3d6';ctx.font=`800 166px ${SHARE_FONT}`;ctx.fillText(`${data.total}%`,540,1322);
+  ctx.restore();
+  if(legendary){
+    ctx.save();
+    const panel=ctx.createLinearGradient(0,1355,0,1478);
+    panel.addColorStop(0,'#67461d');panel.addColorStop(.5,'#2b2118');panel.addColorStop(1,'#503319');
+    ctx.fillStyle=panel;ctx.strokeStyle=gold;ctx.lineWidth=2;
+    roundRect(ctx,112,1355,856,132,18);ctx.fill();ctx.stroke();
+    const ribbon=ctx.createLinearGradient(300,0,780,0);
+    ribbon.addColorStop(0,'#a76b21');ribbon.addColorStop(.5,'#ffe6a7');ribbon.addColorStop(1,'#a76b21');
+    ctx.fillStyle=ribbon;ctx.beginPath();ctx.moveTo(290,1338);ctx.lineTo(790,1338);ctx.lineTo(766,1363);ctx.lineTo(790,1388);ctx.lineTo(290,1388);ctx.lineTo(314,1363);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#30200e';ctx.font=`800 28px ${SHARE_FONT}`;ctx.fillText('✦  伝説の組み合わせ  ✦',540,1374);
+    ctx.fillStyle='#fff4d4';drawShareLines(ctx,`「${data.legendTitle}」`,540,1434,798,38,2,700);
+    ctx.restore();
+  }else{
+    ctx.fillStyle=gold;ctx.font=`700 26px ${SHARE_FONT}`;ctx.fillText('ふたりを例えると',540,1380);
+    ctx.fillStyle='#fff5e3';drawShareLines(ctx,data.title,540,1435,840,40,2,700);
+  }
   const bars=[['恋愛',data.sub.love],['友情',data.sub.friend],['仕事',data.sub.work]];
   bars.forEach(([label,value],i)=>{
     const x=270+i*270;
