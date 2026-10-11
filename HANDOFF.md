@@ -1,6 +1,8 @@
 # 八百万診断 引き継ぎ資料
 
-別のチャット（Claude・ChatGPTなど）でこのプロジェクトを続けるための資料です。
+別のチャット（Claude・Codex・ChatGPTなど）でこのプロジェクトを続けるための資料です。
+Claude の残量が少なくなったら Codex（パソコン版、このフォルダで `codex` を起動）に引き継ぐ運用。AIの約束ごとは `CLAUDE.md`（Claude用）と `AGENTS.md`（Codexなど用）に同じ内容で書いてある。
+**どのAIも、作業の区切りでこの HANDOFF.md を最新の状態に更新すること。**
 **AIへの最初のお願いの例：**「このリポジトリの HANDOFF.md を読んで、八百万診断の続きを手伝って」
 
 ---
@@ -57,6 +59,7 @@ articles/          記事（tools/build-articles.js で自動生成。直接編�
 img/ogp.png        SNSでリンクを貼ったときの画像
 img/true/          AIで作った正体の絵（900px幅のJPEGに縮小して置く）
 tools/             更新用のスクリプト
+CLAUDE.md / AGENTS.md  AI向けの約束ごと（片方を変えたらもう片方も同じように直す）
 ```
 
 ## 4. 更新して公開する手順
