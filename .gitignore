@@ -1,3 +1,4 @@
 .claude/
 tools/.ogp-cache/
 tools/ogp-manifest.json
+tools/ogp-compat-manifest.json

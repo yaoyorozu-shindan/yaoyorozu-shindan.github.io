@@ -248,7 +248,10 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
   }).join("");
 
   const shareText = `${nameA || "わたし"}（${tiA.name}）× ${nameB || "お相手"}（${tiB.name}）の相性は ${c.total}%！\n「${c.stemPair.title}」\n#八百万診断 #相性診断`;
-  const shareUrl = SITE_CONFIG.siteUrl || location.href.split("#")[0];
+  // 相性のシェア用ページ：伝説の組み合わせなら c/l番号.html、それ以外は日干の組み合わせ c/日干-日干.html
+  const legendIdx = LEGEND_PAIRS.indexOf(legendPair(tiA, tiB));
+  const [loStem, hiStem] = [c.A.stem.index, c.B.stem.index].sort((x, y) => x - y);
+  const shareUrl = (SITE_CONFIG.siteUrl || location.href.split("#")[0]) + (legendIdx >= 0 ? `c/l${legendIdx + 1}.html` : `c/${loStem}-${hiStem}.html`);
   const s = c.shrine;
   // 宿曜の相性の名前（折りたたみを閉じていても見えるように）
   const sukuyoName = typeof Astronomy !== "undefined" ? sukuyoPair(sukuyoOf(bdayA), sukuyoOf(bdayB)).name : "";

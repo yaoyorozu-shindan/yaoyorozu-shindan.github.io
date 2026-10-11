@@ -10,10 +10,10 @@ const SITE = "https://yaoyorozu-shindan.github.io/";
 const PUBLISHED = "2026-10-11";
 
 // サイトのデータを読み込む
-const src = ["js/config.js", "js/fortune-data.js", "js/images.js", "js/true-identity-a.js", "js/true-identity-b.js", "js/places.js"]
+const src = ["js/config.js", "js/fortune-data.js", "js/images.js", "js/true-identity-a.js", "js/true-identity-b.js", "js/places.js", "js/compat-stems.js"]
   .map((f) => fs.readFileSync(path.join(ROOT, f), "utf8")).join("\n");
-const D = new Function(src + "; return { amazonLink, SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES, PLACES, sjisPercent };")();
-const { amazonLink, SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES, PLACES, sjisPercent } = D;
+const D = new Function(src + "; return { amazonLink, SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES, PLACES, sjisPercent, STEM_PAIRS, ASPECT_TEXT, LEGEND_PAIRS };")();
+const { amazonLink, SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES, PLACES, sjisPercent, STEM_PAIRS, ASPECT_TEXT, LEGEND_PAIRS } = D;
 const ORDER = ["wood", "fire", "earth", "metal", "water"];
 const VERSION = (fs.readFileSync(path.join(ROOT, "index.html"), "utf8").match(/style\.css\?v=(\d+)/) || [])[1] || "1";
 
@@ -656,9 +656,136 @@ TRUE_IDENTITIES.forEach((t, i) => {
 });
 fs.writeFileSync(path.join(ROOT, "tools", "ogp-manifest.json"), JSON.stringify(manifest, null, 1));
 
+// ---- 相性のシェア用ページ（c/l番号.html＝伝説の組み合わせ、c/日干-日干.html＝日干の組み合わせ）----
+// 相性診断のXシェアのリンク先。カード画像は img/ogp/cl番号.jpg・img/ogp/c日干-日干.jpg（tools/make-ogp-images.ps1）
+// 伝説の番号は LEGEND_PAIRS の並び順。並べ替えるとURLが変わるので、増やすときは末尾に足すこと。
+const C_DIR = path.join(ROOT, "c");
+fs.mkdirSync(C_DIR, { recursive: true });
+const compatManifest = [];
+const STEM_SHORT = ["大樹", "草花", "太陽", "灯火", "山", "田畑", "剣", "宝石", "大海", "雨"];
+const stemLabel = (i) => `${STEM_INFO[i][0]}（${STEM_SHORT[i]}）`;
+const relOf = (i, j) => {
+  const a = Math.floor(i / 2), b = Math.floor(j / 2);
+  if (a === b) return "same";
+  return (a + 1) % 5 === b || (b + 1) % 5 === a ? "gen" : "ctrl";
+};
+const REL_NAME = { same: "似た者同士の「比和」", gen: "支え合う「相生」", ctrl: "刺激し合う「相剋」" };
+const tIndex = (name) => TRUE_IDENTITIES.findIndex((t) => t.name === name);
+const tLink = (name) => `<a href="../t/${tIndex(name) + 1}.html">${name}</a>`;
+
+function sharePageShell({ file, title, desc, ogImage, ogDesc, body }) {
+  const url = `${SITE}c/${file}`;
+  return `<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${title}｜八百万診断</title>
+  <meta name="description" content="${desc}">
+  <link rel="canonical" href="${url}">
+  <meta property="og:title" content="${title}">
+  <meta property="og:description" content="${ogDesc}">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="${url}">
+  <meta property="og:site_name" content="八百万診断">
+  <meta property="og:image" content="${ogImage}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="${ogImage}">
+  <link rel="stylesheet" href="../css/style.css?v=${VERSION}">
+</head>
+<body>
+  <header class="site-header">
+    <a href="../" class="logo">⛩️ 八百万診断</a>
+    <nav class="site-nav"><a href="../">正体診断</a><a href="../#compat">相性診断</a><a href="../articles/">読みもの</a></nav>
+  </header>
+  <main class="container">
+    <article class="card article share-page">
+${body}
+      <div class="cta">
+        <p>ふたりの生年月日から、五行・宿曜・本当の正体の組み合わせで相性を診断します。</p>
+        <a class="cta-btn sub" href="../#compat">💞 あなたも相性を診断する（無料）</a>
+        <a class="cta-btn" href="../">⛩️ 自分の本当の正体を診断する</a>
+      </div>
+    </article>
+  </main>
+  <footer class="site-footer">
+    <p>当サイトはアフィリエイト広告を利用しています。</p>
+    <p><a href="../privacy.html">プライバシーポリシー・免責事項</a></p>
+    <p>診断結果は娯楽としてお楽しみください。</p>
+    <p>© 2026 八百万診断</p>
+  </footer>
+</body>
+</html>
+`;
+}
+
+// 伝説の組み合わせ
+LEGEND_PAIRS.forEach((lp, k) => {
+  const n = k + 1, A = TRUE_IDENTITIES[tIndex(lp.a)], B = TRUE_IDENTITIES[tIndex(lp.b)];
+  const elA = ORDER[Math.floor(A.stem / 2)], elB = ORDER[Math.floor(B.stem / 2)];
+  const imgA = IMAGES[A.name], imgB = IMAGES[B.name];
+  compatManifest.push({ kind: "legend", file: `cl${n}`, title: lp.title, a: A.name, b: B.name,
+    colorA: ELEMENTS[elA].color, colorB: ELEMENTS[elB].color,
+    imgA: imgA ? imgA.src : "", imgB: imgB ? imgB.src : "", creditA: imgA ? imgA.credit : "", creditB: imgB ? imgB.credit : "" });
+  fs.writeFileSync(path.join(C_DIR, `l${n}.html`), sharePageShell({
+    file: `l${n}.html`, title: `伝説の組み合わせ「${A.name}×${B.name}」｜${lp.title}`,
+    desc: `${A.name}と${B.name}は、神話・伝承でゆかりのある「伝説の組み合わせ」。${lp.text}`.slice(0, 120),
+    ogImage: `${SITE}img/ogp/cl${n}.jpg`, ogDesc: "ふたりの本当の正体は伝説の組み合わせ！あなたたちの相性も無料で診断。",
+    body: `      <p class="share-lead">シェアされた「伝説の組み合わせ」</p>
+      <div class="pair-ti-row legend-share">
+        <div class="pair-ti">${figure(A.name, true)}<p class="pair-ti-name">${tLink(A.name)}</p><p class="pair-ti-catch">${A.catch}</p></div>
+        <span class="pair-x">×</span>
+        <div class="pair-ti">${figure(B.name, true)}<p class="pair-ti-name">${tLink(B.name)}</p><p class="pair-ti-catch">${B.catch}</p></div>
+      </div>
+      <div class="legend-pair"><p class="legend-badge">✨ 伝説の組み合わせ</p><h1>${lp.title}</h1><p>${lp.text}</p></div>
+      <p class="note">ふたりの正体が${A.name}と${B.name}になったとき、この「伝説の組み合わせ」が現れます。正体は生年月日（と出生時刻）で決まります。</p>`,
+  }));
+});
+
+// 日干の組み合わせ（55通り）
+Object.entries(STEM_PAIRS).forEach(([key, sp]) => {
+  const [i, j] = key.split("-").map(Number);
+  const rel = relOf(i, j), kango = Math.abs(i - j) === 5, polDiff = i % 2 !== j % 2;
+  const aspect = ASPECT_TEXT[rel][polDiff ? "diff" : "same"];
+  const text = sp.text.replace(/\{A\}/g, `${stemLabel(i)}の人`).replace(/\{B\}/g, `${stemLabel(j)}の人`);
+  const elI = ORDER[Math.floor(i / 2)], elJ = ORDER[Math.floor(j / 2)];
+  const examples = (st) => TRUE_IDENTITIES.filter((t) => t.stem === st).slice(0, 5).map((t) => tLink(t.name)).join("・");
+  const legends = LEGEND_PAIRS.map((lp, k) => ({ lp, k })).filter(({ lp }) => {
+    const sa = TRUE_IDENTITIES[tIndex(lp.a)].stem, sb = TRUE_IDENTITIES[tIndex(lp.b)].stem;
+    return (sa === i && sb === j) || (sa === j && sb === i);
+  });
+  const pairName = i === j ? `${stemLabel(i)}どうし` : `${stemLabel(i)}と${stemLabel(j)}`;
+  compatManifest.push({ kind: "stem", file: `c${key}`, title: sp.title, stemA: STEM_INFO[i][0], stemB: STEM_INFO[j][0],
+    shortA: STEM_SHORT[i], shortB: STEM_SHORT[j], colorA: ELEMENTS[elI].color, colorB: ELEMENTS[elJ].color,
+    rel: REL_NAME[rel] + (kango ? "・干合" : "") });
+  fs.writeFileSync(path.join(C_DIR, `${key}.html`), sharePageShell({
+    file: `${key}.html`, title: `${pairName}の相性｜${sp.title}`,
+    desc: `四柱推命の日干でみる${pairName}の相性。${text}`.slice(0, 120),
+    ogImage: `${SITE}img/ogp/c${key}.jpg`, ogDesc: "生年月日でわかる、ふたりの相性。あなたたちも無料で診断。",
+    body: `      <p class="share-lead">シェアされた「ふたりの相性」</p>
+      <p class="stem-pair-big"><span style="color:${ELEMENTS[elI].color}">${STEM_INFO[i][0]}</span> × <span style="color:${ELEMENTS[elJ].color}">${STEM_INFO[j][0]}</span></p>
+      <h1 class="stem-pair-title">「${sp.title}」</h1>
+      <p class="compat-rel" style="text-align:center">${REL_NAME[rel]}${kango ? '<span class="kango">💞 干合</span>' : ""}</p>
+      <p>${text}</p>
+      <dl class="ti-dl">
+        <dt>💞 恋愛</dt><dd>${aspect.love}</dd>
+        <dt>🤝 友情</dt><dd>${aspect.friend}</dd>
+        <dt>💼 仕事</dt><dd>${aspect.work}</dd>
+      </dl>
+      <h2>この組み合わせの本当の正体の例</h2>
+      <p>${stemLabel(i)}の人：${examples(i)} など</p>
+      ${i !== j ? `<p>${stemLabel(j)}の人：${examples(j)} など</p>` : ""}
+      ${legends.length ? `<p>この組み合わせで現れる伝説の組み合わせ：${legends.map(({ lp, k }) => `<a href="l${k + 1}.html">${lp.a}×${lp.b}</a>`).join("、")}</p>` : ""}
+      <p class="note">日干（にっかん）は、生まれた日の十干です。四柱推命では、日干がその人自身をあらわすとされます。<a href="../articles/how-it-works.html">日干とは？</a></p>`,
+  }));
+});
+fs.writeFileSync(path.join(ROOT, "tools", "ogp-compat-manifest.json"), JSON.stringify(compatManifest, null, 1));
+
 // サイトマップ
 const today = new Date().toISOString().slice(0, 10);
-const urls = ["", "privacy.html", "articles/", ...ARTICLES.map((a) => "articles/" + a.file), ...TRUE_IDENTITIES.map((_, i) => `t/${i + 1}.html`)];
+const urls = ["", "privacy.html", "articles/", ...ARTICLES.map((a) => "articles/" + a.file), ...TRUE_IDENTITIES.map((_, i) => `t/${i + 1}.html`), ...LEGEND_PAIRS.map((_, k) => `c/l${k + 1}.html`), ...Object.keys(STEM_PAIRS).map((key) => `c/${key}.html`)];
 fs.writeFileSync(path.join(ROOT, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map((u) => `  <url><loc>${SITE}${u}</loc><lastmod>${today}</lastmod></url>`).join("\n")}

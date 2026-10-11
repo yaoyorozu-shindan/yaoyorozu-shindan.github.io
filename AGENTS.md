@@ -26,3 +26,4 @@ Codex など、このリポジトリで作業するAI向けの約束ごとです
 - この約束ごとを変えたら `CLAUDE.md`（Claude 用）も同じように直す。
 - 本当の正体（`js/true-identity-*.js`）は**必ず末尾に足す**（途中に入れたり並べ替えたりしない）。シェア用ページ `t/番号.html` の番号が並び順で決まるため、ずれると過去にシェアされたURLの中身が変わってしまう。
 - 本当の正体の絵・名前・キャッチコピーを変えたら、Xカード画像を `tools/make-ogp-images.ps1` で作り直す。
+- 伝説の組み合わせ（`js/compat-stems.js` の `LEGEND_PAIRS`）も**必ず末尾に足す**（相性のシェア用ページ `c/l番号.html` の番号が並び順で決まるため）。相性の見出し（`STEM_PAIRS` の title・伝説の title）を変えたら、`tools/make-ogp-images.ps1 -Kind compat` でカード画像を作り直す。
