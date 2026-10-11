@@ -461,3 +461,16 @@ a { color: var(--accent); }
 /* ---- 生年月日（年・月・日を選ぶ形） ---- */
 .date-select { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 6px; }
 .date-select select { font-size: 1rem; padding: 10px 8px; border: 1px solid var(--border); border-radius: 10px; font-family: inherit; background: #fff; color: inherit; min-width: 0; }
+
+/* ---- 記事：本当の正体100体の図鑑 ---- */
+.ti-index { font-size: 0.88rem; line-height: 1.9; }
+.ti-entry { border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin: 12px 0; scroll-margin-top: 12px; }
+.ti-entry::after { content: ""; display: block; clear: both; }
+.ti-entry .a-fig { float: right; width: 38%; max-width: 180px; margin: 0 0 8px 12px; }
+.ti-entry h3 { margin: 2px 0 0; font-size: 1.25rem; }
+.ti-entry .ti-catch { margin: 2px 0 8px; }
+.ti-dl { margin: 8px 0; font-size: 0.92rem; }
+.ti-dl dt { font-weight: 700; margin-top: 6px; }
+.ti-dl dd { margin: 2px 0 0; }
+.ti-cond { font-size: 0.78rem; color: var(--muted); margin: 8px 0 4px; }
+.back-top { text-align: right; font-size: 0.85rem; }

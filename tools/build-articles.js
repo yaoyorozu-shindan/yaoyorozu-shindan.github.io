@@ -10,10 +10,10 @@ const SITE = "https://yaoyorozu-shindan.github.io/";
 const PUBLISHED = "2026-10-11";
 
 // サイトのデータを読み込む
-const src = ["js/config.js", "js/fortune-data.js", "js/images.js"]
+const src = ["js/config.js", "js/fortune-data.js", "js/images.js", "js/true-identity-a.js", "js/true-identity-b.js"]
   .map((f) => fs.readFileSync(path.join(ROOT, f), "utf8")).join("\n");
-const D = new Function(src + "; return { SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES };")();
-const { SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES } = D;
+const D = new Function(src + "; return { SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES };")();
+const { SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES } = D;
 const ORDER = ["wood", "fire", "earth", "metal", "water"];
 const VERSION = (fs.readFileSync(path.join(ROOT, "index.html"), "utf8").match(/style\.css\?v=(\d+)/) || [])[1] || "1";
 
@@ -55,6 +55,8 @@ const label = (el, yang) => `${yang ? "陽" : "陰"}の${ELEMENTS[el].name}`;
 
 // ---- 記事の一覧（タイトル・説明） ----
 const ARTICLES = [
+  { file: "true-identities.html", title: "本当の正体100体の図鑑｜神・霊獣・妖怪の性格と恋愛・仕事の傾向", short: "🌟 本当の正体100体の図鑑",
+    desc: "八百万診断の「本当の正体」100体を、日干（甲〜癸）ごとに紹介。スサノオ、女媧、アヌビスなど、世界の神話の神や霊獣・妖怪の本質、長所・短所、恋愛、仕事の向き不向きがわかります。" },
   ...ORDER.map((el) => ({
     file: `element-${el}.html`,
     title: `「${ELEMENTS[el].name}」属性の性格と特徴｜正体・相性・開運スポット`,
@@ -396,6 +398,60 @@ function zukan(keys, intro) {
   }).join("");
 }
 
+// ---- 本当の正体100体の図鑑 ----
+const STEM_INFO = [
+  ["甲", "きのえ", "天に向かって伸びる大樹"], ["乙", "きのと", "しなやかに広がる草花"],
+  ["丙", "ひのえ", "天を照らす太陽"], ["丁", "ひのと", "闇を照らす灯火"],
+  ["戊", "つちのえ", "どっしりそびえる山"], ["己", "つちのと", "作物を育てる田畑"],
+  ["庚", "かのえ", "鍛えられた剣"], ["辛", "かのと", "磨かれた宝石"],
+  ["壬", "みずのえ", "果てしない大海"], ["癸", "みずのと", "大地をうるおす雨"],
+];
+const WEST_NAME = { fire: "火", earth: "地", air: "風", water: "水" };
+
+function trueIdentitiesArticle() {
+  const toc = STEM_INFO.map(([k, yomi, img], i) =>
+    `<li><a href="#stem-${i}">${k}（${yomi}）</a>：${label(ORDER[Math.floor(i / 2)], i % 2 === 0)}・${img}</li>`).join("");
+  const sections = STEM_INFO.map(([k, yomi, img], i) => {
+    const el = ORDER[Math.floor(i / 2)];
+    const list = TRUE_IDENTITIES.map((t, n) => ({ t, n })).filter(({ t }) => t.stem === i);
+    return `
+    <h2 id="stem-${i}">${ELEMENTS[el].icon} ${k}（${yomi}）の正体10体</h2>
+    <p>${k}は${label(el, i % 2 === 0)}。イメージは「${img}」です。日干が${k}の人は、次の10体のどれかが本当の正体になります。</p>
+    <p class="ti-index">${list.map(({ t, n }) => `<a href="#ti-${n + 1}">${t.name}</a>`).join("／")}</p>
+    ${list.map(({ t, n }) => `
+    <section class="ti-entry" id="ti-${n + 1}">
+      ${figure(t.name, true)}
+      <p class="ti-origin">${t.origin}・${t.type}</p>
+      <h3>${t.name}</h3>
+      <p class="ti-catch">「${t.catch}」</p>
+      <p>${t.essence}</p>
+      <dl class="ti-dl">
+        <dt>✨ 長所</dt><dd>${t.good}</dd>
+        <dt>⚠️ 短所</dt><dd>${t.weak}</dd>
+        <dt>💞 恋愛・人間関係</dt><dd>${t.love}</dd>
+        <dt>💼 仕事・才能</dt><dd>${t.work}</dd>
+      </dl>
+      <p class="ti-cond">なりやすい条件：日干が${k}／西洋占星術で「${WEST_NAME[t.west]}」の星座が強い／紫微斗数の命宮に${t.stars.join("・")}</p>
+      <a href="${wikiUrl(t.wiki)}" target="_blank" rel="noopener">Wikipediaで詳しく ↗</a>
+    </section>`).join("")}
+    <p class="back-top"><a href="#toc">▲ 目次へ戻る</a></p>`;
+  }).join("");
+  return `
+    <p>八百万診断の主役「本当の正体」は、世界中の神話や伝承から選んだ<b>100体</b>。そのうち約6割が神さまで、ほかに霊獣・精霊・妖怪なども登場します。このページでは、100体すべての本質・長所・短所・恋愛・仕事の傾向を紹介します。</p>
+
+    <h2>本当の正体の決まり方</h2>
+    <ol>
+      <li>生まれた日の<b>日干（にっかん）</b>で、100体を10体にしぼります（<a href="how-it-works.html">日干とは？</a>）。</li>
+      <li>その10体の中から、<b>西洋占星術</b>（太陽・月・アセンダントの星座の元素）と<b>紫微斗数</b>（命宮の主星）の結果がいちばん重なる存在を選びます。</li>
+      <li>出生時刻と出生地も入れると、アセンダントや紫微斗数が加わり、より精密に判定できます。</li>
+    </ol>
+
+    <h2 id="toc">目次（日干ごと）</h2>
+    <ul>${toc}</ul>
+    ${sections}
+    <p class="note">※八百万診断は、四柱推命・西洋占星術・紫微斗数をもとにした娯楽のためのオリジナル診断です。各キャラクターの性格は、神話や伝承のイメージから描いたものです。</p>`;
+}
+
 function howItWorksArticle() {
   const stems = ["甲（きのえ）", "乙（きのと）", "丙（ひのえ）", "丁（ひのと）", "戊（つちのえ）", "己（つちのと）", "庚（かのえ）", "辛（かのと）", "壬（みずのえ）", "癸（みずのと）"];
   const rows = stems.map((s, i) => {
@@ -435,6 +491,7 @@ function indexPage() {
 // ---- 書き出し ----
 fs.mkdirSync(OUT, { recursive: true });
 const bodies = {
+  "true-identities.html": [trueIdentitiesArticle(), false],
   "compatibility.html": [compatibilityArticle(), false],
   "birthstones.html": [birthstonesArticle(), true],
   "power-stones.html": [powerStonesArticle(), true],

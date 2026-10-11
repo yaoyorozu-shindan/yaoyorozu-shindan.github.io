@@ -401,6 +401,7 @@ function trueIdentityCard(ti, who, element) {
       <p class="note">同じ日干の10体の中から、西洋占星術と紫微斗数の結果がいちばん重なる存在を選んでいます。</p>
       <p class="ti-near">ほかに近い正体：${ti.runnersUp.map((r) => r.name).join("、")}</p>
     </details>
+    <a class="read-more" href="articles/true-identities.html#ti-${TRUE_IDENTITIES.indexOf(c) + 1}">🌟 本当の正体100体の図鑑で、ほかの正体も見る →</a>
     ${ti.detailed ? "" : '<p class="ti-more">🔭 出生時刻と出生地を入れると、紫微斗数やアセンダントも加わり、<b>より精密な正体</b>がわかります（「くわしく診断する」から）。</p>'}
     <a class="wiki-link" href="${wikiUrl(c.wiki)}" target="_blank" rel="noopener">${c.name}をWikipediaで詳しく見る ↗</a>
     ${bookLinks(c.name)}

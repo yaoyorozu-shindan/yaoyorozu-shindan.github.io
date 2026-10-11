@@ -30,7 +30,7 @@
 | 今日の運勢 | 毎日変わる。金運★4以上で楽天toto（BIG）の案内 | `js/fortune.js` |
 | 相性診断 | 2人の五行の関係（相生・比和・相剋）。1人だけなら相性ランキング | `js/compat.js` |
 | シェア | X、インスタ用画像（1080×1920） | `js/share-image.js` |
-| 読みもの | 記事12本＋一覧（自動生成） | `articles/`（生成元 `tools/build-articles.js`） |
+| 読みもの | 記事13本＋一覧（自動生成） | `articles/`（生成元 `tools/build-articles.js`） |
 
 ### 本当の正体の判定（`js/true-judge.js`）
 1. 日干で10体にしぼる
@@ -50,6 +50,7 @@ css/style.css      デザイン
 js/config.js       サイトURL・アフィリエイトID（★ここだけ触ればIDが反映）
 js/fortune-data.js 文章データ（属性・7カテゴリの候補・神社・石・運勢文）
 js/images.js       結果の画像URLとクレジット（tools/fetch-images.js で自動生成）
+js/date-select.js  生年月日の入力を「年・月・日」を選ぶ形にする（スマホではドラム式）
 js/*.js            各占いのロジック（上の表）
 articles/          記事（tools/build-articles.js で自動生成。直接編集しない）
 img/ogp.png        SNSでリンクを貼ったときの画像
@@ -76,7 +77,7 @@ tools/             更新用のスクリプト
 
 ## 6. これからのアイデア（優先度順の目安）
 - ~~相性診断に「ふたりの本当の正体」の組み合わせを出す~~（完了）
-- 記事「本当の正体100体の図鑑」を追加（検索流入）
+- ~~記事「本当の正体100体の図鑑」を追加~~（完了：`articles/true-identities.html`。診断結果から該当の正体へリンク）
 - 絵のない正体13体の画像をAIで生成して差し替え（`js/images.js` の `src` を差し替えるだけ）
 - 7カテゴリの候補にも短所を追加
 - ゆかりの地・パワースポット巡り（神話・怪異の伝承地を地図で）
