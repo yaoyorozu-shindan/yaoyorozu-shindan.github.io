@@ -576,7 +576,7 @@ function render(birthday, nickname, birthtime, birthplace) {
       <p class="share-title">結果をシェアする</p>
       <div class="share-btns">
         <a class="share-btn x" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}" target="_blank" rel="noopener">Xでシェア</a>
-        <button type="button" class="share-btn insta" id="insta-share">インスタでシェア</button>
+        <button type="button" class="share-btn insta" id="insta-share">インスタ用画像を作る</button>
       </div>
       <div id="insta-preview" class="insta-preview" hidden></div>
     </div>

@@ -268,7 +268,7 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
       <p class="share-title">相性をシェアする</p>
       <div class="share-btns">
         <a class="share-btn x" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}" target="_blank" rel="noopener">Xでシェア</a>
-        <button type="button" class="share-btn insta" id="insta-share-compat">インスタでシェア</button>
+        <button type="button" class="share-btn insta" id="insta-share-compat">インスタ用画像を作る</button>
       </div>
       <div id="insta-preview-compat" class="insta-preview" hidden></div>
     </div>

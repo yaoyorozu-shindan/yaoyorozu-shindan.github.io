@@ -98,28 +98,57 @@ function buildShareImage(data) {
   return new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
 }
 
-// ボタンが押されたとき：スマホなら共有メニュー（インスタを選べる）、それ以外は保存用のプレビューを出す
+// 画像を先に用意し、次のタップで共有する（Safariの操作判定を保つ）。
 async function shareToInstagram(data, previewEl, text, builder) {
-  const blob = await (builder || buildShareImage)(data);
-  const file = new File([blob], "yaoyorozu-shindan.png", { type: "image/png" });
-  const url = URL.createObjectURL(blob);
-  previewEl.innerHTML = `
-    <img src="${url}" alt="診断結果のシェア画像">
-    <p>画像を保存して、Instagramのストーリーズや投稿に使ってください。<br>スマホは画像を長押しでも保存できます。</p>
-    <a class="share-btn save" href="${url}" download="yaoyorozu-shindan.png">画像を保存する</a>`;
-  previewEl.hidden = false;
-
-  if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    try {
-      await navigator.share({ files: [file], text });
-    } catch (e) {
-      // 共有メニューを閉じただけなら何もしない
-    }
-  } else {
-    previewEl.scrollIntoView({ behavior: "smooth", block: "center" });
+  const request = {};
+  previewEl.shareRequest = request;
+  if (previewEl.shareImageUrl) {
+    URL.revokeObjectURL(previewEl.shareImageUrl);
+    previewEl.shareImageUrl = null;
   }
+  previewEl.hidden = false;
+  previewEl.innerHTML = '<p role="status">インスタ用の画像を作っています…</p>';
+  let blob;
+  try {
+    blob = await (builder || buildShareImage)(data);
+    if (!blob) throw new Error('Image creation failed');
+  } catch (error) {
+    if (previewEl.shareRequest === request) previewEl.innerHTML = '<p role="status">画像を作れませんでした。もう一度お試しください。</p>';
+    return;
+  }
+  if (previewEl.shareRequest !== request || !previewEl.isConnected) return;
+  const file = new File([blob], 'yaoyorozu-shindan.png', { type: 'image/png' });
+  const url = URL.createObjectURL(blob);
+  previewEl.shareImageUrl = url;
+  let canShare = false;
+  try { canShare = !!(navigator.share && navigator.canShare && navigator.canShare({ files: [file] })); } catch (error) {}
+  previewEl.innerHTML = `
+    <img src="${url}" alt="診断結果のインスタ用画像">
+    <p>画像ができました。共有メニューでInstagramを選んでください。<br>Instagramが見つからないときは「画像を保存」で写真に保存し、Instagramのストーリーズや投稿から選んでください。</p>
+    <div class="share-btns">
+      ${canShare ? '<button type="button" class="share-btn insta image-share">共有メニューを開く</button>' : ''}
+      <a class="share-btn save" href="${url}" download="yaoyorozu-shindan.png">画像を保存する</a>
+    </div>
+    <p class="share-status" role="status">${canShare ? 'Instagramアプリは、共有先で選んだ後に開きます。' : 'このブラウザでは画像の共有に対応していません。保存して投稿してください。'}</p>
+    <p>iPhoneで保存画面が開いた場合は、画像を開いて共有ボタンから「画像を保存」を選んでください。画像の長押しでも保存できます。</p>`;
+  if (canShare) {
+    const button = previewEl.querySelector('.image-share');
+    const status = previewEl.querySelector('.share-status');
+    button.addEventListener('click', async () => {
+      button.disabled = true;
+      try {
+        // 他の非同期処理を挟まず、タップ直後に画像だけを渡す。
+        await navigator.share({ files: [file] });
+        status.textContent = 'Instagramが見つからなかった場合は、画像を保存して投稿してください。';
+      } catch (error) {
+        status.textContent = error.name === 'AbortError'
+          ? '共有を閉じました。もう一度共有するか、画像を保存できます。'
+          : '共有メニューを開けませんでした。画像を保存してInstagramから投稿してください。';
+      } finally { button.disabled = false; }
+    });
+  }
+  previewEl.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
 }
-
 // ---- 相性診断のシェア画像（1080×1920）----
 // data: { nameA, nameB, elA, elB, labelA, labelB, total, title, sub: {love, friend, work}, pairs: [[ラベル, A, B]], shrine }
 function buildCompatShareImage(data) {
