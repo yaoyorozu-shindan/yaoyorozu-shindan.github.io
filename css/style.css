@@ -387,3 +387,22 @@ a { color: var(--accent); }
 .gx-track { height: 12px; background: var(--border); border-radius: 999px; overflow: hidden; }
 .gx-fill { height: 100%; border-radius: 999px; }
 .gx-advice { font-size: 0.92rem; }
+
+/* ---- 西洋占星術 ---- */
+.wheel { display: block; width: 100%; max-width: 300px; margin: 0 auto 12px; }
+.w-ring { fill: none; stroke: var(--border); stroke-width: 1.5; }
+.w-inner { fill: #f8f5fd; stroke: var(--border); }
+.w-line { stroke: var(--border); stroke-width: 1; }
+.w-sign { font-size: 16px; text-anchor: middle; dominant-baseline: central; font-family: "Segoe UI Symbol", "Apple Symbols", sans-serif; }
+.w-planet { font-size: 15px; text-anchor: middle; dominant-baseline: central; fill: var(--text); font-family: "Segoe UI Symbol", "Apple Symbols", sans-serif; }
+.w-axis { stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.w-label { font-size: 10px; font-weight: 700; fill: var(--accent); }
+.big3-wrap { display: grid; gap: 8px; }
+.big3 { border-left: 4px solid var(--wc); background: #faf8fd; border-radius: 10px; padding: 8px 12px; }
+.b3-label { margin: 0; font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+.b3-label small { font-weight: 400; }
+.b3-sign { margin: 2px 0; font-size: 1.2rem; font-weight: 800; color: var(--wc); }
+.b3-sign small { font-size: 0.8rem; color: var(--muted); font-weight: 400; }
+.b3-text { margin: 0; font-size: 0.88rem; }
+.horoscope-card h4 { margin: 14px 0 6px; }
+.planet-list summary { cursor: pointer; font-weight: 700; color: var(--accent); margin: 8px 0; }

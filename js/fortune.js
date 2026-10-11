@@ -284,6 +284,69 @@ function meishikiCard(fp) {
   </div>`;
 }
 
+// 西洋占星術のカード（ホロスコープの円・主要3点・天体一覧・4元素）
+function horoscopeWheel(wc) {
+  const cx = 150, cy = 150, R1 = 140, R2 = 112, R3 = 80;
+  const base = wc.asc ? wc.asc.lon : 0; // ASCを左（9時の位置）に置く。なければ牡羊座0度を左に
+  // 反時計回り（黄経が増えると下へ進む）が一般的なホロスコープの向き
+  const pos = (lon, r) => { const a = Math.PI + (lon - base) * Math.PI / 180; return [cx + r * Math.cos(a), cy - r * Math.sin(a)]; };
+  let s = `<svg class="wheel" viewBox="0 0 300 300" role="img" aria-label="ホロスコープ">`;
+  s += `<circle cx="${cx}" cy="${cy}" r="${R1}" class="w-ring"/><circle cx="${cx}" cy="${cy}" r="${R2}" class="w-ring"/><circle cx="${cx}" cy="${cy}" r="${R3}" class="w-inner"/>`;
+  for (let i = 0; i < 12; i++) {
+    const [x1, y1] = pos(i * 30, R2), [x2, y2] = pos(i * 30, R1), [gx, gy] = pos(i * 30 + 15, (R1 + R2) / 2);
+    s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="w-line"/>`;
+    s += `<text x="${gx}" y="${gy}" class="w-sign" fill="${WEST_ELEMENTS[ZODIAC[i].el].color}">${ZODIAC[i].glyph}︎</text>`;
+  }
+  if (wc.asc) {
+    const [ax, ay] = pos(wc.asc.lon, R1 + 2), [dx, dy] = pos(wc.asc.lon + 180, R1 + 2);
+    s += `<line x1="${ax}" y1="${ay}" x2="${dx}" y2="${dy}" class="w-axis"/><text x="${ax - 2}" y="${ay - 6}" class="w-label">ASC</text>`;
+  }
+  // 天体：近いものは内側にずらして重ならないようにする
+  const placed = [];
+  wc.planets.slice().sort((a, b) => a.lon - b.lon).forEach((p) => {
+    let r = R2 - 16;
+    while (placed.some((q) => Math.abs(((q.lon - p.lon + 540) % 360) - 180) < 9 && q.r === r)) r -= 15;
+    placed.push({ lon: p.lon, r });
+    const [px, py] = pos(p.lon, r);
+    s += `<text x="${px}" y="${py}" class="w-planet">${p.glyph}︎</text>`;
+  });
+  return s + "</svg>";
+}
+
+function horoscopeCard(wc) {
+  const z = (o) => ZODIAC[o.sign];
+  const big3 = [
+    ["☉ 太陽星座", "表の自分", wc.sun],
+    ["☽ 月星座", "心の内・素の自分", wc.moon],
+    ...(wc.asc ? [["ASC アセンダント", "第一印象・見た目の雰囲気", wc.asc]] : []),
+  ].map(([label, role, o]) => `<div class="big3" style="--wc:${WEST_ELEMENTS[z(o).el].color}">
+      <p class="b3-label">${label}<small>（${role}）</small></p>
+      <p class="b3-sign">${z(o).glyph}︎ ${z(o).name}<small> ${o.deg}°</small></p>
+      <p class="b3-text">${z(o).text}</p></div>`).join("");
+  const rows = wc.planets.map((p) => `<tr><td>${p.glyph}︎ ${p.name}</td><td>${z(p).name} ${p.deg}°</td><td>${p.role}</td></tr>`).join("")
+    + (wc.asc ? `<tr><td>ASC</td><td>${z(wc.asc).name} ${wc.asc.deg}°</td><td>第一印象</td></tr><tr><td>MC</td><td>${z(wc.mc).name} ${wc.mc.deg}°</td><td>社会での顔・天職</td></tr>` : "");
+  const total = Object.values(wc.balance).reduce((a, b) => a + b, 0);
+  const max = Math.max(...Object.values(wc.balance));
+  const bars = Object.entries(WEST_ELEMENTS).map(([k, e]) => `<div class="gx-row"><span>${e.name}</span>
+      <div class="gx-track"><div class="gx-fill" style="width:${(wc.balance[k] / total) * 100}%;background:${e.color}"></div></div><b>${wc.balance[k]}</b></div>`).join("");
+  const top = Object.keys(WEST_ELEMENTS).filter((k) => wc.balance[k] === max).map((k) => `「${WEST_ELEMENTS[k].name}」（${WEST_ELEMENTS[k].text}）`).join("と");
+  const notes = [];
+  if (wc.moonUncertain) notes.push(`※生まれた日のうちに月の星座が${ZODIAC[wc.moonUncertain[0]].name}から${ZODIAC[wc.moonUncertain[1]].name}へ移っています。出生時刻を入れると正確にわかります。`);
+  if (!wc.hasTime) notes.push("※出生時刻を入れると、アセンダント（ASC）とMCも出ます。");
+  else if (!wc.hasPlace) notes.push("※出生地（都道府県）を選ぶと、アセンダント（ASC）とMCも出ます。海外の場合は表示されません。");
+  return `<div class="card horoscope-card">
+    <h3>🌌 西洋占星術のホロスコープ</h3>
+    ${horoscopeWheel(wc)}
+    <div class="big3-wrap">${big3}</div>
+    <h4>4元素のバランス</h4>
+    <div class="gx">${bars}</div>
+    <p class="gx-advice">いちばん強いのは${top}のエレメントです。</p>
+    <details class="planet-list"><summary>すべての天体の位置を見る</summary>
+      <table class="a-table"><tbody>${rows}</tbody></table></details>
+    ${notes.map((n) => `<p class="note">${n}</p>`).join("")}
+  </div>`;
+}
+
 function wikiUrl(title) {
   return `https://ja.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, "_"))}`;
 }
@@ -296,8 +359,9 @@ function spotList(shrine) {
   return `<div class="spots"><p class="travel-title">📍 周辺の観光スポット</p><ul>${items}</ul></div>`;
 }
 
-function render(birthday, nickname, birthtime) {
+function render(birthday, nickname, birthtime, birthplace) {
   const fp = fourPillars(birthday, birthtime || "");
+  const wc = typeof Astronomy !== "undefined" ? westernChart(birthday, birthtime || "", birthplace || "") : null;
   const dx = diagnose(birthday);
   const daily = dailyFortune(birthday, todayString());
   const { element, stem, identities, shrine } = dx;
@@ -354,6 +418,8 @@ function render(birthday, nickname, birthtime) {
     </div>
 
     ${meishikiCard(fp)}
+
+    ${wc ? horoscopeCard(wc) : ""}
 
     <h3 class="section-title">${who}の正体</h3>
     ${SITE_CONFIG.rakutenAffiliateId ? '<p class="pr-line">PR：漫画・小説のリンクは楽天ブックスのアフィリエイトリンクです</p>' : ""}
@@ -429,15 +495,18 @@ try {
 
 // 前に診断したことがある人には「おかえりなさい」バナーを出す
 (function () {
-  let saved = "", name = "", time = "";
-  try { saved = localStorage.getItem("birthday") || ""; name = localStorage.getItem("nickname") || ""; time = localStorage.getItem("birthtime") || ""; } catch (e) {}
+  let saved = "", name = "", time = "", place = "";
+  try {
+    saved = localStorage.getItem("birthday") || ""; name = localStorage.getItem("nickname") || "";
+    time = localStorage.getItem("birthtime") || ""; place = localStorage.getItem("birthplace") || "";
+  } catch (e) {}
   if (!saved) return;
   const box = document.getElementById("welcome-back");
   const who = name ? `${escapeHtml(name)}さん` : "";
   box.querySelector(".welcome-msg").innerHTML = `おかえりなさい${who ? "、" + who : ""}！<br><small>今日の運勢は毎日変わります。</small>`;
   box.hidden = false;
   const show = (targetId) => {
-    render(saved, name, time);
+    render(saved, name, time, place);
     setTimeout(() => document.getElementById(targetId).scrollIntoView({ behavior: "smooth", block: "start" }), 50);
   };
   document.getElementById("wb-today").addEventListener("click", () => show("today-card"));
@@ -455,5 +524,5 @@ form.addEventListener("submit", (e) => {
     localStorage.setItem("birthtime", birthtimeInput.value);
     localStorage.setItem("birthplace", birthplaceInput.value);
   } catch (e) {}
-  render(birthday, nickname, birthtimeInput.value);
+  render(birthday, nickname, birthtimeInput.value, birthplaceInput.value);
 });
