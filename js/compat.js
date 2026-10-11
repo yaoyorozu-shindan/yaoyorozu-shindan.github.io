@@ -332,6 +332,7 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
     shareToInstagram(imgData, document.getElementById("insta-preview-compat"), shareText + "\n" + shareUrl, buildCompatShareImage));
   el.hidden = false;
   el.scrollIntoView({ behavior: "smooth" });
+  if (typeof track === "function") track("compat_diagnose", { legend: legendIdx >= 0, relation: c.type });
 }
 
 // ---- 初期化 ----

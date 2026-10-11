@@ -756,6 +756,8 @@ function render(birthday, nickname, birthtime, birthplace) {
   el.hidden = false;
   startIdentityReveal(el);
   el.scrollIntoView({ behavior: "smooth" });
+  // アクセス解析：どの正体が出たか（生年月日などの入力内容は送らない）
+  if (typeof track === "function") track("diagnose", { identity: ti.identity.name, element: stem.element, detailed: !!birthtime });
 }
 
 // ---- 初期化 ----

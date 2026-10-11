@@ -154,6 +154,8 @@ function page({ file, title, desc, body, hasAd }) {
     <p>診断結果や記事の内容は娯楽としてお楽しみください。</p>
     <p>© 2026 八百万診断</p>
   </footer>
+  <script src="../js/config.js?v=${VERSION}"></script>
+  <script src="../js/analytics.js?v=${VERSION}"></script>
 </body>
 </html>
 `;
@@ -650,6 +652,8 @@ TRUE_IDENTITIES.forEach((t, i) => {
     <p>診断結果は娯楽としてお楽しみください。</p>
     <p>© 2026 八百万診断</p>
   </footer>
+  <script src="../js/config.js?v=${VERSION}"></script>
+  <script src="../js/analytics.js?v=${VERSION}"></script>
 </body>
 </html>
 `);
@@ -716,6 +720,8 @@ ${body}
     <p>診断結果は娯楽としてお楽しみください。</p>
     <p>© 2026 八百万診断</p>
   </footer>
+  <script src="../js/config.js?v=${VERSION}"></script>
+  <script src="../js/analytics.js?v=${VERSION}"></script>
 </body>
 </html>
 `;

@@ -19,6 +19,9 @@ const SITE_CONFIG = {
   valueCommerceSid: "",
   valueCommercePid: "",
 
+  // Google アナリティクス 4 の測定ID（"G-" で始まる）。入れると全ページでアクセス解析が始まる（js/analytics.js）
+  gaMeasurementId: "G-XZ1V9NZ8WF",
+
   // 占い師への相談（A8.net）。A8の「広告リンク作成」のテキスト広告から、リンク先(href)と計測用の画像(pixel)を入れます。
   // 空のままにすると、その案件は表示されません。
   consult: [
