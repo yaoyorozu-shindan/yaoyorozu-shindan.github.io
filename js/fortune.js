@@ -413,13 +413,85 @@ function ziweiCard(zw) {
   </div>`;
 }
 
+// 日干の五行×陰陽で、正体が現れる演出を10種類に分ける。
+const REVEAL_THEMES = {
+  'wood-yang': ['翠光の覚醒', '#65f6aa', '芽吹く生命が、天へ駆ける'],
+  'wood-yin': ['花霞の降臨', '#a2f5bd', '花と葉が、静かに結ばれる'],
+  'fire-yang': ['紅蓮の覚醒', '#ff9b45', '燃え上がる炎が、闇を照らす'],
+  'fire-yin': ['灯火の降臨', '#ffcf86', '幾千の灯りが、ひとつに宿る'],
+  'earth-yang': ['大地の覚醒', '#efc66d', '大地が響き、封印がほどける'],
+  'earth-yin': ['黄金の降臨', '#f8df9c', '砂金の流れが、姿を結ぶ'],
+  'metal-yang': ['白銀の覚醒', '#cfebff', '閃く銀光が、空を切り開く'],
+  'metal-yin': ['星晶の降臨', '#e4d9ff', '星のかけらが、静かに集う'],
+  'water-yang': ['蒼海の覚醒', '#57d9ff', '広がる波が、深淵をひらく'],
+  'water-yin': ['月雫の降臨', '#acd6ff', '月明かりと霧が、姿を映す'],
+};
+
+function identityRevealArt(c, element) {
+  const kind = SC_ELEMENTS[Math.floor(c.stem / 2)] + '-' + (c.stem % 2 === 0 ? 'yang' : 'yin');
+  return `<div class="ti-reveal" data-reveal="${kind}">${artFor(c.name, 'true', element)}</div><button type="button" class="reveal-replay">✦ 登場の演出をもう一度見る</button>`;
+}
+
+function playIdentityReveal(stage) {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (document.identityRevealClose) document.identityRevealClose();
+  const kind = stage.dataset.reveal;
+  const [title, color, line] = REVEAL_THEMES[kind];
+  const overlay = document.createElement('div');
+  overlay.className = 'identity-cinema';
+  overlay.dataset.reveal = kind;
+  overlay.style.setProperty('--aura', color);
+  const rays = Array.from({length: 24}, (_, i) => `<i style="--angle:${i * 15}deg;--delay:${i % 6 * 55}ms"></i>`).join('');
+  const sparks = Array.from({length: 64}, (_, i) => {
+    const angle = i * 2.39996;
+    const radius = 110 + (i % 9) * 32;
+    return `<i style="--x:${Math.round(Math.cos(angle) * radius)}px;--y:${Math.round(Math.sin(angle) * radius)}px;--turn:${i * 37}deg;--delay:${i % 8 * 55}ms;--size:${3 + i % 5 * 2}px"></i>`;
+  }).join('');
+  overlay.innerHTML = `<div class="cinema-nebula" aria-hidden="true"></div><div class="cinema-rays" aria-hidden="true">${rays}</div><div class="cinema-seal" aria-hidden="true"><i></i><i></i><i></i></div><div class="cinema-sparks" aria-hidden="true">${sparks}</div><div class="cinema-content"><p class="cinema-eyebrow">あなたの本当の正体</p><p class="cinema-theme">${title}</p><p class="cinema-line">${line}</p><div class="cinema-portrait"></div><div class="cinema-name"></div></div><button class="cinema-skip" type="button">演出をスキップ ↗</button>`;
+  const art = stage.querySelector('.art');
+  if (art) overlay.querySelector('.cinema-portrait').append(art.cloneNode(true));
+  overlay.querySelector('.cinema-name').append(stage.closest('.ti-card').querySelector('.ti-name').cloneNode(true));
+  // 下の結果を読む操作を遮らず、演出は自動で片付ける。
+  let timer;
+  const close = () => {
+    clearTimeout(timer);
+    overlay.remove();
+    document.removeEventListener('keydown', onKey);
+    if (document.identityRevealClose === close) document.identityRevealClose = null;
+  };
+  const onKey = event => { if (event.key === 'Escape') close(); };
+  overlay.querySelector('.cinema-skip').addEventListener('click', close);
+  document.addEventListener('keydown', onKey);
+  document.identityRevealClose = close;
+  document.body.append(overlay);
+  timer = setTimeout(close, 4300);
+}
+
+function startIdentityReveal(root) {
+  if (root.identityRevealObserver) root.identityRevealObserver.disconnect();
+  if (document.identityRevealClose) document.identityRevealClose();
+  const stage = root.querySelector('.ti-reveal');
+  if (!stage) return;
+  const replay = root.querySelector('.reveal-replay');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { replay.hidden = true; return; }
+  replay.addEventListener('click', () => playIdentityReveal(stage));
+  const play = () => playIdentityReveal(stage);
+  if (typeof IntersectionObserver === 'undefined') { play(); return; }
+  const observer = new IntersectionObserver(entries => {
+    if (entries.some(entry => entry.isIntersecting)) { observer.disconnect(); play(); }
+    else if (!stage.isConnected) observer.disconnect();
+  }, { threshold: 0.3 });
+  root.identityRevealObserver = observer;
+  observer.observe(stage);
+}
+
 // 本当の正体（主役）のカード
 function trueIdentityCard(ti, who, element) {
   const c = ti.identity;
   const sec = (icon, label, text) => `<div class="ti-sec"><p class="ti-sec-label">${icon} ${label}</p><p>${text}</p></div>`;
   return `<div class="card ti-card" id="true-identity">
     <p class="ti-lead">${who}の本当の正体は——</p>
-    ${artFor(c.name, "true", element)}
+    ${identityRevealArt(c, element)}
     <p class="ti-origin">${c.origin}・${c.type}</p>
     <h2 class="ti-name">${nameRuby(c)}</h2>
     <p class="ti-catch">「${c.catch}」</p>
@@ -432,10 +504,10 @@ function trueIdentityCard(ti, who, element) {
     </div>
     <details class="ti-why"><summary>なぜこの正体？（判定の理由）</summary>
       <ul>${ti.reasons.map((r) => `<li>${r}</li>`).join("")}</ul>
-      <p class="note">同じ日干の10体の中から、西洋占星術と紫微斗数の結果がいちばん重なる存在を選んでいます。</p>
+      <p class="note">同じ日干の10候補の中から、西洋占星術と紫微斗数の結果がいちばん重なる存在を選んでいます。</p>
       <p class="ti-near">ほかに近い正体：${ti.runnersUp.map((r) => r.name).join("、")}</p>
     </details>
-    <a class="read-more" href="articles/true-identities.html#ti-${TRUE_IDENTITIES.indexOf(c) + 1}">🌟 本当の正体100体の図鑑で、ほかの正体も見る →</a>
+    <a class="read-more" href="articles/true-identities.html#ti-${TRUE_IDENTITIES.indexOf(c) + 1}">🌟 本当の正体図鑑 — 100の正体で、ほかの正体も見る →</a>
     ${ti.detailed ? "" : '<p class="ti-more">🔭 出生時刻と出生地を入れると、紫微斗数やアセンダントも加わり、<b>より精密な正体</b>がわかります（「くわしく診断する」から）。</p>'}
     ${placeBlock(c.name)}
     <a class="wiki-link" href="${wikiUrl(c.wiki)}" target="_blank" rel="noopener">${c.name}をWikipediaで詳しく見る ↗</a>
@@ -577,6 +649,7 @@ function render(birthday, nickname, birthtime, birthplace) {
   document.getElementById("insta-share").addEventListener("click", () =>
     shareToInstagram(shareData, document.getElementById("insta-preview"), shareText + "\n" + shareUrl));
   el.hidden = false;
+  startIdentityReveal(el);
   el.scrollIntoView({ behavior: "smooth" });
 }
 

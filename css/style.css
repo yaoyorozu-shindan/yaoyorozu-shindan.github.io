@@ -462,7 +462,7 @@ a { color: var(--accent); }
 .date-select { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 6px; }
 .date-select select { font-size: 1rem; padding: 10px 8px; border: 1px solid var(--border); border-radius: 10px; font-family: inherit; background: #fff; color: inherit; min-width: 0; }
 
-/* ---- 記事：本当の正体100体の図鑑 ---- */
+/* ---- 記事：本当の正体図鑑 — 100の正体 ---- */
 .ti-index { font-size: 0.88rem; line-height: 1.9; }
 .ti-entry { border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin: 12px 0; scroll-margin-top: 12px; }
 .ti-entry::after { content: ""; display: block; clear: both; }
@@ -513,3 +513,53 @@ a { color: var(--accent); }
 .match-rest li small { grid-column: 2 / -1; margin-top: -4px; font-size: 0.78rem; color: var(--muted); }
 .matches-card .legend-pair ul { margin: 6px 0 0; padding-left: 1.2em; font-size: 0.88rem; }
 .birthcity:not([hidden]) { display: flex; flex-direction: column; gap: 6px; }
+
+/* 正体の登場：五行×陰陽の全画面演出 */
+.ti-reveal { position: relative; }
+.reveal-replay { border: 1px solid var(--el); border-radius: 30px; padding: 8px 16px; background: transparent; color: var(--el); cursor: pointer; font: inherit; font-size: .8rem; margin: 0 0 12px; }
+.identity-cinema { position: fixed; inset: 0; z-index: 1000; overflow: hidden; background: #050712; color: #fff; pointer-events: none; animation: cinema-exit 4.3s both; --aura: #efc66d; }
+.cinema-nebula { position: absolute; inset: -40%; background: radial-gradient(ellipse at center, color-mix(in srgb,var(--aura) 40%,transparent),transparent 48%), repeating-conic-gradient(from 0deg,transparent 0deg 12deg,color-mix(in srgb,var(--aura) 12%,transparent) 15deg 18deg,transparent 22deg 30deg); animation: nebula-turn 4.3s ease-out both; }
+.cinema-rays, .cinema-seal, .cinema-sparks { position: absolute; inset: 0; }
+.cinema-rays i { position: absolute; left: 50%; top: 45%; width: 2px; height: 65vmax; transform-origin: center top; background: linear-gradient(var(--aura),transparent 75%); opacity: 0; animation: cinema-ray 3.5s var(--delay) both; }
+.cinema-seal { inset: auto; left: 50%; top: 45%; width: min(74vw,480px); aspect-ratio: 1; transform: translate(-50%,-50%); }
+.cinema-seal i { position: absolute; inset: 0; border: 1px solid var(--aura); border-radius: 50%; box-shadow: 0 0 25px color-mix(in srgb,var(--aura) 40%,transparent),inset 0 0 25px color-mix(in srgb,var(--aura) 20%,transparent); animation: seal-open 3.6s both; }
+.cinema-seal i:nth-child(2) { inset: -10%; border: 3px double var(--aura); animation-delay: .15s; }
+.cinema-seal i:nth-child(3) { inset: 9%; border: 8px dotted var(--aura); animation: seal-orbit 3.6s both; }
+.cinema-sparks i { position: absolute; left: 50%; top: 45%; width: var(--size); height: var(--size); background: var(--aura); border-radius: 50%; box-shadow: 0 0 12px var(--aura); opacity: 0; animation: spark-burst 3.4s var(--delay) both; }
+.identity-cinema[data-reveal$="yin"] .cinema-sparks i { animation-name: spark-gather; }
+.identity-cinema[data-reveal^="wood"] .cinema-sparks i { border-radius: 0 90% 0 90%; height: calc(var(--size) * 2.3); }
+.identity-cinema[data-reveal^="fire"] .cinema-sparks i { border-radius: 80% 0 80% 80%; height: calc(var(--size) * 3); animation-name: flame-rise; }
+.identity-cinema[data-reveal="fire-yin"] .cinema-sparks i { animation-name: flame-gather; }
+.identity-cinema[data-reveal^="earth"] .cinema-sparks i { border-radius: 2px; box-shadow: 0 0 8px var(--aura); }
+.identity-cinema[data-reveal="earth-yang"] .cinema-seal { animation: earth-rise 3.6s both; }
+.identity-cinema[data-reveal^="metal"] .cinema-sparks i { clip-path: polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%); width: calc(var(--size) * 3); height: calc(var(--size) * 3); }
+.identity-cinema[data-reveal="metal-yang"] .cinema-rays i { width: 5px; }
+.identity-cinema[data-reveal^="water"] .cinema-sparks i { background: transparent; border: 1px solid var(--aura); box-shadow: 0 0 15px var(--aura); }
+.identity-cinema[data-reveal="water-yang"] .cinema-seal i { animation-name: tidal-ring; }
+.identity-cinema[data-reveal="water-yin"] .cinema-nebula { filter: blur(20px); }
+.cinema-content { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 35px 20px; text-align: center; }
+.cinema-eyebrow { font-size: .72rem; letter-spacing: .4em; color: #ead8ad; margin: 0 0 12px; animation: cinema-text 3.9s both; }
+.cinema-theme { margin: 0; font-family: 'Yu Mincho','Hiragino Mincho ProN',serif; font-size: clamp(1.6rem,5vw,2.6rem); letter-spacing: .24em; color: var(--aura); text-shadow: 0 0 25px var(--aura); animation: cinema-text 3.9s both; }
+.cinema-line { margin: 10px 0 22px; font-size: .75rem; letter-spacing: .12em; color: #e0dbe9; animation: cinema-text 3.9s both; }
+.cinema-portrait { width: min(68vw,320px,42vh); aspect-ratio: 1; padding: 7px; border: 1px solid var(--aura); border-radius: 50%; background: #101321; box-shadow: 0 0 45px color-mix(in srgb,var(--aura) 35%,transparent),0 0 100px color-mix(in srgb,var(--aura) 20%,transparent); animation: portrait-arrive 3.9s both; }
+.cinema-portrait .art { margin: 0; width: 100%; height: 100%; border-radius: 50%; overflow: hidden; }
+.cinema-portrait .art img, .cinema-portrait .art-svg { width: 100%; height: 100%; aspect-ratio: 1; object-fit: cover; }
+.cinema-portrait figcaption { display: none; }
+.cinema-name { margin: 24px 0 0; animation: name-arrive 3.9s both; }
+.cinema-name .ti-name { color: #fff3d6; font-family: 'Yu Mincho','Hiragino Mincho ProN',serif; font-size: clamp(1.8rem,7vw,3rem); text-shadow: 0 2px 5px #000,0 0 28px var(--aura); }
+.cinema-skip { position: absolute; right: 18px; bottom: max(20px,env(safe-area-inset-bottom)); background: #101321cc; color: #e2d9e8; border: 1px solid #ffffff40; padding: 10px 16px; border-radius: 30px; font: inherit; font-size: .75rem; pointer-events: auto; cursor: pointer; }
+@keyframes cinema-exit { 0%,85% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes nebula-turn { 0% { opacity: 0; transform: scale(.4) rotate(-40deg); } 30% { opacity: 1; } 100% { transform: scale(1.3) rotate(40deg); } }
+@keyframes cinema-ray { 0% { opacity: 0; transform: rotate(var(--angle)) scaleY(.1); } 40% { opacity: .7; } 100% { opacity: 0; transform: rotate(var(--angle)) scaleY(1.5); } }
+@keyframes seal-open { 0% { opacity: 0; transform: scale(.1) rotate(-120deg); } 35% { opacity: .85; } 100% { opacity: 0; transform: scale(1.5) rotate(80deg); } }
+@keyframes seal-orbit { 0% { opacity: 0; transform: scale(.3) rotate(90deg); } 35% { opacity: .6; } 100% { opacity: 0; transform: scale(1.3) rotate(-120deg); } }
+@keyframes spark-burst { 0% { opacity: 0; transform: scale(.1); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--x),var(--y)) rotate(var(--turn)) scale(.3); } }
+@keyframes spark-gather { 0% { opacity: 0; transform: translate(var(--x),var(--y)) rotate(var(--turn)); } 35% { opacity: 1; } 80%,100% { opacity: 0; transform: translate(0,0) rotate(180deg) scale(.2); } }
+@keyframes flame-rise { 0% { opacity: 0; transform: translate(var(--x),45vh) scale(.3); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--x),-55vh) rotate(var(--turn)) scale(.3); } }
+@keyframes flame-gather { 0% { opacity: 0; transform: translate(var(--x),35vh); } 35% { opacity: .9; } 100% { opacity: 0; transform: translate(0,-15vh) scale(.2); } }
+@keyframes earth-rise { 0% { opacity: 0; transform: translate(-50%,30%) scale(.3); } 35% { opacity: 1; } 100% { opacity: .2; transform: translate(-50%,-50%) scale(1.4); } }
+@keyframes tidal-ring { 0% { opacity: 0; transform: scale(.1); } 25% { opacity: 1; } 100% { opacity: 0; transform: scale(2.5); } }
+@keyframes cinema-text { 0% { opacity: 0; transform: translateY(10px); } 18%,85% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; } }
+@keyframes portrait-arrive { 0%,20% { opacity: 0; transform: scale(.65); filter: brightness(2); } 55%,100% { opacity: 1; transform: scale(1); filter: brightness(1); } }
+@keyframes name-arrive { 0%,40% { opacity: 0; transform: translateY(20px) scale(.9); } 65%,100% { opacity: 1; transform: translateY(0) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .identity-cinema, .reveal-replay { display: none; } }
