@@ -7,19 +7,11 @@
 
 const ELEMENT_ORDER = ["wood", "fire", "earth", "metal", "water"];
 
+// 五行の関係の見出し（ふたりの組み合わせごとの文章は js/compat-stems.js の STEM_PAIRS）
 const COMPAT_TEXT = {
-  same: {
-    title: "似た者同士の「比和」",
-    desc: (a, b, el) => `ふたりとも同じ「${el}」の気を持っています。言わなくても通じ合える安心感が魅力。ただ似ているぶん、同じところでつまずくことも。お互いの小さな違いを楽しむと、絆がさらに深まります。`,
-  },
-  gen: {
-    title: "支え合う「相生」",
-    desc: (giver, receiver, ge, re) => `${giver}の「${ge}」が${receiver}の「${re}」を育てる、五行でいちばん相性のよい関係。${giver}がそばにいるだけで、${receiver}は力を発揮しやすくなります。${receiver}が感謝を言葉にすると、ふたりの運気がさらに巡ります。`,
-  },
-  ctrl: {
-    title: "刺激し合う「相剋」",
-    desc: (strong, weak, se, we) => `${strong}の「${se}」が${weak}の「${we}」を引き締める関係。ぶつかることもありますが、お互いに足りないものを持っている、成長し合えるふたりです。${strong}は言い方をやわらかく、${weak}は遠慮せず本音を伝えるのがうまくいくコツ。`,
-  },
+  same: { title: "似た者同士の「比和」" },
+  gen: { title: "支え合う「相生」" },
+  ctrl: { title: "刺激し合う「相剋」" },
 };
 
 function compatibility(bdayA, bdayB) {
@@ -39,6 +31,10 @@ function compatibility(bdayA, bdayB) {
     shrineElement = ELEMENT_ORDER[(ELEMENT_ORDER.indexOf((from === "A" ? A : B).stem.element) + 1) % 5];
   }
   const polarityDiff = A.stem.yang !== B.stem.yang;
+  // 日干の組み合わせ（55通り）。{A} は番号の小さい日干の人
+  const lowFirst = A.stem.index <= B.stem.index;
+  const stemPair = STEM_PAIRS[lowFirst ? `${A.stem.index}-${B.stem.index}` : `${B.stem.index}-${A.stem.index}`];
+  const kango = Math.abs(A.stem.index - B.stem.index) === 5; // 干合：甲己・乙庚・丙辛・丁壬・戊癸
 
   // 入れる順番を変えても同じ結果になるよう、並べ替えてから計算
   const pairKey = [bdayA, bdayB].sort().join("|");
@@ -47,13 +43,13 @@ function compatibility(bdayA, bdayB) {
   const clamp = (n) => Math.max(35, Math.min(99, n));
   const total = clamp(base + Math.floor(rand() * 9) - 4);
   const sub = {
-    love: clamp(total + Math.floor(rand() * 17) - 8),
+    love: clamp(total + Math.floor(rand() * 17) - 8 + (kango ? 10 : 0)),
     friend: clamp(total + Math.floor(rand() * 17) - 8),
     work: clamp(total + Math.floor(rand() * 17) - 8),
   };
   const shrines = RESULTS[shrineElement].shrine;
   const shrine = shrines[hashString("pair-shrine|" + pairKey) % shrines.length];
-  return { A, B, type, from, to, polarityDiff, total, sub, shrine, shrineElement };
+  return { A, B, type, from, to, polarityDiff, total, sub, shrine, shrineElement, stemPair, lowFirst, kango };
 }
 
 // ---- 1人の入力から「相性のいいタイプ」を出す ----
@@ -128,8 +124,9 @@ document.addEventListener("click", (e) => {
   setTimeout(() => document.getElementById("bday-b").focus(), 500);
 });
 
-function compatBar(label, value) {
-  return `<div class="cbar"><span>${label}</span><div class="cbar-track"><div class="cbar-fill" style="width:${value}%"></div></div><b>${value}%</b></div>`;
+function compatBar(label, value, note) {
+  return `<div class="cbar"><span>${label}</span><div class="cbar-track"><div class="cbar-fill" style="width:${value}%"></div></div><b>${value}%</b></div>
+      ${note ? `<p class="cbar-note">${note}</p>` : ""}`;
 }
 
 // ふたりそれぞれの本当の正体（生年月日だけで判定。「あなた」に保存済みの出生時刻があれば、くわしく判定）
@@ -155,11 +152,21 @@ function pairCard(tiA, tiB, nA, nB, c) {
     </div>`;
   const byKey = { A: tiA, B: tiB };
   const text = c.type === "same" ? PAIR_TEXT.same(tiA, tiB) : PAIR_TEXT[c.type](byKey[c.from], byKey[c.to]);
+  const legend = legendPair(tiA, tiB);
   return `<div class="card pair-card">
     <h3>ふたりの本当の正体</h3>
     <div class="pair-ti-row">${side(tiA, nA)}<span class="pair-x">×</span>${side(tiB, nB)}</div>
-    <p class="pair-text">${text}</p>
+    ${legend ? `<div class="legend-pair">
+      <p class="legend-badge">✨ 伝説の組み合わせ</p>
+      <h4>${legend.title}</h4>
+      <p>${legend.text}</p>
+    </div>` : `<p class="pair-text">${text}</p>`}
   </div>`;
+}
+
+// 神話・伝承でゆかりのあるふたりなら、その組み合わせを返す
+function legendPair(tiA, tiB) {
+  return LEGEND_PAIRS.find((p) => (p.a === tiA.name && p.b === tiB.name) || (p.a === tiB.name && p.b === tiA.name)) || null;
 }
 
 function renderCompat(bdayA, nameA, bdayB, nameB) {
@@ -172,14 +179,10 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
   const nB = nameB ? `${escapeHtml(nameB)}さん` : "お相手";
   const elA = ELEMENTS[c.A.stem.element], elB = ELEMENTS[c.B.stem.element];
   const label = (d) => `${d.stem.yang ? "陽" : "陰"}の${ELEMENTS[d.stem.element].name}`;
-  const who = { A: nA, B: nB }, elOf = { A: elA.name, B: elB.name };
-
-  let desc;
-  if (c.type === "same") desc = COMPAT_TEXT.same.desc(nA, nB, elA.name);
-  else desc = COMPAT_TEXT[c.type].desc(who[c.from], who[c.to], elOf[c.from], elOf[c.to]);
-  desc += c.polarityDiff
-    ? " さらに陰と陽の組み合わせなので、凸凹がぴったりはまるバランスのよさもあります。"
-    : " 陰陽も同じなので、テンポや価値観が近いふたりです。";
+  // 文章の {A} は日干の番号が小さい人、{B} は大きい人
+  const [lowName, highName] = c.lowFirst ? [nA, nB] : [nB, nA];
+  const desc = c.stemPair.text.replace(/\{A\}/g, lowName).replace(/\{B\}/g, highName);
+  const aspect = ASPECT_TEXT[c.type][c.polarityDiff ? "diff" : "same"];
 
   const hearts = "💗".repeat(Math.round(c.total / 20)) + "🤍".repeat(5 - Math.round(c.total / 20));
   const rows = ["japan", "greece", "norse", "yokai", "legend"].map((key) => {
@@ -187,7 +190,7 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
     return `<tr><th>${cat.label}</th><td>${c.A.identities[key].name}</td><td class="x">×</td><td>${c.B.identities[key].name}</td></tr>`;
   }).join("");
 
-  const shareText = `${nameA || "わたし"}（${tiA.name}）× ${nameB || "お相手"}（${tiB.name}）の相性は ${c.total}%！\n${COMPAT_TEXT[c.type].title}\n#八百万診断 #相性診断`;
+  const shareText = `${nameA || "わたし"}（${tiA.name}）× ${nameB || "お相手"}（${tiB.name}）の相性は ${c.total}%！\n「${c.stemPair.title}」\n#八百万診断 #相性診断`;
   const shareUrl = SITE_CONFIG.siteUrl || location.href.split("#")[0];
   const s = c.shrine;
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.name + " " + s.area)}`;
@@ -201,11 +204,12 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
       <p class="pair-el">${elA.icon} ${label(c.A)} × ${elB.icon} ${label(c.B)}</p>
       <p class="score">${c.total}<small>%</small></p>
       <p class="hearts">${hearts}</p>
-      <h3>${COMPAT_TEXT[c.type].title}</h3>
+      <h3>「${c.stemPair.title}」</h3>
+      <p class="compat-rel">${COMPAT_TEXT[c.type].title}${c.kango ? '<span class="kango">💞 干合</span>' : ""}</p>
       <p class="compat-desc">${desc}</p>
-      ${compatBar("恋愛", c.sub.love)}
-      ${compatBar("友情", c.sub.friend)}
-      ${compatBar("仕事", c.sub.work)}
+      ${compatBar("恋愛", c.sub.love, aspect.love)}
+      ${compatBar("友情", c.sub.friend, aspect.friend)}
+      ${compatBar("仕事", c.sub.work, aspect.work)}
     </div>
 
     ${pairCard(tiA, tiB, nA, nB, c)}
@@ -244,7 +248,7 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
   const imgData = {
     nameA: nameA ? `${nameA}さん` : "あなた", nameB: nameB ? `${nameB}さん` : "お相手",
     elA, elB, labelA: label(c.A), labelB: label(c.B),
-    total: c.total, title: COMPAT_TEXT[c.type].title, sub: c.sub, shrine: s.name,
+    total: c.total, title: `「${c.stemPair.title}」`, sub: c.sub, shrine: s.name,
     trueA: tiA.name, trueB: tiB.name,
     pairs: ["japan", "greece", "norse", "yokai"].map((key) => [CATEGORIES.find((x) => x.key === key).label, c.A.identities[key].name, c.B.identities[key].name]),
   };

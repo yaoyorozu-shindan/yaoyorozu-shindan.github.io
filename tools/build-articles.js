@@ -10,10 +10,10 @@ const SITE = "https://yaoyorozu-shindan.github.io/";
 const PUBLISHED = "2026-10-11";
 
 // サイトのデータを読み込む
-const src = ["js/config.js", "js/fortune-data.js", "js/images.js", "js/true-identity-a.js", "js/true-identity-b.js"]
+const src = ["js/config.js", "js/fortune-data.js", "js/images.js", "js/true-identity-a.js", "js/true-identity-b.js", "js/places.js"]
   .map((f) => fs.readFileSync(path.join(ROOT, f), "utf8")).join("\n");
-const D = new Function(src + "; return { SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES };")();
-const { SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES } = D;
+const D = new Function(src + "; return { SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES, PLACES, sjisPercent };")();
+const { SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES, PLACES, sjisPercent } = D;
 const ORDER = ["wood", "fire", "earth", "metal", "water"];
 const VERSION = (fs.readFileSync(path.join(ROOT, "index.html"), "utf8").match(/style\.css\?v=(\d+)/) || [])[1] || "1";
 
@@ -35,13 +35,37 @@ function priceButtons(keyword) {
 
 function travelButtons(s) {
   const rUrl = `https://kw.travel.rakuten.co.jp/keyword/Search.do?charset=utf-8&f_query=${encodeURIComponent(s.stay)}`;
-  const jUrl = `https://www.jalan.net/uw/uwp2011/uww2011init.do?keyword=${s.jalan}`;
+  const jUrl = `https://www.jalan.net/uw/uwp2011/uww2011init.do?keyword=${s.jalan || sjisPercent(s.stay)}`;
   const jHref = vcSid && vcPid ? `https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=${vcSid}&pid=${vcPid}&vc_url=${encodeURIComponent(jUrl)}` : jUrl;
   return `<p class="travel-title">🏨 ${s.stay}周辺の宿を探す</p>
     <div class="aff-btns">
       <a class="aff-btn rakuten" href="${rakuten(rUrl)}" target="_blank" rel="${relFor(rid)}">楽天トラベル</a>
       <a class="aff-btn jalan" href="${jHref}" target="_blank" rel="${relFor(vcSid && vcPid)}">じゃらん</a>
     </div>`;
+}
+
+function overseasButtons(guide) {
+  const bookUrl = `https://books.rakuten.co.jp/search?sitem=${encodeURIComponent("地球の歩き方 " + guide)}&g=001`;
+  return `<p class="travel-title">✈️ ${guide}への旅を準備する</p>
+    <div class="aff-btns">
+      <a class="aff-btn rakuten" href="${rakuten(bookUrl)}" target="_blank" rel="${relFor(rid)}">ガイドブック</a>
+      <a class="aff-btn rakuten" href="${rakuten("https://travel.rakuten.co.jp/kaigai/")}" target="_blank" rel="${relFor(rid)}">楽天トラベル 海外</a>
+    </div>`;
+}
+
+// ---- ゆかりの地：同じ場所は1つにまとめ、記事内の番号（#pl-番号）を振る ----
+const PLACE_LIST = [];
+const placeIdOf = {};
+for (const [name, p] of Object.entries(PLACES)) {
+  const key = p.place + "|" + p.area;
+  if (!(key in placeIdOf)) { placeIdOf[key] = PLACE_LIST.length; PLACE_LIST.push({ ...p, chars: [] }); }
+  PLACE_LIST[placeIdOf[key]].chars.push(name);
+}
+// 図鑑の各キャラに付ける「📍 ゆかりの地」の1行（くわしくは places.html へ）
+function placeLine(name) {
+  const p = PLACES[name];
+  if (!p) return "";
+  return `<p class="z-place">📍 ゆかりの地：<a href="places.html#pl-${placeIdOf[p.place + "|" + p.area]}">${p.place}</a>（${p.area}）</p>`;
 }
 
 function figure(name, small) {
@@ -56,6 +80,8 @@ const label = (el, yang) => `${yang ? "陽" : "陰"}の${ELEMENTS[el].name}`;
 
 // ---- 記事の一覧（タイトル・説明） ----
 const ARTICLES = [
+  { file: "places.html", title: "神話・妖怪のゆかりの地めぐり｜日本と世界の伝説の場所と、近くの宿", short: "📍 神話・妖怪のゆかりの地めぐり",
+    desc: "河童の遠野、天狗の鞍馬山、九尾の狐の殺生石から、ギリシャのデルフォイ、エジプトのフィラエ神殿まで。神話・妖怪・都市伝説の伝説の場所を、地域別に紹介します。" },
   { file: "true-identities.html", title: "本当の正体100体の図鑑｜神・霊獣・妖怪の性格と恋愛・仕事の傾向", short: "🌟 本当の正体100体の図鑑",
     desc: "八百万診断の「本当の正体」100体を、日干（甲〜癸）ごとに紹介。スサノオ、女媧、アヌビスなど、世界の神話の神や霊獣・妖怪の本質、長所・短所、恋愛、仕事の向き不向きがわかります。" },
   ...ORDER.map((el) => ({
@@ -394,9 +420,49 @@ function zukan(keys, intro) {
           <h4>${r.name}</h4>
           <p class="z-sub">${r.sub}</p>
           <p>${r.desc}</p>
+          ${r.weak ? `<p class="z-weak">⚠️ このキャラの弱点：${r.weak}</p>` : ""}
+          ${placeLine(r.name)}
           <a href="${wikiUrl(r.wiki)}" target="_blank" rel="noopener">Wikipediaで詳しく ↗</a>
         </div>`).join("")}</div>`).join("");
   }).join("");
+}
+
+// ---- ゆかりの地めぐり ----
+const PREFS = "北海道 青森県 岩手県 宮城県 秋田県 山形県 福島県 茨城県 栃木県 群馬県 埼玉県 千葉県 東京都 神奈川県 新潟県 富山県 石川県 福井県 山梨県 長野県 岐阜県 静岡県 愛知県 三重県 滋賀県 京都府 大阪府 兵庫県 奈良県 和歌山県 鳥取県 島根県 岡山県 広島県 山口県 徳島県 香川県 愛媛県 高知県 福岡県 佐賀県 長崎県 熊本県 大分県 宮崎県 鹿児島県 沖縄県".split(" ");
+const REGIONS = [["北海道・東北", 0, 6], ["関東", 7, 13], ["中部", 14, 22], ["近畿", 23, 29], ["中国・四国", 30, 38], ["九州・沖縄", 39, 46]];
+
+function placesArticle() {
+  // キャラ名 → どの図鑑のキャラか
+  const where = {};
+  for (const v of Object.values(RESULTS)) for (const c of CATEGORIES) (v[c.key] || []).forEach((r) => (where[r.name] = { label: c.label, file: ["yokai", "kaii", "legend"].includes(c.key) ? "yokai.html" : "gods.html" }));
+  TRUE_IDENTITIES.forEach((t, n) => (where[t.name] = { label: "本当の正体", file: `true-identities.html#ti-${n + 1}` }));
+
+  const card = (p) => `
+    <section class="pl-entry" id="pl-${PLACE_LIST.indexOf(p)}">
+      <h4>📍 ${p.place}</h4>
+      <p class="pl-area">${p.area}　<a href="${mapUrl(p.place + " " + p.area)}" target="_blank" rel="noopener">地図で見る</a></p>
+      <p>${p.note}</p>
+      <p class="pl-chars">ゆかりのキャラ：${p.chars.map((n) => `<a href="${where[n].file}">${n}</a><small>（${where[n].label}）</small>`).join("、")}</p>
+      <div class="travel">${p.stay ? travelButtons(p) : overseasButtons(p.guide)}</div>
+    </section>`;
+
+  const prefIndex = (p) => PREFS.findIndex((x) => p.area.startsWith(x));
+  const domestic = PLACE_LIST.filter((p) => p.stay).sort((a, b) => prefIndex(a) - prefIndex(b));
+  const overseas = PLACE_LIST.filter((p) => !p.stay);
+  const countries = [...new Set(overseas.map((p) => p.area.split("・")[0]))];
+  const japan = REGIONS.map(([label, from, to]) => {
+    const list = domestic.filter((p) => prefIndex(p) >= from && prefIndex(p) <= to);
+    return list.length ? `<h3>${label}</h3>${list.map(card).join("")}` : "";
+  }).join("");
+  const world = countries.map((c) => `<h3>${c}</h3>${overseas.filter((p) => p.area.split("・")[0] === c).map(card).join("")}`).join("");
+
+  return `
+    <p>八百万診断に登場する神さま・妖怪・怪異・都市伝説には、それぞれの伝説が生まれた場所や、祀られている場所があります。このページでは、日本と世界の「ゆかりの地」${PLACE_LIST.length}か所を、地域ごとに紹介します。あなたの正体ゆかりの地へ、旅に出てみませんか？</p>
+    <p class="note">※特定の場所が伝わっていない妖怪などは、仲間に会えそうな場所を紹介しています。拝観時間や公開状況は変わることがあるので、お出かけ前に公式情報をご確認ください。</p>
+    <h2>日本のゆかりの地</h2>
+    ${japan}
+    <h2>世界のゆかりの地</h2>
+    ${world}`;
 }
 
 // ---- 本当の正体100体の図鑑 ----
@@ -433,6 +499,7 @@ function trueIdentitiesArticle() {
         <dt>💼 仕事・才能</dt><dd>${t.work}</dd>
       </dl>
       <p class="ti-cond">なりやすい条件：日干が${k}／西洋占星術で「${WEST_NAME[t.west]}」の星座が強い／紫微斗数の命宮に${t.stars.join("・")}</p>
+      ${placeLine(t.name)}
       <a href="${wikiUrl(t.wiki)}" target="_blank" rel="noopener">Wikipediaで詳しく ↗</a>
     </section>`).join("")}
     <p class="back-top"><a href="#toc">▲ 目次へ戻る</a></p>`;
@@ -492,6 +559,7 @@ function indexPage() {
 // ---- 書き出し ----
 fs.mkdirSync(OUT, { recursive: true });
 const bodies = {
+  "places.html": [placesArticle(), true],
   "true-identities.html": [trueIdentitiesArticle(), false],
   "compatibility.html": [compatibilityArticle(), false],
   "birthstones.html": [birthstonesArticle(), true],

@@ -478,3 +478,33 @@ a { color: var(--accent); }
 /* ---- 正体の名前の読みがな ---- */
 .ti-name rt { font-size: 0.32em; font-weight: 700; letter-spacing: 0.08em; }
 .pair-ti-name rt, .ti-entry h3 rt { font-size: 0.5em; font-weight: 700; }
+
+/* ---- 7カテゴリの短所 ---- */
+.id-desc:has(+ .id-weak) { flex: none; }
+.id-weak { flex: 1; margin: 8px 0 0; font-size: 0.82rem; color: var(--muted); }
+.id-weak b { display: block; font-size: 0.75rem; color: var(--text, inherit); }
+.z-weak { font-size: 0.82rem; color: var(--muted); }
+
+/* ---- 相性：日干の組み合わせ・ひとこと・伝説の組み合わせ ---- */
+.compat-rel { margin: -4px 0 8px; font-size: 0.85rem; font-weight: 700; color: var(--muted); }
+.kango { display: inline-block; margin-left: 8px; padding: 1px 10px; border-radius: 999px; background: #ffe3ef; color: #c2185b; font-size: 0.8rem; }
+.cbar-note { margin: 2px 0 6px 3.5em; font-size: 0.8rem; color: var(--muted); text-align: left; }
+.legend-pair { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: linear-gradient(135deg, #fff7e0, #fdeaff); border: 1px solid #f0d27a; text-align: left; }
+.legend-badge { margin: 0; font-size: 0.8rem; font-weight: 800; color: #b8860b; }
+.legend-pair h4 { margin: 2px 0 6px; font-size: 1.05rem; }
+.legend-pair p:last-child { margin: 0; font-size: 0.9rem; }
+
+/* ---- ゆかりの地 ---- */
+.place { margin-top: 10px; border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; font-size: 0.85rem; text-align: left; }
+.place summary { cursor: pointer; font-weight: 700; color: var(--accent); }
+.place[open] summary { margin-bottom: 4px; }
+.place-area { margin: 4px 0 0; color: var(--muted); font-size: 0.8rem; }
+.place-note { margin: 4px 0 8px; }
+.place .travel { margin-bottom: 0; }
+.place .aff-btns { flex-wrap: wrap; }
+.z-place { font-size: 0.82rem; }
+.pl-entry { border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin: 10px 0; scroll-margin-top: 12px; }
+.pl-entry h4 { margin: 0; font-size: 1.05rem; }
+.pl-area { margin: 2px 0 6px; font-size: 0.82rem; color: var(--muted); }
+.pl-chars { font-size: 0.88rem; }
+.pl-chars small { color: var(--muted); }

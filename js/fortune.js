@@ -159,7 +159,7 @@ function affiliateLinks(keyword, label) {
 // 神社近くの宿を探すリンク。IDが未設定でも通常リンクとして表示し、設定済みならアフィリエイトリンクになる
 function travelLinks(shrine) {
   const rakutenUrl = `https://kw.travel.rakuten.co.jp/keyword/Search.do?charset=utf-8&f_query=${encodeURIComponent(shrine.stay)}`;
-  const jalanUrl = `https://www.jalan.net/uw/uwp2011/uww2011init.do?keyword=${shrine.jalan}`;
+  const jalanUrl = `https://www.jalan.net/uw/uwp2011/uww2011init.do?keyword=${shrine.jalan || sjisPercent(shrine.stay)}`;
   const { rakutenAffiliateId: rid, valueCommerceSid: sid, valueCommercePid: pid } = SITE_CONFIG;
   const rakutenHref = rid ? `https://hb.afl.rakuten.co.jp/hgc/${rid}/?pc=${encodeURIComponent(rakutenUrl)}` : rakutenUrl;
   const jalanHref = sid && pid
@@ -174,6 +174,35 @@ function travelLinks(shrine) {
       <a class="aff-btn jalan" href="${jalanHref}" target="_blank" rel="${sid && pid ? "sponsored " : ""}noopener">じゃらん</a>
     </div>
   </div>`;
+}
+
+// 海外のゆかりの地：ガイドブック（楽天ブックス）と楽天トラベルの海外旅行ページ
+function overseasLinks(guide) {
+  const rid = SITE_CONFIG.rakutenAffiliateId;
+  const aff = (url) => (rid ? `https://hb.afl.rakuten.co.jp/hgc/${rid}/?pc=${encodeURIComponent(url)}` : url);
+  const rel = rid ? "sponsored noopener" : "noopener";
+  const bookUrl = `https://books.rakuten.co.jp/search?sitem=${encodeURIComponent("地球の歩き方 " + guide)}&g=001`;
+  return `<div class="travel${rid ? " aff" : ""}">
+    ${rid ? '<span class="pr">PR</span>' : ""}
+    <p class="travel-title">✈️ ${guide}への旅を準備する</p>
+    <div class="aff-btns">
+      <a class="aff-btn rakuten" href="${aff(bookUrl)}" target="_blank" rel="${rel}">ガイドブック</a>
+      <a class="aff-btn rakuten" href="${aff("https://travel.rakuten.co.jp/kaigai/")}" target="_blank" rel="${rel}">楽天トラベル 海外</a>
+    </div>
+  </div>`;
+}
+
+// キャラのゆかりの地（js/places.js）。場所がないキャラは何も出さない
+function placeBlock(name) {
+  const p = typeof PLACES !== "undefined" && PLACES[name];
+  if (!p) return "";
+  const map = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.place + " " + p.area)}`;
+  return `<details class="place">
+    <summary>📍 ゆかりの地：${p.place}</summary>
+    <p class="place-area">${p.area}　<a href="${map}" target="_blank" rel="noopener">地図で見る</a></p>
+    <p class="place-note">${p.note}</p>
+    ${p.stay ? travelLinks({ stay: p.stay }) : overseasLinks(p.guide)}
+  </details>`;
 }
 
 // 「現在の価格を見る」リンク。IDが未設定なら通常リンク、設定済みならアフィリエイトリンクになる
@@ -403,6 +432,7 @@ function trueIdentityCard(ti, who, element) {
     </details>
     <a class="read-more" href="articles/true-identities.html#ti-${TRUE_IDENTITIES.indexOf(c) + 1}">🌟 本当の正体100体の図鑑で、ほかの正体も見る →</a>
     ${ti.detailed ? "" : '<p class="ti-more">🔭 出生時刻と出生地を入れると、紫微斗数やアセンダントも加わり、<b>より精密な正体</b>がわかります（「くわしく診断する」から）。</p>'}
+    ${placeBlock(c.name)}
     <a class="wiki-link" href="${wikiUrl(c.wiki)}" target="_blank" rel="noopener">${c.name}をWikipediaで詳しく見る ↗</a>
     ${bookLinks(c.name)}
   </div>`;
@@ -441,6 +471,8 @@ function render(birthday, nickname, birthtime, birthplace) {
         <h4>${r.name}</h4>
         <p class="id-sub">${r.sub}</p>
         <p class="id-desc">${r.desc}</p>
+        ${r.weak ? `<p class="id-weak"><b>⚠️ このキャラの弱点</b>${r.weak}</p>` : ""}
+        ${placeBlock(r.name)}
         <a class="wiki-link" href="${wikiUrl(r.wiki)}" target="_blank" rel="noopener">Wikipediaで詳しく見る ↗</a>
         ${bookLinks(r.name)}
       </div>`;
