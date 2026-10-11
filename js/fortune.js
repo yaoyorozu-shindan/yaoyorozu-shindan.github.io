@@ -798,7 +798,7 @@ try {
   nicknameInput.value = localStorage.getItem("nickname") || "";
   birthtimeInput.value = localStorage.getItem("birthtime") || "";
   setBirthplace(localStorage.getItem("birthplace") || "");
-  if (birthtimeInput.value || birthplaceInput.value) document.getElementById("detail-input").open = true;
+  // 保存済みの出生情報を復元しても、詳細入力は最初は閉じたままにする。
 } catch (e) {}
 
 // 前に診断したことがある人には「おかえりなさい」バナーを出す
