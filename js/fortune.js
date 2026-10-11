@@ -93,6 +93,10 @@ const MOTIFS = {
     <rect x="48" y="52" width="104" height="8" fill="#fff"/>
     <g fill="#fff"><rect x="56" y="64" width="10" height="46"/><rect x="78" y="64" width="10" height="46"/><rect x="112" y="64" width="10" height="46"/><rect x="134" y="64" width="10" height="46"/></g>
     <rect x="44" y="112" width="112" height="10" fill="#fff"/>`,
+  // 光輪と星（本当の正体）
+  true: `<circle cx="100" cy="70" r="46" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="3"/>
+    <circle cx="100" cy="70" r="58" fill="none" stroke="#fff" stroke-opacity=".2" stroke-width="2"/>
+    <path d="M100 30l10 28h30l-24 18 9 29-25-18-25 18 9-29-24-18h30z" fill="#fff"/>`,
   // 雷神の槌と稲妻
   norse: `<g fill="#fff"><rect x="62" y="30" width="76" height="34" rx="6"/><rect x="93" y="62" width="14" height="56" rx="4"/>
       <rect x="88" y="114" width="24" height="10" rx="3"/></g>
@@ -375,6 +379,34 @@ function ziweiCard(zw) {
   </div>`;
 }
 
+// 本当の正体（主役）のカード
+function trueIdentityCard(ti, who, element) {
+  const c = ti.identity;
+  const sec = (icon, label, text) => `<div class="ti-sec"><p class="ti-sec-label">${icon} ${label}</p><p>${text}</p></div>`;
+  return `<div class="card ti-card" id="true-identity">
+    <p class="ti-lead">${who}の本当の正体は——</p>
+    ${artFor(c.name, "true", element)}
+    <p class="ti-origin">${c.origin}・${c.type}</p>
+    <h2 class="ti-name">${c.name}</h2>
+    <p class="ti-catch">「${c.catch}」</p>
+    <div class="ti-body">
+      ${sec("🔮", "本質", c.essence)}
+      ${sec("✨", "長所", c.good)}
+      ${sec("⚠️", "短所", c.weak)}
+      ${sec("💞", "恋愛・人間関係", c.love)}
+      ${sec("💼", "仕事・才能", c.work)}
+    </div>
+    <details class="ti-why"><summary>なぜこの正体？（判定の理由）</summary>
+      <ul>${ti.reasons.map((r) => `<li>${r}</li>`).join("")}</ul>
+      <p class="note">同じ日干の10体の中から、西洋占星術と紫微斗数の結果がいちばん重なる存在を選んでいます。</p>
+      <p class="ti-near">ほかに近い正体：${ti.runnersUp.map((r) => r.name).join("、")}</p>
+    </details>
+    ${ti.detailed ? "" : '<p class="ti-more">🔭 出生時刻と出生地を入れると、紫微斗数やアセンダントも加わり、<b>より精密な正体</b>がわかります（「くわしく診断する」から）。</p>'}
+    <a class="wiki-link" href="${wikiUrl(c.wiki)}" target="_blank" rel="noopener">${c.name}をWikipediaで詳しく見る ↗</a>
+    ${bookLinks(c.name)}
+  </div>`;
+}
+
 function wikiUrl(title) {
   return `https://ja.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, "_"))}`;
 }
@@ -391,6 +423,7 @@ function render(birthday, nickname, birthtime, birthplace) {
   const fp = fourPillars(birthday, birthtime || "");
   const wc = typeof Astronomy !== "undefined" ? westernChart(birthday, birthtime || "", birthplace || "") : null;
   const zw = typeof Astronomy !== "undefined" && birthtime ? ziweiChart(birthday, birthtime) : null;
+  const ti = judgeTrueIdentity(birthday, fp, wc, zw);
   const dx = diagnose(birthday);
   const daily = dailyFortune(birthday, todayString());
   const { element, stem, identities, shrine } = dx;
@@ -421,21 +454,13 @@ function render(birthday, nickname, birthtime, birthplace) {
     </div>`).join("");
 
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shrine.name + " " + shrine.area)}`;
-  const shareText = `私の正体は…\nインド神話：${identities.india.name}\n日本神話：${identities.japan.name}\nギリシャ神話：${identities.greece.name}\n北欧神話：${identities.norse.name}\n妖怪：${identities.yokai.name}\n都市伝説：${identities.legend.name}\n#八百万診断`;
+  const shareText = `私の本当の正体は「${ti.identity.name}」！\n${ti.identity.catch}\n\n別の世界では…\nインド神話：${identities.india.name}\n日本神話：${identities.japan.name}\nギリシャ神話：${identities.greece.name}\n北欧神話：${identities.norse.name}\n妖怪：${identities.yokai.name}\n都市伝説：${identities.legend.name}\n#八百万診断`;
   const shareUrl = SITE_CONFIG.siteUrl || location.href.split("#")[0];
 
   const el = document.getElementById("result");
   el.style.setProperty("--el", element.color);
   el.innerHTML = `
-    <div class="card element-card">
-      <div class="element-icon" aria-hidden="true">${element.icon}</div>
-      <p class="sub">${who}の属性は</p>
-      <h2>${polarity}の${element.name}</h2>
-      <p class="stem">日干：${stem.kanji}</p>
-      <p>${element.trait}</p>
-      <p class="polarity">${element[stem.yang ? "yang" : "yin"]}</p>
-      <a class="read-more" href="articles/element-${stem.element}.html">「${element.name}」属性について詳しく読む →</a>
-    </div>
+    ${trueIdentityCard(ti, who, element)}
 
     <div class="share-area">
       <p class="share-title">結果をシェアする</p>
@@ -446,13 +471,25 @@ function render(birthday, nickname, birthtime, birthplace) {
       <div id="insta-preview" class="insta-preview" hidden></div>
     </div>
 
+    <div class="card element-card">
+      <div class="element-icon" aria-hidden="true">${element.icon}</div>
+      <p class="sub">${who}の属性は</p>
+      <h2>${polarity}の${element.name}</h2>
+      <p class="stem">日干：${stem.kanji}</p>
+      <p>${element.trait}</p>
+      <p class="polarity">${element[stem.yang ? "yang" : "yin"]}</p>
+      <a class="read-more" href="articles/element-${stem.element}.html">「${element.name}」属性について詳しく読む →</a>
+    </div>
+
+
     ${meishikiCard(fp)}
 
     ${wc ? horoscopeCard(wc) : ""}
 
     ${ziweiCard(zw)}
 
-    <h3 class="section-title">${who}の正体</h3>
+    <h3 class="section-title">別の世界に生まれていたら…</h3>
+    <p class="section-sub">神話や伝承の7つの世界での、${who}の姿</p>
     ${SITE_CONFIG.rakutenAffiliateId ? '<p class="pr-line">PR：漫画・小説のリンクは楽天ブックスのアフィリエイトリンクです</p>' : ""}
     <div class="id-grid">${idCards}</div>
 
@@ -495,6 +532,7 @@ function render(birthday, nickname, birthtime, birthplace) {
   `;
   const shareData = {
     who: nickname ? `${nickname}さん` : "あなた",
+    trueName: ti.identity.name, trueCatch: ti.identity.catch,
     element, polarity, stemKanji: stem.kanji, identities, shrine,
     power: POWER_STONES[stem.element][stem.yang ? "yang" : "yin"],
   };

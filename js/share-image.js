@@ -44,20 +44,19 @@ function buildShareImage(data) {
   ctx.textAlign = "right";
   ctx.fillText(data.element.name, W - 30, 760);
 
-  // 見出し
+  // 見出し：本当の正体を主役に
   ctx.textAlign = "center";
   ctx.fillStyle = "rgba(255,255,255,0.75)";
   ctx.font = `700 44px ${SHARE_FONT}`;
-  ctx.fillText("⛩️ 八百万診断", W / 2, 170);
+  ctx.fillText("⛩️ 八百万診断", W / 2, 150);
   ctx.fillStyle = "#fff";
-  fitText(ctx, `${data.who}の正体は…`, W / 2, 290, 900, 60, 700);
-  ctx.font = `120px ${SHARE_FONT}`;
-  ctx.fillText(data.element.icon, W / 2, 470);
-  ctx.font = `800 150px ${SHARE_FONT}`;
-  ctx.fillText(`${data.polarity}の${data.element.name}`, W / 2, 650);
+  fitText(ctx, `${data.who}の本当の正体は——`, W / 2, 260, 900, 54, 700);
+  fitText(ctx, data.trueName || "", W / 2, 420, 960, 140, 800);
+  ctx.fillStyle = "rgba(255,255,255,0.9)";
+  fitText(ctx, data.trueCatch ? `「${data.trueCatch}」` : "", W / 2, 510, 960, 48, 700);
   ctx.fillStyle = "rgba(255,255,255,0.75)";
   ctx.font = `500 40px ${SHARE_FONT}`;
-  ctx.fillText(`日干：${data.stemKanji}`, W / 2, 725);
+  ctx.fillText(`${data.element.icon} ${data.polarity}の${data.element.name}（日干：${data.stemKanji}）`, W / 2, 600);
 
   // 正体の一覧
   const rows = [
@@ -65,7 +64,7 @@ function buildShareImage(data) {
     ["相性のいい神社", data.shrine.name],
     ["守護パワーストーン", data.power.name],
   ];
-  const top = 800, rowH = Math.min(96, Math.floor(820 / rows.length)), left = 110, right = W - 110;
+  const top = 670, rowH = Math.min(96, Math.floor(940 / rows.length)), left = 110, right = W - 110;
   ctx.fillStyle = "rgba(255,255,255,0.12)";
   roundRect(ctx, 70, top, W - 140, rows.length * rowH + 50, 36);
   ctx.fill();
