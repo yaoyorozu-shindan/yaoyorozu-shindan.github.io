@@ -12,13 +12,13 @@ const PUBLISHED = "2026-10-11";
 // サイトのデータを読み込む
 const src = ["js/config.js", "js/fortune-data.js", "js/images.js", "js/true-identity-a.js", "js/true-identity-b.js", "js/places.js"]
   .map((f) => fs.readFileSync(path.join(ROOT, f), "utf8")).join("\n");
-const D = new Function(src + "; return { SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES, PLACES, sjisPercent };")();
-const { SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES, PLACES, sjisPercent } = D;
+const D = new Function(src + "; return { amazonLink, SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES, PLACES, sjisPercent };")();
+const { amazonLink, SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES, PLACES, sjisPercent } = D;
 const ORDER = ["wood", "fire", "earth", "metal", "water"];
 const VERSION = (fs.readFileSync(path.join(ROOT, "index.html"), "utf8").match(/style\.css\?v=(\d+)/) || [])[1] || "1";
 
 // ---- リンク作成 ----
-const rid = SITE_CONFIG.rakutenAffiliateId, tag = SITE_CONFIG.amazonTag;
+const rid = SITE_CONFIG.rakutenAffiliateId;
 const vcSid = SITE_CONFIG.valueCommerceSid, vcPid = SITE_CONFIG.valueCommercePid;
 const rakuten = (url) => (rid ? `https://hb.afl.rakuten.co.jp/hgc/${rid}/?pc=${encodeURIComponent(url)}` : url);
 const relFor = (isAd) => (isAd ? "sponsored noopener" : "noopener");
@@ -27,9 +27,10 @@ const mapUrl = (q) => `https://www.google.com/maps/search/?api=1&query=${encodeU
 
 function priceButtons(keyword) {
   const q = encodeURIComponent(keyword);
+  const amazon = amazonLink(`https://www.amazon.co.jp/s?k=${q}`);
   return `<div class="price-btns">
       <a class="aff-btn rakuten" href="${rakuten(`https://search.rakuten.co.jp/search/mall/${q}/`)}" target="_blank" rel="${relFor(rid)}">楽天で現在の価格を見る</a>
-      <a class="aff-btn amazon" href="https://www.amazon.co.jp/s?k=${q}${tag ? "&tag=" + encodeURIComponent(tag) : ""}" target="_blank" rel="${relFor(tag)}">Amazonで現在の価格を見る</a>
+      <a class="aff-btn amazon" href="${amazon.href}" target="_blank" rel="${relFor(amazon.isAd)}">Amazonで現在の価格を見る</a>
     </div>`;
 }
 

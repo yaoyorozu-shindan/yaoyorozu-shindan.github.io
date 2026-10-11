@@ -145,8 +145,9 @@ function artFor(name, category, element) {
 function affiliateLinks(keyword, label) {
   const q = encodeURIComponent(keyword);
   const links = [];
-  if (SITE_CONFIG.amazonTag) {
-    links.push(`<a class="aff-btn amazon" href="https://www.amazon.co.jp/s?k=${q}&tag=${encodeURIComponent(SITE_CONFIG.amazonTag)}" target="_blank" rel="sponsored noopener">Amazonで${label}</a>`);
+  const amazon = amazonLink(`https://www.amazon.co.jp/s?k=${q}`);
+  if (amazon.isAd) {
+    links.push(`<a class="aff-btn amazon" href="${amazon.href}" target="_blank" rel="sponsored noopener">Amazonで${label}</a>`);
   }
   if (SITE_CONFIG.rakutenAffiliateId) {
     const target = encodeURIComponent(`https://search.rakuten.co.jp/search/mall/${q}/`);
@@ -208,13 +209,13 @@ function placeBlock(name) {
 // 「現在の価格を見る」リンク。IDが未設定なら通常リンク、設定済みならアフィリエイトリンクになる
 function priceLinks(keyword) {
   const q = encodeURIComponent(keyword);
-  const { rakutenAffiliateId: rid, amazonTag: tag } = SITE_CONFIG;
+  const rid = SITE_CONFIG.rakutenAffiliateId;
+  const amazon = amazonLink(`https://www.amazon.co.jp/s?k=${q}`);
   const rakutenUrl = `https://search.rakuten.co.jp/search/mall/${q}/`;
   const rakutenHref = rid ? `https://hb.afl.rakuten.co.jp/hgc/${rid}/?pc=${encodeURIComponent(rakutenUrl)}` : rakutenUrl;
-  const amazonHref = `https://www.amazon.co.jp/s?k=${q}${tag ? "&tag=" + encodeURIComponent(tag) : ""}`;
   return `<div class="price-btns">
     <a class="aff-btn rakuten" href="${rakutenHref}" target="_blank" rel="${rid ? "sponsored " : ""}noopener">楽天で現在の価格を見る</a>
-    <a class="aff-btn amazon" href="${amazonHref}" target="_blank" rel="${tag ? "sponsored " : ""}noopener">Amazonで現在の価格を見る</a>
+    <a class="aff-btn amazon" href="${amazon.href}" target="_blank" rel="${amazon.isAd ? "sponsored " : ""}noopener">Amazonで現在の価格を見る</a>
   </div>`;
 }
 
@@ -241,7 +242,7 @@ function stoneCard(birthday, stem) {
   const month = Number(birthday.split("-")[1]);
   const power = POWER_STONES[stem.element][stem.yang ? "yang" : "yin"];
   const births = BIRTHSTONES[month].map((b) => stoneItem(`${month}月の誕生石`, b)).join("");
-  const isAd = SITE_CONFIG.rakutenAffiliateId || SITE_CONFIG.amazonTag;
+  const isAd = SITE_CONFIG.rakutenAffiliateId || amazonLink("https://www.amazon.co.jp/").isAd;
   return `<div class="card stones-card${isAd ? " has-pr" : ""}">
     ${isAd ? '<span class="pr">PR</span>' : ""}
     <h3>💎 あなたの石</h3>
