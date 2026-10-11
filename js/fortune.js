@@ -347,6 +347,34 @@ function horoscopeCard(wc) {
   </div>`;
 }
 
+// 紫微斗数のカード（命盤と命宮の主星）
+const PALACE_NAMES = ["命宮", "兄弟宮", "夫妻宮", "子女宮", "財帛宮", "疾厄宮", "遷移宮", "交友宮", "官禄宮", "田宅宮", "福徳宮", "父母宮"];
+function ziweiCard(zw) {
+  if (!zw) {
+    return `<div class="card ziwei-card"><h3>🌟 紫微斗数</h3>
+      <p>紫微斗数は、生まれた時刻（十二時辰）で命盤が大きく変わる占いです。「くわしく診断する」から<b>出生時刻</b>を入れると、あなたの命宮と主星がわかります。</p></div>`;
+  }
+  const palaceOf = (b) => PALACE_NAMES[((zw.ming.branch - b) % 12 + 12) % 12];
+  const starsAt = (b) => Object.keys(zw.positions).filter((s) => zw.positions[s] === b);
+  const cell = (b) => `<div class="zp${b === zw.ming.branch ? " ming" : ""}${b === zw.shen.branch ? " shen" : ""}" style="grid-area:b${b}">
+      <span class="zp-name">${palaceOf(b)}${b === zw.shen.branch ? "<i>身</i>" : ""}</span>
+      <span class="zp-stars">${starsAt(b).join(" ")}</span>
+      <span class="zp-br">${ZW_BRANCHES[b]}</span></div>`;
+  const main = zw.mainStars.map((s) => `<div class="zw-main"><p class="zw-star">${s}星</p><p>${MAJOR_STARS[s].text}</p></div>`).join("");
+  const L = zw.lunar;
+  return `<div class="card ziwei-card">
+    <h3>🌟 紫微斗数の命盤</h3>
+    <div class="zw-board">
+      ${[0,1,2,3,4,5,6,7,8,9,10,11].map(cell).join("")}
+      <div class="zw-center"><b>${zw.bureau}</b><span>命宮 ${zw.ming.kanji}</span><span>旧暦 ${L.isLeap ? "閏" : ""}${L.month}月${L.day}日</span><span>${ZW_BRANCHES[zw.hourBranch]}の刻生まれ</span></div>
+    </div>
+    <h4>命宮の主星（あなたの本質）</h4>
+    ${main}
+    ${zw.borrowed ? '<p class="note">※命宮に主星がない「空宮」のため、向かいの遷移宮の星を借りて読んでいます。</p>' : ""}
+    <p class="note">※旧暦は中国の農暦で計算しています。閏月は15日までを前の月、16日以降を次の月として扱い、23時台は翌日の子の刻としています（流派により異なる場合があります）。</p>
+  </div>`;
+}
+
 function wikiUrl(title) {
   return `https://ja.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, "_"))}`;
 }
@@ -362,6 +390,7 @@ function spotList(shrine) {
 function render(birthday, nickname, birthtime, birthplace) {
   const fp = fourPillars(birthday, birthtime || "");
   const wc = typeof Astronomy !== "undefined" ? westernChart(birthday, birthtime || "", birthplace || "") : null;
+  const zw = typeof Astronomy !== "undefined" && birthtime ? ziweiChart(birthday, birthtime) : null;
   const dx = diagnose(birthday);
   const daily = dailyFortune(birthday, todayString());
   const { element, stem, identities, shrine } = dx;
@@ -420,6 +449,8 @@ function render(birthday, nickname, birthtime, birthplace) {
     ${meishikiCard(fp)}
 
     ${wc ? horoscopeCard(wc) : ""}
+
+    ${ziweiCard(zw)}
 
     <h3 class="section-title">${who}の正体</h3>
     ${SITE_CONFIG.rakutenAffiliateId ? '<p class="pr-line">PR：漫画・小説のリンクは楽天ブックスのアフィリエイトリンクです</p>' : ""}
