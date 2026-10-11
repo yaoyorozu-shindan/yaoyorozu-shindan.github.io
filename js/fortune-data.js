@@ -40,8 +40,8 @@ const ELEMENTS = {
 
 // 結果に表示するカテゴリ（この順番で表示されます）
 const CATEGORIES = [
-  { key: "india",  label: "インド神話の神",   lead: "あなたが神だったら" },
-  { key: "japan",  label: "日本神話の神",     lead: "八百万の神なら" },
+  { key: "india",  label: "インド神話の神",   lead: "神々の住む須弥山（しゅみせん）なら" },
+  { key: "japan",  label: "日本神話の神",     lead: "高天原（たかまがはら）なら" },
   { key: "greece", label: "ギリシャ神話の神", lead: "オリュンポスなら" },
   { key: "norse",  label: "北欧神話の神",     lead: "アースガルズなら" },
   { key: "yokai",  label: "妖怪",             lead: "妖怪だったら" },
