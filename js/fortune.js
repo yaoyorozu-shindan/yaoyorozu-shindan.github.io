@@ -679,6 +679,8 @@ function render(birthday, nickname, birthtime, birthplace) {
 
     ${sukuyoCard(birthday, zw)}
 
+    ${typeof kyuseiCardHTML === "function" ? kyuseiCardHTML(birthday, fp) : ""}
+
     <h3 class="section-title">別の世界に生まれていたら…</h3>
     <p class="section-sub">神話や伝承の7つの世界での、${who}の姿</p>
     ${SITE_CONFIG.rakutenAffiliateId ? '<p class="pr-line">PR：漫画・小説のリンクは楽天ブックスのアフィリエイトリンクです</p>' : ""}
