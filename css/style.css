@@ -355,3 +355,13 @@ a { color: var(--accent); }
 .lottery-desc { font-size: 0.9rem; }
 .lottery-btn { display: block; text-align: center; padding: 12px; border-radius: 999px; font-weight: 700; text-decoration: none; color: #fff;
   background: linear-gradient(135deg, #e8b923, #d98b1f); }
+
+/* ---- おかえりなさいバナー ---- */
+.welcome { text-align: center; background: linear-gradient(135deg, #f3edff, #fff); border: 2px solid var(--accent-2); }
+.welcome-msg { margin: 0 0 12px; font-weight: 700; font-size: 1.05rem; }
+.welcome-msg small { font-weight: 400; color: var(--muted); }
+.welcome-btns { display: grid; gap: 8px; }
+.welcome-btns button { padding: 12px; font-size: 1rem; font-weight: 700; font-family: inherit; color: #fff; border: none; border-radius: 999px; cursor: pointer;
+  background: linear-gradient(135deg, var(--accent), #9a6fd6); }
+.welcome-btns button.sub { background: #fff; color: var(--accent); border: 2px solid var(--accent-2); }
+.element-card + .share-area { margin: 16px 0; }

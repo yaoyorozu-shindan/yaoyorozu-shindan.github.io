@@ -309,6 +309,15 @@ function render(birthday, nickname) {
       <a class="read-more" href="articles/element-${stem.element}.html">「${element.name}」属性について詳しく読む →</a>
     </div>
 
+    <div class="share-area">
+      <p class="share-title">結果をシェアする</p>
+      <div class="share-btns">
+        <a class="share-btn x" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}" target="_blank" rel="noopener">Xでシェア</a>
+        <button type="button" class="share-btn insta" id="insta-share">インスタでシェア</button>
+      </div>
+      <div id="insta-preview" class="insta-preview" hidden></div>
+    </div>
+
     <h3 class="section-title">${who}の正体</h3>
     ${SITE_CONFIG.rakutenAffiliateId ? '<p class="pr-line">PR：漫画・小説のリンクは楽天ブックスのアフィリエイトリンクです</p>' : ""}
     <div class="id-grid">${idCards}</div>
@@ -332,7 +341,7 @@ function render(birthday, nickname) {
 
     ${typeof bestMatchesHTML === "function" ? bestMatchesHTML(birthday, who) : ""}
 
-    <div class="card">
+    <div class="card" id="today-card">
       <h3>${todayString().replace(/-/g, "/")} の運勢</h3>
       ${luckRows}
     </div>
@@ -349,14 +358,6 @@ function render(birthday, nickname) {
       <p class="advice">💡 ${daily.advice}</p>
     </div>
 
-    <div class="share-area">
-      <p class="share-title">結果をシェアする</p>
-      <div class="share-btns">
-        <a class="share-btn x" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}" target="_blank" rel="noopener">Xでシェア</a>
-        <button type="button" class="share-btn insta" id="insta-share">インスタでシェア</button>
-      </div>
-      <div id="insta-preview" class="insta-preview" hidden></div>
-    </div>
   `;
   const shareData = {
     who: nickname ? `${nickname}さん` : "あなた",
@@ -383,6 +384,23 @@ try {
   birthdayInput.value = localStorage.getItem("birthday") || "";
   nicknameInput.value = localStorage.getItem("nickname") || "";
 } catch (e) {}
+
+// 前に診断したことがある人には「おかえりなさい」バナーを出す
+(function () {
+  let saved = "", name = "";
+  try { saved = localStorage.getItem("birthday") || ""; name = localStorage.getItem("nickname") || ""; } catch (e) {}
+  if (!saved) return;
+  const box = document.getElementById("welcome-back");
+  const who = name ? `${escapeHtml(name)}さん` : "";
+  box.querySelector(".welcome-msg").innerHTML = `おかえりなさい${who ? "、" + who : ""}！<br><small>今日の運勢は毎日変わります。</small>`;
+  box.hidden = false;
+  const show = (targetId) => {
+    render(saved, name);
+    setTimeout(() => document.getElementById(targetId).scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+  };
+  document.getElementById("wb-today").addEventListener("click", () => show("today-card"));
+  document.getElementById("wb-result").addEventListener("click", () => show("result"));
+})();
 
 form.addEventListener("submit", (e) => {
   e.preventDefault();

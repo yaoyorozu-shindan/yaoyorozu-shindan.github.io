@@ -93,6 +93,9 @@ function page({ file, title, desc, body, hasAd }) {
   <meta property="og:description" content="${desc}">
   <meta property="og:type" content="article">
   <meta property="og:url" content="${url}">
+  <meta property="og:site_name" content="八百万診断">
+  <meta property="og:image" content="${SITE}img/ogp.png">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="../css/style.css?v=${VERSION}">
 </head>
 <body>
