@@ -6,6 +6,9 @@
   const id = typeof SITE_CONFIG !== "undefined" && SITE_CONFIG.gaMeasurementId;
   window.track = function () {};
   if (!id) return;
+  // 手元のパソコンでの確認（localhost など）や、ファイルを直接開いたときは記録しない
+  const host = location.hostname;
+  if (location.protocol === "file:" || host === "localhost" || host === "127.0.0.1" || host === "[::1]" || host.endsWith(".localhost")) return;
 
   const s = document.createElement("script");
   s.async = true;

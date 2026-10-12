@@ -290,7 +290,7 @@ const IMAGES = {
   "ママ・キリャ": {"src":"img/true/mamakilla.jpg","credit":"AI生成イラスト（八百万診断オリジナル）","page":"img/true/mamakilla.jpg"},
   "ザガン": {"src":"img/true/zagan.jpg","credit":"AI生成イラスト（八百万診断オリジナル）","page":"img/true/zagan.jpg"},
   "ママ・コチャ": {"src":"img/true/mamacocha.jpg","credit":"AI生成イラスト（八百万診断オリジナル）","page":"img/true/mamacocha.jpg"},
-  "ウェパル": {"src":"https://upload.wikimedia.org/wikipedia/commons/9/92/42-Vepar_seal01.png","credit":"S.L. MacGregor Mathers and Aleister Crowley / Public domain","page":"https://commons.wikimedia.org/wiki/File:42-Vepar_seal01.png"},
+  "ウェパル": {"src":"img/true/vepar.jpg","credit":"AI生成イラスト（八百万診断オリジナル）","page":"img/true/vepar.jpg"},
   "モケーレ・ムベンベ": {"src":"https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/Mokele-mbembe_ill_artlibre_jnl.png/500px-Mokele-mbembe_ill_artlibre_jnl.png","credit":"JNL / FAL","page":"https://commons.wikimedia.org/wiki/File:Mokele-mbembe_ill_artlibre_jnl.png"},
   "チャルチウィトリクエ": {"src":"https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/Chalchiutlicue_rios.jpg/500px-Chalchiutlicue_rios.jpg","credit":"作者不明 / Public domain","page":"https://commons.wikimedia.org/wiki/File:Chalchiutlicue_rios.jpg"},
   "クッシー": {"src":"img/true/kussie.jpg","credit":"AI生成イラスト（八百万診断オリジナル）","page":"img/true/kussie.jpg"},

@@ -35,6 +35,7 @@ const LOCAL_IMAGES = {
   "パチャカマック": { src: "img/true/pachacamac.jpg", credit: AI_CREDIT },
   "クッシー": { src: "img/true/kussie.jpg", credit: AI_CREDIT },
   "コティングリー妖精": { src: "img/true/cottingley.jpg", credit: AI_CREDIT },
+  "ウェパル": { src: "img/true/vepar.jpg", credit: AI_CREDIT },
 };
 const commonsThumb = (file) => {
   const f = file.replace(/ /g, "_"), h = require("crypto").createHash("md5").update(f).digest("hex");
