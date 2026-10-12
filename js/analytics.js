@@ -9,6 +9,13 @@
   // 手元のパソコンでの確認（localhost など）や、ファイルを直接開いたときは記録しない
   const host = location.hostname;
   if (location.protocol === "file:" || host === "localhost" || host === "127.0.0.1" || host === "[::1]" || host.endsWith(".localhost")) return;
+  // 運営者の端末を数えない：一度 ?notrack=1 を付けて開くと、その端末では記録しない（?notrack=0 で元に戻す）
+  try {
+    const q = new URLSearchParams(location.search).get("notrack");
+    if (q === "1") localStorage.setItem("notrack", "1");
+    if (q === "0") localStorage.removeItem("notrack");
+    if (localStorage.getItem("notrack") === "1") return;
+  } catch (e) {}
 
   const s = document.createElement("script");
   s.async = true;

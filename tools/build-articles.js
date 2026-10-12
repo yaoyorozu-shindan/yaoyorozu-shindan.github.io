@@ -137,7 +137,14 @@ function page({ file, title, desc, body, hasAd }) {
     });
     body = body.replace(/(<p>[\s\S]*?<\/p>)/, `$1<nav class="toc" aria-label="記事の目次"><p>目次</p><ol>${entries.join("")}</ol></nav>`);
   }
-  const url = SITE + "articles/" + file;
+  const url = SITE + "articles/" + (file === "index.html" ? "" : file);
+  // 検索エンジン向けの構造化データ（パンくずと記事の情報）
+  const crumbList = [["トップ", SITE], ["読みもの", SITE + "articles/"], ...(file === "index.html" ? [] : [[title.split("｜")[0], url]])];
+  const ld = [{ "@context": "https://schema.org", "@type": "BreadcrumbList",
+    itemListElement: crumbList.map(([name, item], i) => ({ "@type": "ListItem", position: i + 1, name, item })) }];
+  if (file !== "index.html") ld.push({ "@context": "https://schema.org", "@type": "Article", headline: title.split("｜")[0], description: desc,
+    datePublished: published, inLanguage: "ja", image: SITE + "img/ogp.png", mainEntityOfPage: url,
+    publisher: { "@type": "Organization", name: "八百万診断", url: SITE }, author: { "@type": "Organization", name: "八百万診断", url: SITE } });
   const related = ARTICLES.filter((a) => a.file !== file).map((a) => `<li><a href="${a.file}">${a.short}</a></li>`).join("");
   return `<!doctype html>
 <html lang="ja">
@@ -155,6 +162,7 @@ function page({ file, title, desc, body, hasAd }) {
   <meta property="og:image" content="${SITE}img/ogp.png">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="../css/style.css?v=${VERSION}">
+  <script type="application/ld+json">${JSON.stringify(ld)}</script>
 </head>
 <body>
   <header class="site-header">
