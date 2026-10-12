@@ -3,7 +3,7 @@
 const fs = require("fs");
 const [site] = process.argv.slice(2);
 eval(fs.readFileSync(site + "/js/fortune-data.js", "utf8") + ";globalThis.R=RESULTS;");
-eval(fs.readFileSync(site + "/js/true-identity-a.js", "utf8") + fs.readFileSync(site + "/js/true-identity-b.js", "utf8") + ";globalThis.T=TRUE_IDENTITIES;");
+eval(fs.readFileSync(site + "/js/true-identity-a.js", "utf8") + fs.readFileSync(site + "/js/true-identity-b.js", "utf8") + fs.readFileSync(site + "/js/true-identity-c.js", "utf8") + ";globalThis.T=TRUE_IDENTITIES;");
 // 絵として合わない画像は使わない（系図・動画・ロゴ・無関係な風景など）
 const SKIP_FILES = ["Descendants_of_Izanami_alone.svg", "Gongenyama_Mt_Kimotsuki_Kagoshima.jpg", "Mayoiga_8086294422_ff2f173cf1_k.jpg",
   "Children_born_from_the_Challenge_of_Amaterasu_and_Susanoo.svg", "Sol_de_Mayo-Bandera_de_Argentina.svg", "Kinkaku-ji_04.jpg"];
@@ -29,6 +29,12 @@ const LOCAL_IMAGES = {
   "共工": { src: "img/true/kyoko.jpg", credit: AI_CREDIT },
   "瀬織津姫": { src: "img/true/seoritsuhime.jpg", credit: AI_CREDIT },
   "イチキシマヒメ": { src: "img/true/ichikishimahime.jpg", credit: AI_CREDIT },
+  "ザガン": { src: "img/true/zagan.jpg", credit: AI_CREDIT },
+  "ママ・コチャ": { src: "img/true/mamacocha.jpg", credit: AI_CREDIT },
+  "ママ・キリャ": { src: "img/true/mamakilla.jpg", credit: AI_CREDIT },
+  "パチャカマック": { src: "img/true/pachacamac.jpg", credit: AI_CREDIT },
+  "クッシー": { src: "img/true/kussie.jpg", credit: AI_CREDIT },
+  "コティングリー妖精": { src: "img/true/cottingley.jpg", credit: AI_CREDIT },
 };
 const commonsThumb = (file) => {
   const f = file.replace(/ /g, "_"), h = require("crypto").createHash("md5").update(f).digest("hex");

@@ -556,18 +556,18 @@ function trueIdentityWhy(ti) {
   ];
   const story = layers.length
     ? `生まれた日の「${polarity}の${el.name}」を土台に、${layers.join('と')}が重なりました。この重なりを「${c.catch}」という姿にたとえて、${c.name}を選んでいます。`
-    : `生まれた日の「${polarity}の${el.name}」を土台に、同じ日干の10候補から${c.name}を選んでいます。今回は星の情報による加点がなく、生年月日で決まる順番が決め手になりました。`;
+    : `生まれた日の「${polarity}の${el.name}」を土台に、同じ日干の13候補から${c.name}を選んでいます。今回は星の情報による加点がなく、生年月日で決まる順番が決め手になりました。`;
   const matches = signals.map(signal => `<li><span class="why-signal-label">${escapeHtml(signal.label)}</span><b>${escapeHtml(signal.detail)}</b><small>${escapeHtml(signal.role)}として読まれ、この正体の設定と重なりました。</small></li>`).join('');
   return `<section class="ti-why-story" aria-label="正体の判定理由">
     <p class="why-eyebrow">あなたの正体への道筋</p>
     <h3>あなたが${escapeHtml(c.name)}になった理由</h3>
     <p class="why-story">${escapeHtml(story)}</p>
-    <div class="why-root"><span>${el.icon} 生まれた日の土台</span><b>${SC_STEMS[c.stem]} · ${polarity}の${el.name}</b><p>${stemMotifs[c.stem]}として読まれます。まず、この日干に対応する10候補にしぼります。</p></div>
+    <div class="why-root"><span>${el.icon} 生まれた日の土台</span><b>${SC_STEMS[c.stem]} · ${polarity}の${el.name}</b><p>${stemMotifs[c.stem]}として読まれます。まず、この日干に対応する13候補にしぼります。</p></div>
     ${matches ? `<p class="why-matches-title">この正体と重なった星の手がかり</p><ul class="why-signals">${matches}</ul>` : ''}
     ${ti.tied ? '<p class="why-tie">同じ最高得点の候補が複数あったため、最後は生年月日で決まる順番で選んでいます。同じ入力なら、毎回同じ正体になります。</p>' : ''}
     <details class="ti-why"><summary>判定の詳しい情報を見る</summary>
       <ul>${ti.reasons.map(r => `<li>${escapeHtml(r)}</li>`).join('')}</ul>
-      <p class="note">同じ日干の10候補の中で、星の情報との重なりを得点にし、最も高い候補を選ぶ、八百万診断オリジナルの判定です。</p>
+      <p class="note">同じ日干の13候補の中で、星の情報との重なりを得点にし、最も高い候補を選ぶ、八百万診断オリジナルの判定です。</p>
       <p class="ti-near">ほかに近い正体：${ti.runnersUp.map(r => escapeHtml(r.name)).join('、')}</p>
     </details>
   </section>`;
@@ -591,7 +591,7 @@ function trueIdentityCard(ti, who, element) {
       ${sec("💼", "仕事・才能", c.work)}
     </div>
     ${trueIdentityWhy(ti)}
-    <a class="read-more" href="articles/true-identities.html#ti-${TRUE_IDENTITIES.indexOf(c) + 1}">🌟 本当の正体図鑑 — 100の正体で、ほかの正体も見る →</a>
+    <a class="read-more" href="articles/true-identities.html#ti-${TRUE_IDENTITIES.indexOf(c) + 1}">🌟 本当の正体図鑑 — 130の正体で、ほかの正体も見る →</a>
     ${ti.detailed ? "" : '<p class="ti-more">🔭 出生時刻と出生地を入れると、紫微斗数やアセンダントも加わり、<b>より精密な正体</b>がわかります（「くわしく診断する」から）。</p>'}
     ${placeBlock(c.name)}
     <a class="wiki-link" href="${wikiUrl(c.wiki)}" target="_blank" rel="noopener">${c.name}をWikipediaで詳しく見る ↗</a>

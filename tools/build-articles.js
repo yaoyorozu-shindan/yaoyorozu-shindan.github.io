@@ -10,7 +10,7 @@ const SITE = "https://yaoyorozu-shindan.github.io/";
 const PUBLISHED = "2026-10-11";
 
 // サイトのデータを読み込む
-const src = ["js/config.js", "js/fortune-data.js", "js/images.js", "js/true-identity-a.js", "js/true-identity-b.js", "js/places.js", "js/compat-stems.js"]
+const src = ["js/config.js", "js/fortune-data.js", "js/images.js", "js/true-identity-a.js", "js/true-identity-b.js", "js/true-identity-c.js", "js/places.js", "js/compat-stems.js"]
   .map((f) => fs.readFileSync(path.join(ROOT, f), "utf8")).join("\n");
 const D = new Function(src + "; return { amazonLink, SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES, PLACES, sjisPercent, STEM_PAIRS, ASPECT_TEXT, LEGEND_PAIRS };")();
 const { amazonLink, SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES, PLACES, sjisPercent, STEM_PAIRS, ASPECT_TEXT, LEGEND_PAIRS } = D;
@@ -86,8 +86,8 @@ const ARTICLES = [
   {"file":"eki.html","title":"今日の易の読み方｜64卦・爻・変爻をやさしく解説","short":"☯ 今日の易の読み方","desc":"6本の線でできた卦と、金色に表示される変爻の読み方を解説。問いの立て方と、一日一回の易を振り返る具体例を紹介します。"},
   { file: "places.html", title: "神話・妖怪のゆかりの地めぐり｜日本と世界の伝説の場所と、近くの宿", short: "📍 神話・妖怪のゆかりの地めぐり",
     desc: "河童の遠野、天狗の鞍馬山、九尾の狐の殺生石から、ギリシャのデルフォイ、エジプトのフィラエ神殿まで。神話・妖怪・都市伝説の伝説の場所を、地域別に紹介します。" },
-  { file: "true-identities.html", title: "本当の正体図鑑 — 100の正体｜神・霊獣・妖怪の性格と恋愛・仕事の傾向", short: "🌟 本当の正体図鑑 — 100の正体",
-    desc: "八百万診断に登場する100の正体を、日干（甲〜癸）ごとに紹介。スサノオ、女媧、アヌビスなど、世界の神話の神や霊獣・妖怪の本質、長所・短所、恋愛、仕事の向き不向きがわかります。" },
+  { file: "true-identities.html", title: "本当の正体図鑑 — 130の正体｜神・霊獣・妖怪の性格と恋愛・仕事の傾向", short: "🌟 本当の正体図鑑 — 130の正体",
+    desc: "八百万診断に登場する130の正体を、日干（甲〜癸）ごとに紹介。スサノオ、女媧、アヌビスなど、世界の神話の神や霊獣・妖怪の本質、長所・短所、恋愛、仕事の向き不向きがわかります。" },
   ...ORDER.map((el) => ({
     file: `element-${el}.html`,
     title: `「${ELEMENTS[el].name}」属性の性格と特徴｜正体・相性・開運スポット`,
@@ -483,7 +483,7 @@ function placesArticle() {
     ${world}`;
 }
 
-// ---- 本当の正体図鑑 — 100の正体 ----
+// ---- 本当の正体図鑑 — 130の正体 ----
 const STEM_INFO = [
   ["甲", "きのえ", "天に向かって伸びる大樹"], ["乙", "きのと", "しなやかに広がる草花"],
   ["丙", "ひのえ", "天を照らす太陽"], ["丁", "ひのと", "闇を照らす灯火"],
@@ -500,8 +500,8 @@ function trueIdentitiesArticle() {
     const el = ORDER[Math.floor(i / 2)];
     const list = TRUE_IDENTITIES.map((t, n) => ({ t, n })).filter(({ t }) => t.stem === i);
     return `
-    <h2 id="stem-${i}">${ELEMENTS[el].icon} ${k}（${yomi}）の正体10体</h2>
-    <p>${k}は${label(el, i % 2 === 0)}。イメージは「${img}」です。日干が${k}の人は、次の10体のどれかが本当の正体になります。</p>
+    <h2 id="stem-${i}">${ELEMENTS[el].icon} ${k}（${yomi}）の正体13体</h2>
+    <p>${k}は${label(el, i % 2 === 0)}。イメージは「${img}」です。日干が${k}の人は、次の13体のどれかが本当の正体になります。</p>
     <p class="ti-index">${list.map(({ t, n }) => `<a href="#ti-${n + 1}">${t.name}${t.kana ? `（${t.kana}）` : ""}</a>`).join("／")}</p>
     ${list.map(({ t, n }) => `
     <section class="ti-entry" id="ti-${n + 1}">
@@ -523,12 +523,12 @@ function trueIdentitiesArticle() {
     <p class="back-top"><a href="#toc">▲ 目次へ戻る</a></p>`;
   }).join("");
   return `
-    <p>八百万診断の主役「本当の正体」は、世界中の神話や伝承から選んだ<b>100の正体</b>。そのうち約6割が神さまで、ほかに霊獣・精霊・妖怪なども登場します。このページでは、100の正体すべての本質・長所・短所・恋愛・仕事の傾向を紹介します。</p>
+    <p>八百万診断の主役「本当の正体」は、世界中の神話や伝承から選んだ<b>130の正体</b>。そのうち半分以上が神さまで、ほかに霊獣・精霊・妖怪・悪魔・未確認生物なども登場します。このページでは、130の正体すべての本質・長所・短所・恋愛・仕事の傾向を紹介します。</p>
 
     <h2>本当の正体の決まり方</h2>
     <ol>
-      <li>生まれた日の<b>日干（にっかん）</b>で、100の正体から10候補にしぼります（<a href="how-it-works.html">日干とは？</a>）。</li>
-      <li>その10体の中から、<b>西洋占星術</b>（太陽・月・アセンダントの星座の元素）と<b>紫微斗数</b>（命宮の主星）の結果がいちばん重なる存在を選びます。</li>
+      <li>生まれた日の<b>日干（にっかん）</b>で、130の正体から13候補にしぼります（<a href="how-it-works.html">日干とは？</a>）。</li>
+      <li>その13体の中から、<b>西洋占星術</b>（太陽・月・アセンダントの星座の元素）と<b>紫微斗数</b>（命宮の主星）の結果がいちばん重なる存在を選びます。</li>
       <li>出生時刻と出生地も入れると、アセンダントや紫微斗数が加わり、より精密に判定できます。</li>
     </ol>
 
@@ -557,7 +557,7 @@ function howItWorksArticle() {
     <h2>八百万診断の流れ</h2>
     <ol>
       <li>生年月日から日干を計算し、<b>五行の属性</b>（木・火・土・金・水）と<b>陰陽</b>を決めます。</li>
-      <li>日干で100の正体を10候補にしぼり、西洋占星術の太陽・月・アセンダント（ASC）・元素バランス、紫微斗数の命宮主星との一致を得点にして、最高点の候補を<b>「本当の正体」</b>に選びます。同点なら生年月日で決まる順番を使います。出生時刻や出生地を追加・訂正すると、使える情報が変わり、正体が変わる場合があります。同じ入力条件なら同じ結果になります。</li>
+      <li>日干で130の正体を13候補にしぼり、西洋占星術の太陽・月・アセンダント（ASC）・元素バランス、紫微斗数の命宮主星との一致を得点にして、最高点の候補を<b>「本当の正体」</b>に選びます。同点なら生年月日で決まる順番を使います。出生時刻や出生地を追加・訂正すると、使える情報が変わり、正体が変わる場合があります。同じ入力条件なら同じ結果になります。</li>
       <li>属性にゆかりのある<b>神社</b>と、属性・陰陽に合った<b>守護パワーストーン</b>、生まれ月の<b>誕生石</b>を紹介します。</li>
       <li>今日の運勢は、生年月日と今日の日付から計算するので、毎日変わります。</li>
     </ol>
@@ -746,7 +746,7 @@ TRUE_IDENTITIES.forEach((t, i) => {
       </dl>
       ${placeLine(t.name).replace('href="places.html', 'href="../articles/places.html')}
       <div class="cta">
-        <p>生年月日から、四柱推命・西洋占星術・紫微斗数で「100の正体」のどれかを診断します。</p>
+        <p>生年月日から、四柱推命・西洋占星術・紫微斗数で「130の正体」のどれかを診断します。</p>
         <a class="cta-btn" href="../">⛩️ あなたの正体を診断する</a>
         <a class="cta-btn sub" href="../articles/true-identities.html#ti-${n}">🌟 本当の正体図鑑でほかの正体を見る</a>
       </div>

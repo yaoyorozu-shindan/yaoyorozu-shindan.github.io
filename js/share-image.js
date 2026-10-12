@@ -146,7 +146,7 @@ async function buildShareImage(data) {
   ctx.strokeStyle = '#efdaaa50'; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(240, 1656); ctx.lineTo(840, 1656); ctx.stroke();
   ctx.fillStyle = '#fff5e3'; ctx.font = `700 38px ${SHARE_FONT}`;
-  ctx.fillText('あなたは、100の正体のどれ？', 540, 1716);
+  ctx.fillText('あなたは、130の正体のどれ？', 540, 1716);
   ctx.fillStyle = '#d8d0e5'; ctx.font = `500 28px ${SHARE_FONT}`;
   ctx.fillText((SITE_CONFIG.siteUrl || location.origin).replace(/^https?:\/\//, '').replace(/\/$/, ''), 540, 1766);
   // ハッシュタグは画面下端の操作ボタンと重ならない位置へ。
