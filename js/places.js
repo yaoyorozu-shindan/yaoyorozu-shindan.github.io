@@ -8,6 +8,7 @@
 const YOKAI_ROAD = { place: "水木しげるロード", area: "鳥取県境港市", note: "100体以上の妖怪ブロンズ像が並ぶ、妖怪好きの聖地。仲間に会えるかも。", stay: "境港" };
 const EDDA_LAND = { place: "レイクホルト", area: "アイスランド", note: "北欧神話を今に伝える『エッダ』を書いた、スノッリ・ストゥルルソンゆかりの地。", guide: "アイスランド" };
 const KITORA = { place: "キトラ古墳", area: "奈良県明日香村", note: "石室の壁に、青龍・白虎・朱雀・玄武の四神が描かれた古墳。", stay: "明日香" };
+const LOVECRAFT = { place: "プロビデンス", area: "アメリカ・ロードアイランド州", note: "クトゥルフ神話の生みの親、作家ラヴクラフトが生まれ育ち、眠る町。", guide: "アメリカ" };
 const PARACELSUS = { place: "ザルツブルク", area: "オーストリア", note: "四大精霊を説いた錬金術師パラケルススが眠る町。", guide: "オーストリア" };
 
 const PLACES = {
@@ -240,6 +241,15 @@ const PLACES = {
   "ネッシー": { place: "ネス湖", area: "イギリス・スコットランド", note: "ネッシーが棲むといわれる、細長く深い湖。", guide: "イギリス" },
   "バミューダトライアングル": { place: "バミューダ諸島", area: "イギリス領バミューダ", note: "「魔の三角海域」の頂点のひとつ。実際は美しいビーチリゾート。", guide: "カリブ海" },
   "コロポックル": { place: "阿寒湖アイヌコタン", area: "北海道釧路市", note: "アイヌ文化にふれられる、阿寒湖畔の集落。", stay: "阿寒湖" },
+
+  // ===== クトゥルフ神話（架空の神話なので、作者ラヴクラフトの町を紹介）=====
+  "シュブ＝ニグラス": LOVECRAFT, "古のもの": LOVECRAFT, "ズーグ": LOVECRAFT, "ウボ＝サスラ": LOVECRAFT,
+  "アトラク＝ナクア": LOVECRAFT, "ニャルラトホテプ": LOVECRAFT, "アザトース": LOVECRAFT, "ハスター": LOVECRAFT,
+  "シャンタク鳥": LOVECRAFT, "ウルタールの猫": LOVECRAFT, "ツァトゥグァ": LOVECRAFT, "グール": LOVECRAFT,
+  "ガグ": LOVECRAFT, "ガタノトーア": LOVECRAFT, "ニョグタ": LOVECRAFT, "ヨグ＝ソトース": LOVECRAFT,
+  "ノーデンス": LOVECRAFT, "ナイトゴーント": LOVECRAFT, "イースの大いなる種族": LOVECRAFT, "ミ＝ゴ": LOVECRAFT,
+  "クトゥルフ": LOVECRAFT, "ダゴン": LOVECRAFT, "深きもの": LOVECRAFT, "ハイドラ": LOVECRAFT,
+  "ショゴス": LOVECRAFT,
 };
 
 // じゃらんの検索キーワードは Shift_JIS でURLに入れる必要があるので、ブラウザの文字コード変換を使って作る

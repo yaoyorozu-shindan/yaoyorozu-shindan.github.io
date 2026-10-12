@@ -243,7 +243,7 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
   const aspect = ASPECT_TEXT[c.type][c.polarityDiff ? "diff" : "same"];
 
   const hearts = "💗".repeat(Math.round(c.total / 20)) + "🤍".repeat(5 - Math.round(c.total / 20));
-  const rows = ["japan", "greece", "norse", "yokai", "legend"].map((key) => {
+  const rows = ["japan", "greece", "norse", "yokai", "legend", "cthulhu"].map((key) => {
     const cat = CATEGORIES.find((x) => x.key === key);
     return `<tr><th>${cat.label}</th><td>${c.A.identities[key].name}</td><td class="x">×</td><td>${c.B.identities[key].name}</td></tr>`;
   }).join("");
@@ -290,7 +290,7 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
 
     ${sukuyoName ? fold("fold-c-sukuyo", "🌙 宿曜占星術でみる相性", sukuyoName, sukuyoPairCard(bdayA, bdayB, nA, nB, c.type)) : ""}
 
-    ${fold("fold-c-worlds", "🌏 ふたりを例えると…", "7つの世界でのふたりの組み合わせ", `
+    ${fold("fold-c-worlds", "🌏 ふたりを例えると…", "神話や伝承の世界でのふたりの組み合わせ", `
     <div class="card">
       <h3>ふたりを例えると…</h3>
       <table class="pair-table">

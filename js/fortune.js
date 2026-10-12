@@ -113,6 +113,11 @@ const MOTIFS = {
   legend: `<path d="M140 30a34 34 0 1 0 24 52 27 27 0 1 1-24-52z" fill="#fff" fill-opacity=".85"/>
     <text x="72" y="108" font-size="80" font-weight="700" fill="#fff" text-anchor="middle" font-family="Georgia, serif">?</text>
     <g fill="#fff"><circle cx="40" cy="30" r="2"/><circle cx="168" cy="110" r="2"/><circle cx="56" cy="118" r="1.5"/></g>`,
+  // 海からのびる触手と、沈んだ都の上の星
+  cthulhu: `<path d="M100 26l4 12h12l-10 7 4 12-10-7-10 7 4-12-10-7h12z" fill="#fff" fill-opacity=".7"/>
+    <g fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-opacity=".9">
+      <path d="M58 120c-6-22 4-36 14-40s14 8 6 14"/><path d="M100 120c-4-26 4-44 14-50s16 6 8 14"/><path d="M142 120c6-20-2-34-12-38s-14 8-6 14"/></g>
+    <path d="M14 122q14-8 28 0t28 0 28 0 28 0 28 0 28 0 28 0v18h-196z" fill="#fff" fill-opacity=".5"/>`,
   // 鳥居
   shrine: `<g fill="#fff"><path d="M36 40q64 -14 128 0v10q-64 -12 -128 0z"/><rect x="48" y="58" width="104" height="8"/>
     <rect x="62" y="48" width="10" height="76"/><rect x="128" y="48" width="10" height="76"/><rect x="96" y="58" width="8" height="10"/></g>`,
@@ -652,6 +657,8 @@ function render(birthday, nickname, birthtime, birthplace) {
 
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shrine.name + " " + shrine.area)}`;
   const shareText = `私の本当の正体は「${ti.identity.name}」！\n${ti.identity.catch}\n\n別の世界では…\nインド神話：${identities.india.name}\n日本神話：${identities.japan.name}\nギリシャ神話：${identities.greece.name}\n北欧神話：${identities.norse.name}\n妖怪：${identities.yokai.name}\n怪異：${identities.kaii.name}\n都市伝説：${identities.legend.name}\n#八百万診断`;
+  // インスタの投稿文には文字数の上限がないので、Xでは入りきらないクトゥルフ神話も足す
+  const instaText = shareText.replace("\n#八百万診断", `\nクトゥルフ神話：${identities.cthulhu.name}\n#八百万診断`);
   // 正体ごとのページ（t/番号.html）をシェアすると、Xのカードにその正体の画像が出る
   const shareUrl = (SITE_CONFIG.siteUrl || location.href.split("#")[0]) + `t/${TRUE_IDENTITIES.indexOf(ti.identity) + 1}.html`;
 
@@ -673,7 +680,7 @@ function render(birthday, nickname, birthtime, birthplace) {
 
     ${fold("fold-worlds", "🌏 別の世界に生まれていたら…", `${identities.japan.name}・${identities.greece.name}・${identities.yokai.name} ほか`, `
     <h3 class="section-title">別の世界に生まれていたら…</h3>
-    <p class="section-sub">神話や伝承の7つの世界での、${who}の姿</p>
+    <p class="section-sub">神話や伝承の8つの世界での、${who}の姿</p>
     ${SITE_CONFIG.rakutenAffiliateId ? '<p class="pr-line">PR：漫画・小説のリンクは楽天ブックスのアフィリエイトリンクです</p>' : ""}
     <div class="id-grid">${idCards}</div>
     `, true)}
@@ -753,7 +760,7 @@ function render(birthday, nickname, birthtime, birthplace) {
     power: POWER_STONES[stem.element][stem.yang ? "yang" : "yin"],
   };
   document.getElementById("insta-share").addEventListener("click", () =>
-    shareToInstagram(shareData, document.getElementById("insta-preview"), shareText + "\n" + shareUrl));
+    shareToInstagram(shareData, document.getElementById("insta-preview"), instaText + "\n" + shareUrl));
   el.hidden = false;
   startIdentityReveal(el);
   el.scrollIntoView({ behavior: "smooth" });

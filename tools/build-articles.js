@@ -106,6 +106,8 @@ const ARTICLES = [
     desc: "ガネーシャ、アマテラス、ゼウス、オーディンなど、インド神話・日本神話・ギリシャ神話・北欧神話の神々100柱を、五行の属性別にわかりやすく紹介します。" },
   { file: "yokai.html", title: "妖怪・怪異・都市伝説図鑑｜河童から口裂け女まで75種", short: "👻 妖怪・怪異・都市伝説図鑑",
     desc: "河童・天狗などの妖怪、狐火・神隠しなどの怪異、口裂け女・きさらぎ駅などの都市伝説75種を、五行の属性別に紹介します。" },
+  { file: "cthulhu.html", title: "クトゥルフ神話図鑑｜クトゥルフからショゴスまで25種", short: "🐙 クトゥルフ神話図鑑",
+    desc: "クトゥルフ、ニャルラトホテプ、ヨグ＝ソトースなど、八百万診断に登場するクトゥルフ神話の神々と生き物25種を、五行の属性別に紹介します。" },
   { file: "how-it-works.html", title: "八百万診断の仕組み｜日干（にっかん）とは？生年月日から属性を出す方法", short: "📖 八百万診断の仕組みと日干",
     desc: "八百万診断が使っている「日干（にっかん）」とは何か、生年月日から五行の属性と陰陽を求める方法をわかりやすく解説します。" },
 ];
@@ -257,7 +259,7 @@ function stoneBlock(st, labelText) {
 // ---- 各記事の本文 ----
 function elementArticle(el) {
   const E = ELEMENTS[el], T = ELEMENT_TEXT[el];
-  const toc = ["基本データ", "陽と陰の違い", "神話の神としての正体", "妖怪・怪異・都市伝説としての正体", "相性のいい属性", "おすすめの神社", "守護パワーストーン"];
+  const toc = ["基本データ", "陽と陰の違い", "神話の神としての正体", "妖怪・怪異・都市伝説・クトゥルフ神話としての正体", "相性のいい属性", "おすすめの神社", "守護パワーストーン"];
   return `
     <div class="a-hero" style="--el:${E.color}"><span>${E.icon}</span><b>${E.name}</b></div>
     ${T.intro.map((p) => `<p>${p}</p>`).join("")}
@@ -284,8 +286,8 @@ function elementArticle(el) {
     <p>八百万診断では、${E.name}属性の人の「正体」を、${E.name}の気にゆかりのある神々の中から導き出します。あなたはどの神に近いでしょうか。</p>
     ${identityTable(el, ["india", "japan", "greece", "norse"])}
 
-    <h2 id="s4">妖怪・怪異・都市伝説としての正体</h2>
-    ${identityTable(el, ["yokai", "kaii", "legend"])}
+    <h2 id="s4">妖怪・怪異・都市伝説・クトゥルフ神話としての正体</h2>
+    ${identityTable(el, ["yokai", "kaii", "legend", "cthulhu"])}
 
     <h2 id="s5">「${E.name}」属性と相性のいい属性</h2>
     <ul>
@@ -450,7 +452,7 @@ const REGIONS = [["北海道・東北", 0, 6], ["関東", 7, 13], ["中部", 14,
 function placesArticle() {
   // キャラ名 → どの図鑑のキャラか
   const where = {};
-  for (const v of Object.values(RESULTS)) for (const c of CATEGORIES) (v[c.key] || []).forEach((r) => (where[r.name] = { label: c.label, file: ["yokai", "kaii", "legend"].includes(c.key) ? "yokai.html" : "gods.html" }));
+  for (const v of Object.values(RESULTS)) for (const c of CATEGORIES) (v[c.key] || []).forEach((r) => (where[r.name] = { label: c.label, file: c.key === "cthulhu" ? "cthulhu.html" : ["yokai", "kaii", "legend"].includes(c.key) ? "yokai.html" : "gods.html" }));
   TRUE_IDENTITIES.forEach((t, n) => (where[t.name] = { label: "本当の正体", file: `true-identities.html#ti-${n + 1}` }));
 
   const card = (p) => `
@@ -562,7 +564,7 @@ function howItWorksArticle() {
 
     <h2>どの占いが正体に使われる？</h2>
     <p>本当の正体を選ぶ材料は、日干、西洋占星術、紫微斗数です。時刻が分からない場合などは、使える情報だけで判定します。月星座が確定できないときは月の加点を使いません。詳しくは結果の「あなたが〇〇になった理由」で確認できます。</p>
-    <p>宿曜と九星気学は、正体を選ぶ点数には入れず、別の角度から見た性質として紹介します。また「別の世界の正体」の7カテゴリは、日干から出した五行の属性をもとに選ぶ、別の一覧です。</p>
+    <p>宿曜と九星気学は、正体を選ぶ点数には入れず、別の角度から見た性質として紹介します。また「別の世界の正体」の8カテゴリは、日干から出した五行の属性をもとに選ぶ、別の一覧です。</p>
     <table class="a-table kv"><thead><tr><th>表示</th><th>使う情報・仕組み</th><th>読み方</th></tr></thead><tbody>
       <tr><td>本当の正体</td><td>日干・西洋占星術・紫微斗数</td><td>生まれ持った性質を重ねたオリジナル診断</td></tr>
       <tr><td>宿曜</td><td>日本時間の旧暦の生年月日</td><td><a href="sukuyo.html">本命宿と6種類の相性</a></td></tr>
@@ -673,6 +675,7 @@ const bodies = {
   "shrines.html": [shrinesArticle(), true],
   "gods.html": [zukan(["india", "japan", "greece", "norse"], "八百万診断に登場するインド神話・日本神話・ギリシャ神話・北欧神話の神々を、五行の属性別に紹介します。診断で出た神のことをもっと知りたいときや、ほかの属性の神々をのぞいてみたいときにどうぞ。"), false],
   "yokai.html": [zukan(["yokai", "kaii", "legend"], "八百万診断に登場する妖怪・怪異・都市伝説を、五行の属性別に紹介します。江戸時代の絵師・鳥山石燕の妖怪画など、昔の絵とあわせてお楽しみください。"), false],
+  "cthulhu.html": [zukan(["cthulhu"], "クトゥルフ神話は、アメリカの作家H・P・ラヴクラフト（1890〜1937年）と仲間の作家たちの小説から生まれた、架空の神話です。八百万診断の「ルルイエなら…」の結果に登場する神々や生き物を、五行の属性別に紹介します。紹介しているのは、著作権の切れた原作の小説に登場する存在です。"), false],
   "how-it-works.html": [howItWorksArticle(), false],
 };
 ORDER.forEach((el) => (bodies[`element-${el}.html`] = [elementArticle(el), true]));

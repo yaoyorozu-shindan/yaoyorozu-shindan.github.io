@@ -7,6 +7,8 @@ eval(fs.readFileSync(site + "/js/true-identity-a.js", "utf8") + fs.readFileSync(
 // 絵として合わない画像は使わない（系図・動画・ロゴ・無関係な風景など）
 const SKIP_FILES = ["Descendants_of_Izanami_alone.svg", "Gongenyama_Mt_Kimotsuki_Kagoshima.jpg", "Mayoiga_8086294422_ff2f173cf1_k.jpg",
   "Children_born_from_the_Challenge_of_Amaterasu_and_Susanoo.svg", "Sol_de_Mayo-Bandera_de_Argentina.svg", "Kinkaku-ji_04.jpg"];
+// 記事の画像が別のキャラのものなので、絵を出さない名前（ハイドラの記事の画像はダゴン）
+const SKIP_NAMES = ["ハイドラ"];
 // Wikipedia の記事の画像が使えない・合わないときに、Commons の画像を名前ごとに指定する
 const PICK_FILES = {
   "鳳凰": "Yu_Sheng_-_Fenghuang_-_18th-century.jpg",
@@ -89,7 +91,7 @@ async function getJson(u) {
       continue;
     }
     const x = byName[e.name] || byWiki[e.wiki];
-    if (!x) continue;
+    if (!x || SKIP_NAMES.includes(e.name)) continue;
     const m = meta[x.file];
     if (!m || !m.license) { missingMeta++; console.log("NO LICENSE:", e.name, x.file); continue; }
     let artist = m.artist.replace(/(Unknown (author|artist))+/gi, "作者不明").replace(/\s*\(.*$/, "").trim().slice(0, 60) || "作者不明";
