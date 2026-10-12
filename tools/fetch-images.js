@@ -66,7 +66,7 @@ const LOCAL_IMAGES = {
   "ウボ＝サスラ": { src: "img/true/ubbosathla.jpg", credit: AI_CREDIT },
   "ズーグ": { src: "img/true/zoog.jpg", credit: AI_CREDIT },
   "トイレの花子さん": { src: "img/true/hanakosan.jpg", credit: AI_CREDIT },
-  "人面犬": { src: "img/true/jinmenken.jpg", credit: AI_CREDIT },
+  "人面犬": { src: "img/true/jinmenken2.jpg", credit: AI_CREDIT },
   "メリーさん": { src: "img/true/merrysan.jpg", credit: AI_CREDIT },
   "テケテケ": { src: "img/true/teketeke.jpg", credit: AI_CREDIT },
   "黒服の男": { src: "img/true/meninblack.jpg", credit: AI_CREDIT },

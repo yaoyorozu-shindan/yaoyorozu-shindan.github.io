@@ -165,7 +165,7 @@ const IMAGES = {
   "黒服の男": {"src":"img/true/meninblack.jpg","credit":"AI生成イラスト（八百万診断オリジナル）","page":"img/true/meninblack.jpg"},
   "テケテケ": {"src":"img/true/teketeke.jpg","credit":"AI生成イラスト（八百万診断オリジナル）","page":"img/true/teketeke.jpg"},
   "メリーさん": {"src":"img/true/merrysan.jpg","credit":"AI生成イラスト（八百万診断オリジナル）","page":"img/true/merrysan.jpg"},
-  "人面犬": {"src":"img/true/jinmenken.jpg","credit":"AI生成イラスト（八百万診断オリジナル）","page":"img/true/jinmenken.jpg"},
+  "人面犬": {"src":"img/true/jinmenken2.jpg","credit":"AI生成イラスト（八百万診断オリジナル）","page":"img/true/jinmenken2.jpg"},
   "ヨグ＝ソトース": {"src":"https://upload.wikimedia.org/wikipedia/commons/1/1d/Yog-Sothoth_couleur.jpg","credit":"Dominique Signoret / CC BY-SA 3.0","page":"https://commons.wikimedia.org/wiki/File:Yog-Sothoth_couleur.jpg"},
   "ノーデンス": {"src":"img/true/nodens.jpg","credit":"AI生成イラスト（八百万診断オリジナル）","page":"img/true/nodens.jpg"},
   "ナイトゴーント": {"src":"img/true/nightgaunt.jpg","credit":"AI生成イラスト（八百万診断オリジナル）","page":"img/true/nightgaunt.jpg"},
