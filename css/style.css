@@ -118,6 +118,9 @@ a { color: var(--accent); }
 }
 
 .about p { font-size: 0.92rem; color: var(--muted); margin-bottom: 0; }
+.about-list { font-size: 0.92rem; color: var(--muted); padding-left: 1.2em; margin: 8px 0 0; }
+.about-list li { margin-bottom: 6px; }
+.about-list b { color: var(--text); }
 
 .site-footer {
   text-align: center;
@@ -275,9 +278,11 @@ a { color: var(--accent); }
 
 /* ---- ナビ ---- */
 .site-header { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.site-nav { display: flex; gap: 16px; font-size: 0.88rem; font-weight: 700; }
-.site-nav a { text-decoration: none; }
-.site-nav a:hover { text-decoration: underline; }
+.site-nav { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; font-size: 0.88rem; font-weight: 700; }
+/* ボタンのような形にして、押せる場所だとわかりやすくする */
+.site-nav a { text-decoration: none; padding: 5px 14px; border: 1.5px solid var(--accent-2); border-radius: 999px; background: var(--card); box-shadow: 0 1px 3px rgba(107, 79, 187, .12); }
+.site-nav a:hover, .site-nav a:focus-visible { background: var(--accent); border-color: var(--accent); color: #fff; }
+.site-nav a::after { content: " ›"; opacity: .6; }
 
 /* ---- 読みもの（記事） ---- */
 .crumbs { font-size: 0.8rem; color: var(--muted); margin: 0 0 8px; }
@@ -659,3 +664,21 @@ a { color: var(--accent); }
 .share-page .legend-pair h1 { margin: 2px 0 6px; font-size: 1.3rem; }
 .stem-pair-big { margin: 6px 0 0; text-align: center; font-size: 3rem; font-weight: 800; font-family: "Yu Mincho", serif; }
 .stem-pair-title { text-align: center; font-size: 1.4rem; margin: 4px 0; }
+
+/* ---- 相性のいいパワースポット・占いの本 ---- */
+.power-spot-card, .books-card { position: relative; }
+.power-spot-card .pr, .books-card .pr { top: 12px; left: auto; right: 12px; }
+.spot-list, .book-list { list-style: none; margin: 8px 0 0; padding: 0; }
+.spot-item { border-top: 1px solid var(--border); padding: 12px 0 4px; }
+.spot-item b { display: block; font-size: 1rem; }
+.spot-item small { color: var(--muted); font-size: 0.8rem; }
+.spot-item p { margin: 4px 0 8px; font-size: 0.9rem; }
+.spot-item .aff-btns { align-items: center; }
+.spot-item .map-btn { margin: 0; }
+.book-list li { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; border-top: 1px solid var(--border); padding: 10px 0; }
+.book-list li span { font-weight: 700; }
+.spot-item .aff-btn { flex: 0 1 auto; padding: 6px 14px; font-size: 0.85rem; }
+.spot-item .map-btn { padding: 5px 14px; font-size: 0.85rem; }
+.book-list .aff-btns { flex: 0 1 auto; }
+.book-list .aff-btn { flex: 0 1 auto; padding: 6px 14px; font-size: 0.85rem; }
+.lucky-shop { font-size: 0.85rem; font-weight: 700; color: var(--muted); margin: 12px 0 14px; }

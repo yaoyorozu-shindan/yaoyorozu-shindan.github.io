@@ -182,6 +182,61 @@ function travelLinks(shrine) {
   </div>`;
 }
 
+// 属性と相性のいいパワースポット。それぞれに地図と、宿を探すリンク（楽天トラベル・じゃらん）を付ける
+function powerSpotCard(elKey, element) {
+  const spots = (typeof POWER_SPOTS !== "undefined" && POWER_SPOTS[elKey]) || [];
+  if (!spots.length) return "";
+  const { rakutenAffiliateId: rid, valueCommerceSid: sid, valueCommercePid: pid } = SITE_CONFIG;
+  const isAd = rid || (sid && pid);
+  const items = spots.map((p) => {
+    const map = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name.replace(/（.*?）/g, "") + " " + p.area)}`;
+    const rakutenUrl = `https://kw.travel.rakuten.co.jp/keyword/Search.do?charset=utf-8&f_query=${encodeURIComponent(p.stay)}`;
+    const jalanUrl = `https://www.jalan.net/uw/uwp2011/uww2011init.do?keyword=${sjisPercent(p.stay)}`;
+    const rakutenHref = rid ? `https://hb.afl.rakuten.co.jp/hgc/${rid}/?pc=${encodeURIComponent(rakutenUrl)}` : rakutenUrl;
+    const jalanHref = sid && pid ? `https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=${sid}&pid=${pid}&vc_url=${encodeURIComponent(jalanUrl)}` : jalanUrl;
+    return `<li class="spot-item">
+      <b>${p.name}</b><small>${p.area}</small>
+      <p>${p.desc}</p>
+      <div class="aff-btns">
+        <a class="map-btn" href="${map}" target="_blank" rel="noopener">地図</a>
+        <a class="aff-btn rakuten" href="${rakutenHref}" target="_blank" rel="${rid ? "sponsored " : ""}noopener">楽天トラベル</a>
+        <a class="aff-btn jalan" href="${jalanHref}" target="_blank" rel="${sid && pid ? "sponsored " : ""}noopener">じゃらん</a>
+      </div>
+    </li>`;
+  }).join("");
+  return `<div class="card power-spot-card">${isAd ? '<span class="pr">PR</span>' : ""}
+      <p class="id-label">相性のいいパワースポット</p>
+      <h3>🌄 「${element.name}」の気と響き合う場所</h3>
+      <p class="note">神社のほかに、「${element.name}」の気にゆかりのある自然の名所を紹介します。旅の目的地にどうぞ。${isAd ? "" : ""}</p>
+      <ul class="spot-list">${items}</ul>
+    </div>`;
+}
+
+// 占いの本を探す（楽天ブックス、もしも経由のAmazonが設定されていればAmazonも）
+const FORTUNE_BOOKS = [
+  ["四柱推命", "四柱推命 入門"], ["西洋占星術", "西洋占星術 入門"], ["紫微斗数", "紫微斗数"],
+  ["宿曜占星術", "宿曜占星術"], ["九星気学", "九星気学 入門"], ["易", "易経 入門"],
+];
+function fortuneBooksCard() {
+  const rid = SITE_CONFIG.rakutenAffiliateId;
+  const rakuten = (kw) => {
+    const url = `https://books.rakuten.co.jp/search?sitem=${encodeURIComponent(kw)}&g=001`;
+    return rid ? `https://hb.afl.rakuten.co.jp/hgc/${rid}/?pc=${encodeURIComponent(url)}` : url;
+  };
+  const rows = FORTUNE_BOOKS.map(([label, kw]) => {
+    const amazon = amazonLink(`https://www.amazon.co.jp/s?k=${encodeURIComponent(kw)}&i=stripbooks`);
+    return `<li><span>${label}</span><div class="aff-btns">
+      <a class="aff-btn rakuten" href="${rakuten(kw)}" target="_blank" rel="${rid ? "sponsored " : ""}noopener">楽天ブックス</a>
+      ${amazon.isAd ? `<a class="aff-btn amazon" href="${amazon.href}" target="_blank" rel="sponsored noopener">Amazon</a>` : ""}
+    </div></li>`;
+  }).join("");
+  return `<div class="card books-card">${rid ? '<span class="pr">PR</span>' : ""}
+      <h3>📚 占いをもっと知りたい人へ</h3>
+      <p class="note">この診断で使っている占いの、入門書や解説書を探せます。</p>
+      <ul class="book-list">${rows}</ul>
+    </div>`;
+}
+
 // 海外のゆかりの地：ガイドブック（楽天ブックス）と楽天トラベルの海外旅行ページ
 function overseasLinks(guide) {
   const rid = SITE_CONFIG.rakutenAffiliateId;
@@ -334,7 +389,7 @@ function meishikiCard(fp) {
     <h4>五行バランス</h4>
     <div class="gx">${bars}</div>
     <p class="gx-advice">${advice}</p>
-    ${fp.hasTime ? "" : '<p class="note">※出生時刻を入れると「時柱」も出て、五行バランスがより正確になります（「くわしく診断する」から入力）。</p>'}
+    ${fp.hasTime ? "" : '<p class="note">※出生時刻を入れると「時柱」も出て、五行バランスがより正確になります（<a href="#detail-input" class="open-detail">「くわしく診断する」</a>から入力）。</p>'}
     <p class="note">※節入り（月の切り替わり）の前後数十分に生まれた方は、月柱が前後する場合があります。</p>
   </div>`;
 }
@@ -431,7 +486,7 @@ function sukuyoCard(birthday, zw) {
 function ziweiCard(zw) {
   if (!zw) {
     return `<div class="card ziwei-card"><h3>🌟 紫微斗数</h3>
-      <p>紫微斗数は、生まれた時刻（十二時辰）で命盤が大きく変わる占いです。「くわしく診断する」から<b>出生時刻</b>を入れると、あなたの命宮と主星がわかります。</p></div>`;
+      <p>紫微斗数は、生まれた時刻（十二時辰）で命盤が大きく変わる占いです。<a href="#detail-input" class="open-detail">「くわしく診断する」</a>から<b>出生時刻</b>を入れると、あなたの命宮と主星がわかります。</p></div>`;
   }
   const palaceOf = (b) => PALACE_NAMES[((zw.ming.branch - b) % 12 + 12) % 12];
   const starsAt = (b) => Object.keys(zw.positions).filter((s) => zw.positions[s] === b);
@@ -508,7 +563,8 @@ function playIdentityReveal(stage) {
   timer = setTimeout(close, 4300);
 }
 
-function startIdentityReveal(root) {
+// autoplay が false のとき（おかえりバナーの「今日の運勢を見る」など）は、演出を自動では流さない
+function startIdentityReveal(root, autoplay = true) {
   if (root.identityRevealObserver) root.identityRevealObserver.disconnect();
   if (document.identityRevealClose) document.identityRevealClose();
   const stage = root.querySelector('.ti-reveal');
@@ -517,6 +573,7 @@ function startIdentityReveal(root) {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) { replay.hidden = true; return; }
   replay.addEventListener('click', () => playIdentityReveal(stage));
   const play = () => playIdentityReveal(stage);
+  if (!autoplay) return;
   if (typeof IntersectionObserver === 'undefined') { play(); return; }
   const observer = new IntersectionObserver(entries => {
     if (entries.some(entry => entry.isIntersecting)) { observer.disconnect(); play(); }
@@ -556,18 +613,18 @@ function trueIdentityWhy(ti) {
   ];
   const story = layers.length
     ? `生まれた日の「${polarity}の${el.name}」を土台に、${layers.join('と')}が重なりました。この重なりを「${c.catch}」という姿にたとえて、${c.name}を選んでいます。`
-    : `生まれた日の「${polarity}の${el.name}」を土台に、同じ日干の13候補から${c.name}を選んでいます。今回は星の情報による加点がなく、生年月日で決まる順番が決め手になりました。`;
+    : `生まれた日の「${polarity}の${el.name}」を土台に、同じ日干の十数体の候補から${c.name}を選んでいます。今回は星の情報による加点がなく、生年月日で決まる順番が決め手になりました。`;
   const matches = signals.map(signal => `<li><span class="why-signal-label">${escapeHtml(signal.label)}</span><b>${escapeHtml(signal.detail)}</b><small>${escapeHtml(signal.role)}として読まれ、この正体の設定と重なりました。</small></li>`).join('');
   return `<section class="ti-why-story" aria-label="正体の判定理由">
     <p class="why-eyebrow">あなたの正体への道筋</p>
     <h3>あなたが${escapeHtml(c.name)}になった理由</h3>
     <p class="why-story">${escapeHtml(story)}</p>
-    <div class="why-root"><span>${el.icon} 生まれた日の土台</span><b>${SC_STEMS[c.stem]} · ${polarity}の${el.name}</b><p>${stemMotifs[c.stem]}として読まれます。まず、この日干に対応する13候補にしぼります。</p></div>
+    <div class="why-root"><span>${el.icon} 生まれた日の土台</span><b>${SC_STEMS[c.stem]} · ${polarity}の${el.name}</b><p>${stemMotifs[c.stem]}として読まれます。まず、この日干に対応する十数体の候補にしぼります。</p></div>
     ${matches ? `<p class="why-matches-title">この正体と重なった星の手がかり</p><ul class="why-signals">${matches}</ul>` : ''}
     ${ti.tied ? '<p class="why-tie">同じ最高得点の候補が複数あったため、最後は生年月日で決まる順番で選んでいます。同じ入力なら、毎回同じ正体になります。</p>' : ''}
     <details class="ti-why"><summary>判定の詳しい情報を見る</summary>
       <ul>${ti.reasons.map(r => `<li>${escapeHtml(r)}</li>`).join('')}</ul>
-      <p class="note">同じ日干の13候補の中で、星の情報との重なりを得点にし、最も高い候補を選ぶ、八百万診断オリジナルの判定です。</p>
+      <p class="note">同じ日干の十数体の候補の中で、星の情報との重なりを得点にし、最も高い候補を選ぶ、八百万診断オリジナルの判定です。</p>
       <p class="ti-near">ほかに近い正体：${ti.runnersUp.map(r => escapeHtml(r.name)).join('、')}</p>
     </details>
   </section>`;
@@ -591,8 +648,8 @@ function trueIdentityCard(ti, who, element) {
       ${sec("💼", "仕事・才能", c.work)}
     </div>
     ${trueIdentityWhy(ti)}
-    <a class="read-more" href="articles/true-identities.html#ti-${TRUE_IDENTITIES.indexOf(c) + 1}">🌟 本当の正体図鑑 — 130の正体で、ほかの正体も見る →</a>
-    ${ti.detailed ? "" : '<p class="ti-more">🔭 出生時刻と出生地を入れると、紫微斗数やアセンダントも加わり、<b>より精密な正体</b>がわかります（「くわしく診断する」から）。</p>'}
+    <a class="read-more" href="articles/true-identities.html#ti-${TRUE_IDENTITIES.indexOf(c) + 1}">🌟 本当の正体図鑑 — 100を超える正体で、ほかの正体も見る →</a>
+    ${ti.detailed ? "" : '<p class="ti-more">🔭 出生時刻と出生地を入れると、紫微斗数やアセンダントも加わり、<b>より精密な正体</b>がわかります（<a href="#detail-input" class="open-detail">「くわしく診断する」</a>から）。</p>'}
     ${placeBlock(c.name)}
     <a class="wiki-link" href="${wikiUrl(c.wiki)}" target="_blank" rel="noopener">${c.name}をWikipediaで詳しく見る ↗</a>
     ${bookLinks(c.name)}
@@ -619,7 +676,7 @@ function fold(id, title, preview, inner, open) {
   </details>`;
 }
 
-function render(birthday, nickname, birthtime, birthplace) {
+function render(birthday, nickname, birthtime, birthplace, opts = {}) {
   const fp = fourPillars(birthday, birthtime || "", utcOffsetHours(birthplace, birthday, birthtime));
   const wc = typeof Astronomy !== "undefined" ? westernChart(birthday, birthtime || "", birthplace || "") : null;
   const zw = typeof Astronomy !== "undefined" && birthtime ? ziweiChart(birthday, birthtime) : null;
@@ -701,12 +758,13 @@ function render(birthday, nickname, birthtime, birthplace) {
         <dt>カラー</dt><dd>${daily.luckyColor}</dd>
         <dt>アイテム</dt><dd>${daily.luckyItem.name}</dd>
       </dl>
+      <p class="lucky-shop">🛍️ 今日のラッキーアイテム「${daily.luckyItem.name}」を通販で探す</p>
       ${affiliateLinks(daily.luckyItem.keyword, "探す")}
       <p class="advice">💡 ${daily.advice}</p>
     </div>
     `)}
 
-    ${fold("fold-detail", "🔭 占いのくわしい結果", "属性・四柱推命・西洋占星術・紫微斗数・宿曜・九星気学", `
+    ${fold("fold-detail", "🔭 占いのくわしい結果", "属性・四柱推命・西洋占星術・紫微斗数・宿曜・九星気学・占いの本", `
     <div class="card element-card">
       <div class="element-icon" aria-hidden="true">${element.icon}</div>
       <p class="sub">${who}の属性は</p>
@@ -726,9 +784,11 @@ function render(birthday, nickname, birthtime, birthplace) {
     ${sukuyoCard(birthday, zw)}
 
     ${typeof kyuseiCardHTML === "function" ? kyuseiCardHTML(birthday, fp) : ""}
+
+    ${fortuneBooksCard()}
     `)}
 
-    ${fold("fold-shrine", "⛩️ 相性のいい神社と守護石", shrine.name, `
+    ${fold("fold-shrine", "⛩️ 相性のいい神社・パワースポットと守護石", shrine.name, `
     <div class="card shrine-card">
       ${artFor(shrine.name, "shrine", element)}
       <p class="id-label">相性のいい神社</p>
@@ -743,6 +803,8 @@ function render(birthday, nickname, birthtime, birthplace) {
       ${travelLinks(shrine)}
       ${affiliateLinks("御朱印帳", "御朱印帳を探す")}
     </div>
+
+    ${powerSpotCard(stem.element, element)}
 
     ${stoneCard(birthday, stem)}
     `)}
@@ -762,8 +824,8 @@ function render(birthday, nickname, birthtime, birthplace) {
   document.getElementById("insta-share").addEventListener("click", () =>
     shareToInstagram(shareData, document.getElementById("insta-preview"), instaText + "\n" + shareUrl));
   el.hidden = false;
-  startIdentityReveal(el);
-  el.scrollIntoView({ behavior: "smooth" });
+  startIdentityReveal(el, opts.reveal !== false);
+  if (opts.scroll !== false) el.scrollIntoView({ behavior: "smooth" });
   // アクセス解析：どの正体が出たか（生年月日などの入力内容は送らない）
   if (typeof track === "function") track("diagnose", { identity: ti.identity.name, element: stem.element, detailed: !!birthtime });
 }
@@ -821,7 +883,8 @@ try {
   box.querySelector(".welcome-msg").innerHTML = `おかえりなさい${who ? "、" + who : ""}！<br><small>今日の運勢は毎日変わります。</small>`;
   box.hidden = false;
   const show = (targetId) => {
-    render(saved, name, time, place);
+    // 「今日の運勢を見る」では正体の登場演出を流さず、まっすぐ運勢へ移動する
+    render(saved, name, time, place, { reveal: targetId === "result", scroll: false });
     const target = document.getElementById(targetId);
     const folded = target.closest("details");
     if (folded) folded.open = true; // 折りたたみの中なら開いてから移動
@@ -830,6 +893,17 @@ try {
   document.getElementById("wb-today").addEventListener("click", () => show("today-card"));
   document.getElementById("wb-result").addEventListener("click", () => show("result"));
 })();
+
+// 結果の中の「くわしく診断する」を押したら、入力欄を開いてそこへ移動する
+document.addEventListener("click", (e) => {
+  const link = e.target.closest(".open-detail");
+  if (!link) return;
+  e.preventDefault();
+  const details = document.getElementById("detail-input");
+  details.open = true;
+  details.scrollIntoView({ behavior: "smooth", block: "start" });
+  setTimeout(() => birthtimeInput.focus({ preventScroll: true }), 400);
+});
 
 form.addEventListener("submit", (e) => {
   e.preventDefault();
