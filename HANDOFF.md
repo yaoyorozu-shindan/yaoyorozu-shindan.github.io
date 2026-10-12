@@ -97,7 +97,7 @@ CLAUDE.md / AGENTS.md  AI向けの約束ごと（片方を変えたらもう片�
 | もしもアフィリエイト（Amazon） | 登録済み。Amazon は「10記事以上・60日以内に更新」が審査条件 → 記事公開済み。**10月下旬ごろに提携申請予定**。提携できたら、もしもの「どこでもリンク」の `a_id` の数字を `js/config.js` の `moshimoAmazonAid` に入れるだけで、全部のAmazonリンク（石・御朱印帳・記事の価格ボタン）がもしも経由になる（`amazonLink()`、準備済み） |
 | バリューコマース（じゃらん） | 登録済み・サイト審査待ち（2026/10/12 確認。パスワードはリセット申請済み） → 通ったら「じゃらんnet」に提携申請 → sid/pid を `js/config.js` に入れる |
 | A8.net | 登録済み（2026/10/12）。ココナラ電話占い・ココナラ占い（メール/チャット）と提携済み → 診断結果と相性診断に「もっと深く占ってもらうなら」枠（`consultCard`、リンクは `js/config.js` の `consult`）。電話占いセラは審査中（通ったら `consult` に追加）。セラは「お金の相談」が否認条件なので金運の欄のそばに置かない |
-| Google Search Console | 所有権確認済み・サイトマップ送信済み。2026/10/13時点でまだ検索結果に出ない（公開直後のため）。2026/10/13 に運営者が主要12ページの「インデックス登録をリクエスト」済み。Bing Webmaster Tools へのインポートはまだ。手順は運営者用の「解析ナビ」（claude.ai の非公開ページ https://claude.ai/artifact/6V8VyshxuXbTAXRKPZiMTr ）にまとめた |
+| Google Search Console | 所有権確認済み・サイトマップ送信済み。2026/10/13時点でまだ検索結果に出ない（公開直後のため）。2026/10/13 に運営者が主要12ページの「インデックス登録をリクエスト」済み。Bing Webmaster Tools へのインポートも運営者が実施済み。手順は運営者用の「解析ナビ」（claude.ai の非公開ページ https://claude.ai/artifact/6V8VyshxuXbTAXRKPZiMTr ）にまとめた |
 | Google アナリティクス 4 | ✅ 稼働中（2026/10/12〜）。測定IDは `js/config.js` の `gaMeasurementId`（`js/analytics.js`）。イベント：diagnose（正体名）・compat_diagnose・share_*（操作別。下記参照）・eki_draw・affiliate_click・cta_click・fold_open。生年月日など入力内容は送らない。運営者の端末は `?notrack=1` を一度付けて開くと記録されない（`?notrack=0` で解除）。GA4のカスタムディメンション（identity・element・network・label・section・content）は2026/10/13に運営者が登録済み（その日以降のデータだけ表に出る）。プライバシーポリシーに外部送信の説明あり |
 | お問い合わせ | Googleフォーム（`index.html` と `privacy.html` にリンク） |
 
