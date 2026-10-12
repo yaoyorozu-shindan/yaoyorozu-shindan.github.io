@@ -363,8 +363,10 @@ async function buildCompatShareImage(data) {
     ctx.fillStyle='#cec6dd';ctx.font=`500 24px ${SHARE_FONT}`;ctx.fillText(label,x,1522);
     ctx.fillStyle=gold;ctx.font=`800 40px ${SHARE_FONT}`;ctx.fillText(`${value}%`,x,1570);
   });
+  // 宿曜の相性（三九の秘法）
+  if(data.sukuyo){ctx.fillStyle='#efdaaa';fitText(ctx,`宿曜の相性  ·  ${data.sukuyo}`,540,1622,860,28,700);}
   // ふたりの画像の作者・ライセンス・出典を、それぞれ保存画像内に残す。
-  let creditY=1616;
+  let creditY=data.sukuyo ? 1660 : 1616;
   assets.forEach((asset,i)=>{
     if(!portraits[i] || !asset)return;
     ctx.fillStyle='#bdb6cc';

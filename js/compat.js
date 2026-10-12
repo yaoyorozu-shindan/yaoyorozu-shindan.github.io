@@ -248,14 +248,14 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
     return `<tr><th>${cat.label}</th><td>${c.A.identities[key].name}</td><td class="x">×</td><td>${c.B.identities[key].name}</td></tr>`;
   }).join("");
 
-  const shareText = `${nameA || "わたし"}（${tiA.name}）× ${nameB || "お相手"}（${tiB.name}）の相性は ${c.total}%！\n「${c.stemPair.title}」\n#八百万診断 #相性診断`;
+  // 宿曜の相性の名前（折りたたみを閉じていても見えるように。シェア文と画像にも入れる）
+  const sukuyoName = typeof Astronomy !== "undefined" ? sukuyoPair(sukuyoOf(bdayA), sukuyoOf(bdayB)).name : "";
+  const shareText = `${nameA || "わたし"}（${tiA.name}）× ${nameB || "お相手"}（${tiB.name}）の相性は ${c.total}%！\n「${c.stemPair.title}」${sukuyoName ? `\n宿曜の相性：${sukuyoName}` : ""}\n#八百万診断 #相性診断`;
   // 相性のシェア用ページ：伝説の組み合わせなら c/l番号.html、それ以外は日干の組み合わせ c/日干-日干.html
   const legendIdx = LEGEND_PAIRS.indexOf(legendPair(tiA, tiB));
   const [loStem, hiStem] = [c.A.stem.index, c.B.stem.index].sort((x, y) => x - y);
   const shareUrl = (SITE_CONFIG.siteUrl || location.href.split("#")[0]) + (legendIdx >= 0 ? `c/l${legendIdx + 1}.html` : `c/${loStem}-${hiStem}.html`);
   const s = c.shrine;
-  // 宿曜の相性の名前（折りたたみを閉じていても見えるように）
-  const sukuyoName = typeof Astronomy !== "undefined" ? sukuyoPair(sukuyoOf(bdayA), sukuyoOf(bdayB)).name : "";
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.name + " " + s.area)}`;
 
   const el = document.getElementById("compat-result");
@@ -327,6 +327,7 @@ function renderCompat(bdayA, nameA, bdayB, nameB) {
     kanaA: tiA.kana || '', kanaB: tiB.kana || '',
     catchA: tiA.catch, catchB: tiB.catch,
     legendTitle: pairLegend ? pairLegend.title : '',
+    sukuyo: sukuyoName,
     pairs: ["japan", "greece", "norse", "yokai"].map((key) => [CATEGORIES.find((x) => x.key === key).label, c.A.identities[key].name, c.B.identities[key].name]),
   };
   document.getElementById("insta-share-compat").addEventListener("click", () =>
