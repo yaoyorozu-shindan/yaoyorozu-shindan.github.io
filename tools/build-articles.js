@@ -12,8 +12,8 @@ const PUBLISHED = "2026-10-11";
 // サイトのデータを読み込む
 const src = ["js/config.js", "js/fortune-data.js", "js/images.js", "js/true-identity-a.js", "js/true-identity-b.js", "js/true-identity-c.js", "js/places.js", "js/compat-stems.js"]
   .map((f) => fs.readFileSync(path.join(ROOT, f), "utf8")).join("\n");
-const D = new Function(src + "; return { amazonLink, SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES, PLACES, sjisPercent, STEM_PAIRS, ASPECT_TEXT, LEGEND_PAIRS };")();
-const { amazonLink, SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES, PLACES, sjisPercent, STEM_PAIRS, ASPECT_TEXT, LEGEND_PAIRS } = D;
+const D = new Function(src + "; return { amazonLink, SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES, PLACES, sjisPercent, STEM_PAIRS, ASPECT_TEXT, LEGEND_PAIRS, POWER_SPOTS };")();
+const { amazonLink, SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES, PLACES, sjisPercent, STEM_PAIRS, ASPECT_TEXT, LEGEND_PAIRS, POWER_SPOTS } = D;
 const ORDER = ["wood", "fire", "earth", "metal", "water"];
 const VERSION = (fs.readFileSync(path.join(ROOT, "index.html"), "utf8").match(/style\.css\?v=(\d+)/) || [])[1] || "1";
 
@@ -108,13 +108,21 @@ const ARTICLES = [
     desc: "河童・天狗などの妖怪、狐火・神隠しなどの怪異、口裂け女・きさらぎ駅などの都市伝説75種を、五行の属性別に紹介します。" },
   { file: "cthulhu.html", title: "クトゥルフ神話図鑑｜クトゥルフからショゴスまで25種", short: "🐙 クトゥルフ神話図鑑",
     desc: "クトゥルフ、ニャルラトホテプ、ヨグ＝ソトースなど、八百万診断に登場するクトゥルフ神話の神々と生き物25種を、五行の属性別に紹介します。" },
+  { file: "americas.html", title: "アステカ神話・インカ神話の神々｜ケツァルコアトルからパチャママまで", short: "🌞 アステカ・インカ神話の神々",
+    desc: "ケツァルコアトル、テスカトリポカ、インティ、パチャママなど、八百万診断の「本当の正体」に登場するアステカ神話・インカ神話の神々を紹介します。" },
+  { file: "goetia.html", title: "ソロモン72柱の悪魔とは｜バエル・パイモン・アスモデウスなど8柱を紹介", short: "📜 ソロモン72柱の悪魔",
+    desc: "ソロモン王が封じたという72の悪魔「ソロモン72柱」とは？八百万診断の「本当の正体」に登場するバエル、ストラス、アスモデウスなど8柱を紹介します。" },
+  { file: "uma.html", title: "UMA（未確認生物）・オカルトの正体図鑑｜チュパカブラ、イエティ、クッシーなど", short: "🛸 UMA・オカルトの正体図鑑",
+    desc: "チュパカブラ、イエティ、ジャージー・デビル、クッシー、ホムンクルスなど、八百万診断の「本当の正体」に登場するUMA（未確認生物）やオカルトの存在を紹介します。" },
+  { file: "power-spots.html", title: "属性別パワースポットガイド｜五行でわかる相性のいい自然の名所20か所と近くの宿", short: "🌄 属性別パワースポットガイド",
+    desc: "屋久島、阿蘇山、富士山、昇仙峡、那智の滝など、木・火・土・金・水の属性ごとに相性のいい自然の名所20か所を紹介。近くの宿の探し方も。" },
   { file: "how-it-works.html", title: "八百万診断の仕組み｜日干（にっかん）とは？生年月日から属性を出す方法", short: "📖 八百万診断の仕組みと日干",
     desc: "八百万診断が使っている「日干（にっかん）」とは何か、生年月日から五行の属性と陰陽を求める方法をわかりやすく解説します。" },
 ];
 // 読みもの一覧の並び順（トップページの「読みもの」も同じ順にそろえる）
-const ARTICLE_ORDER = ["true-identities.html", "gods.html", "yokai.html", "cthulhu.html", "places.html",
+const ARTICLE_ORDER = ["true-identities.html", "gods.html", "yokai.html", "cthulhu.html", "americas.html", "goetia.html", "uma.html", "places.html",
   ...ORDER.map((el) => `element-${el}.html`), "compatibility.html", "sukuyo.html", "kyusei.html", "eki.html",
-  "shrines.html", "power-stones.html", "birthstones.html", "how-it-works.html"];
+  "shrines.html", "power-spots.html", "power-stones.html", "birthstones.html", "how-it-works.html"];
 ARTICLES.sort((a, b) => ARTICLE_ORDER.indexOf(a.file) - ARTICLE_ORDER.indexOf(b.file));
 
 // ---- ページの共通部分 ----
@@ -432,6 +440,56 @@ function shrinesArticle() {
     <p class="note">※観光スポットの営業時間や季節の行事は変わることがあります。お出かけ前に公式情報をご確認ください。</p>`;
 }
 
+// ---- 出どころ別の正体図鑑（アステカ・インカ／ソロモン72柱／UMA）----
+function originArticle(intro, groups, outro = "") {
+  const entry = (t) => {
+    const n = TRUE_IDENTITIES.indexOf(t);
+    const [k, yomi] = STEM_INFO[t.stem];
+    return `<section class="ti-entry" id="o-${n + 1}">
+      ${figure(t.name, true)}
+      <p class="ti-origin">${t.origin}・${t.type}</p>
+      <h3>${t.kana ? `<ruby>${t.name}<rt>${t.kana}</rt></ruby>` : t.name}</h3>
+      <p class="ti-catch">「${t.catch}」</p>
+      <p>${t.essence}</p>
+      <p class="ti-cond">日干が${k}（${yomi}）の人の正体の候補です。</p>
+      ${placeLine(t.name)}
+      <p><a href="true-identities.html#ti-${n + 1}">長所・短所・恋愛・仕事の傾向を見る →</a> ／ <a href="${wikiUrl(t.wiki)}" target="_blank" rel="noopener">Wikipedia ↗</a></p>
+    </section>`;
+  };
+  return `<p>${intro}</p>` + groups.map((g) => {
+    const list = TRUE_IDENTITIES.filter(g.filter);
+    return `<h2>${g.title}</h2><p>${g.lead}</p>
+      <p class="ti-index">${list.map((t) => `<a href="#o-${TRUE_IDENTITIES.indexOf(t) + 1}">${t.name}</a>`).join("／")}</p>
+      ${list.map(entry).join("")}`;
+  }).join("") + outro + `<p>あなたの正体がどれになるかは、<a href="../">トップページ</a>で生年月日を入れると診断できます。すべての正体は<a href="true-identities.html">本当の正体図鑑</a>で見られます。</p>`;
+}
+const UMA_NAMES = ["コティングリー妖精", "フラットウッズ・モンスター", "ジャージー・デビル", "イエティ", "チュパカブラ", "モケーレ・ムベンベ", "クッシー", "ホムンクルス"];
+
+// ---- 属性別パワースポットガイド ----
+function powerSpotsArticle() {
+  return `
+    <p>八百万診断では、五行の属性ごとに「相性のいいパワースポット」を紹介しています。ここでは、神社以外の自然の名所を属性別に20か所まとめました。生まれ持った気と響き合う場所に出かけると、心が整うといわれます。旅の目的地選びにどうぞ。</p>
+    <p>自分の属性がわからない人は、<a href="../">トップページ</a>で生年月日を入れて診断してみてください。属性と相性のいい神社は<a href="shrines.html">属性別おすすめ神社ガイド</a>で紹介しています。</p>
+    <nav class="toc"><p>目次</p><ol>${ORDER.map((el) => `<li><a href="#ps-${el}">${ELEMENTS[el].icon} ${ELEMENTS[el].name}属性のパワースポット</a></li>`).join("")}</ol></nav>
+    ${ORDER.map((el) => `
+      <h2 id="ps-${el}">${ELEMENTS[el].icon} ${ELEMENTS[el].name}属性の人と相性のいいパワースポット</h2>
+      <p>${ELEMENTS[el].trait} ${ELEMENTS[el].name}属性の性格は<a href="element-${el}.html">こちら</a>。相性のいい「${ELEMENTS[genBy(el)].name}」属性の場所（<a href="#ps-${genBy(el)}">こちら</a>）もおすすめです。</p>
+      ${POWER_SPOTS[el].map((p) => `<div class="a-shrine">
+        <h3>🌄 ${p.name}</h3>
+        <p class="shrine-meta">${p.area}／${ELEMENTS[el].icon}${ELEMENTS[el].name}属性</p>
+        <p>${p.desc}</p>
+        <p><a href="${mapUrl(p.name.replace(/（.*?）/g, "") + " " + p.area)}" target="_blank" rel="noopener">地図で見る</a></p>
+        ${travelButtons(p)}
+      </div>`).join("")}`).join("")}
+    <h2>パワースポットを訪れるときに</h2>
+    <ul>
+      <li>自然の中の名所は、天候や季節で道や施設の状況が変わります。歩きやすい靴と、気温に合った服装で出かけましょう。</li>
+      <li>立ち入り禁止の場所や、植物・岩などには手をふれず、その土地のルールを守りましょう。</li>
+      <li>「パワースポット」の効果は言い伝えです。景色や空気を、ゆっくり味わうことがいちばんの楽しみ方です。</li>
+    </ul>
+    <p class="note">※営業時間・入場料・交通規制などは変わることがあります。お出かけ前に公式情報をご確認ください。</p>`;
+}
+
 function zukan(keys, intro) {
   return `<p>${intro}</p>` + keys.map((key) => {
     const cat = CATEGORIES.find((c) => c.key === key);
@@ -681,6 +739,17 @@ const bodies = {
   "gods.html": [zukan(["india", "japan", "greece", "norse"], "八百万診断に登場するインド神話・日本神話・ギリシャ神話・北欧神話の神々を、五行の属性別に紹介します。診断で出た神のことをもっと知りたいときや、ほかの属性の神々をのぞいてみたいときにどうぞ。"), false],
   "yokai.html": [zukan(["yokai", "kaii", "legend"], "八百万診断に登場する妖怪・怪異・都市伝説を、五行の属性別に紹介します。江戸時代の絵師・鳥山石燕の妖怪画など、昔の絵とあわせてお楽しみください。"), false],
   "cthulhu.html": [zukan(["cthulhu"], "クトゥルフ神話は、アメリカの作家H・P・ラヴクラフト（1890〜1937年）と仲間の作家たちの小説から生まれた、架空の神話です。八百万診断の「ルルイエなら…」の結果に登場する神々や生き物を、五行の属性別に紹介します。紹介しているのは、著作権の切れた原作の小説に登場する存在です。"), false],
+  "power-spots.html": [powerSpotsArticle(), true],
+  "americas.html": [originArticle("八百万診断の「本当の正体」には、中南米の神話の神々も登場します。メキシコ中央部で栄えたアステカと、南米アンデスに大帝国を築いたインカ。どちらも太陽や雨、大地、海といった自然の恵みと深く結びついた神々を信仰していました。", [
+    { title: "🌞 アステカ神話の神々", filter: (t) => t.origin.includes("アステカ"), lead: "アステカ（メシカ）は、14〜16世紀にメキシコ中央部で栄えた人々です。湖の上の都テノチティトランを中心に、太陽・雨・トウモロコシ・水などを司る多くの神々を祀りました。神々どうしがライバルになったり、力を合わせて世界をつくり直したりする、ダイナミックな神話が伝わっています。" },
+    { title: "🏔️ インカ・アンデスの神々", filter: (t) => t.origin.includes("インカ"), lead: "インカは、15〜16世紀に南米アンデスの山々に大帝国を築きました。皇帝は太陽神インティの子とされ、首都クスコの太陽の神殿は黄金でおおわれていたと伝わります。母なる大地パチャママへの感謝は、今もアンデスの暮らしの中に息づいています。" },
+  ]), false],
+  "goetia.html": [originArticle("「ソロモン72柱」は、17世紀ごろにまとめられた魔術書『レメゲトン』の第1部『ゴエティア』に記された、72の悪魔のことです。古代イスラエルのソロモン王が、指輪の力で72の悪魔を従え、真鍮の器に封じたという伝説にもとづきます。悪魔たちはそれぞれ王・公爵・侯爵などの爵位と軍団を持ち、学問や芸術、宝探しなど、得意な知識を授けるとされました。", [
+    { title: "📜 八百万診断に登場するソロモン72柱", filter: (t) => t.origin === "ソロモン72柱", lead: "八百万診断では、72柱のうち、姿や得意なことがそれぞれ異なる8柱を「本当の正体」に選びました。こわい存在というより、強い個性と才能をもつ存在として読み解いています。" },
+  ], '<p class="note">※ソロモン72柱は、魔術書に書かれた伝承です。八百万診断では、物語の登場人物のように性格のたとえとして紹介しています。</p>'), false],
+  "uma.html": [originArticle("UMA（ユーマ）は「未確認動物」を意味する、日本で生まれた言葉です。目撃談は多いのに、正体がはっきりしない生き物たち。八百万診断の「本当の正体」には、そんなUMAや、写真が世界を騒がせた妖精、錬金術の人造生命など、オカルトの世界の存在も登場します。", [
+    { title: "🛸 UMA・オカルトの正体", filter: (t) => UMA_NAMES.includes(t.name), lead: "世界各地で語られてきた、なぞに満ちた存在たちです。見た目のインパクトだけでなく、伝わる話から性格を読み解いています。" },
+  ], '<p>ツチノコ、ビッグフット、ネッシーなどのUMAは、「別の世界の姿」の都市伝説として登場します。<a href="yokai.html">妖怪・怪異・都市伝説図鑑</a>もどうぞ。</p>'), false],
   "how-it-works.html": [howItWorksArticle(), false],
 };
 ORDER.forEach((el) => (bodies[`element-${el}.html`] = [elementArticle(el), true]));

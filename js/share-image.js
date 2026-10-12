@@ -133,8 +133,9 @@ async function buildShareImage(data) {
   const catchY = 1320;
   ctx.fillStyle = '#fff5e3';
   drawShareLines(ctx, data.trueCatch ? `「${data.trueCatch}」` : '', 540, catchY, 864, 42, 2, 700);
-  ctx.fillStyle = '#efdaaa'; ctx.font = `700 32px ${SHARE_FONT}`;
-  ctx.fillText(`${data.polarity}の${data.element.name}  ·  日干 ${data.stemKanji}`, 540, 1470);
+  ctx.fillStyle = '#efdaaa';
+  const infoLine = [`${data.polarity}の${data.element.name}`, `日干 ${data.stemKanji}`, data.sukuyo, data.kyusei].filter(Boolean).join('  ·  ');
+  fitText(ctx, infoLine, 540, 1470, 900, 32, 700);
   // 保存先でも作者・ライセンス・出典を確認できるよう、画像内に残す。
   if (image && asset) {
     ctx.fillStyle = '#c0bacd';

@@ -67,6 +67,23 @@ function dailyFortune(birthday, dateStr) {
   return { scores, texts, luckyColor: pick(LUCKY_COLORS), luckyItem: pick(LUCKY_ITEMS), advice: pick(ADVICE) };
 }
 
+// Xの投稿の長さ（日本語などは1文字を2、英数字は1と数える。上限280、リンクは23＋区切り1）
+function xWeight(text) {
+  let n = 0;
+  for (const ch of text) {
+    const c = ch.codePointAt(0);
+    n += c <= 0x10ff || (c >= 0x2000 && c <= 0x200d) || (c >= 0x2010 && c <= 0x201f) || (c >= 0x2032 && c <= 0x2037) ? 1 : 2;
+  }
+  return n;
+}
+// 見出し・行・結びを、リンク込みでXの上限に収まるように並べる（入りきらない行は後ろから省く）
+function fitXText(head, lines, tail, limit = 280 - 24) {
+  const list = [...lines];
+  let text;
+  while (xWeight(text = [head, ...list, tail].join("\n")) > limit && list.length) list.pop();
+  return text;
+}
+
 // ---- 表示 ----
 
 function escapeHtml(s) {
@@ -209,6 +226,7 @@ function powerSpotCard(elKey, element) {
       <h3>🌄 「${element.name}」の気と響き合う場所</h3>
       <p class="note">神社のほかに、「${element.name}」の気にゆかりのある自然の名所を紹介します。旅の目的地にどうぞ。${isAd ? "" : ""}</p>
       <ul class="spot-list">${items}</ul>
+      <a class="read-more" href="articles/power-spots.html#ps-${elKey}">属性別パワースポットガイドを読む →</a>
     </div>`;
 }
 
@@ -713,9 +731,16 @@ function render(birthday, nickname, birthtime, birthplace, opts = {}) {
     </div>`).join("");
 
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shrine.name + " " + shrine.area)}`;
-  const shareText = `私の本当の正体は「${ti.identity.name}」！\n${ti.identity.catch}\n\n別の世界では…\nインド神話：${identities.india.name}\n日本神話：${identities.japan.name}\nギリシャ神話：${identities.greece.name}\n北欧神話：${identities.norse.name}\n妖怪：${identities.yokai.name}\n怪異：${identities.kaii.name}\n都市伝説：${identities.legend.name}\n#八百万診断`;
-  // インスタの投稿文には文字数の上限がないので、Xでは入りきらないクトゥルフ神話も足す
-  const instaText = shareText.replace("\n#八百万診断", `\nクトゥルフ神話：${identities.cthulhu.name}\n#八百万診断`);
+  // 別の世界の姿（8つ）。インスタは全部、Xは文字数の上限に収まるところまで入れる
+  const worldLines = [["インド神話", "india"], ["日本神話", "japan"], ["ギリシャ神話", "greece"], ["北欧神話", "norse"],
+    ["妖怪", "yokai"], ["怪異", "kaii"], ["都市伝説", "legend"], ["クトゥルフ神話", "cthulhu"]].map(([label, key]) => `${label}：${identities[key].name}`);
+  // 宿曜の本命宿と九星気学の本命星も、シェア文と画像に入れる
+  const sk = typeof sukuyoOf === "function" ? sukuyoOf(birthday) : null;
+  const ky = typeof kyuseiOf === "function" ? KYUSEI[kyuseiOf(birthday, fp).honmei] : null;
+  const starLine = [sk ? `宿曜：${sk.name}` : "", ky ? `九星：${ky.name}` : ""].filter(Boolean).join("／");
+  const shareHead = `私の本当の正体は「${ti.identity.name}」！\n${ti.identity.catch}${starLine ? "\n" + starLine : ""}\n\n別の世界では…`;
+  const instaText = [shareHead, ...worldLines, "#八百万診断"].join("\n");
+  const shareText = fitXText(shareHead, worldLines, "#八百万診断");
   // 正体ごとのページ（t/番号.html）をシェアすると、Xのカードにその正体の画像が出る
   const shareUrl = (SITE_CONFIG.siteUrl || location.href.split("#")[0]) + `t/${TRUE_IDENTITIES.indexOf(ti.identity) + 1}.html`;
 
@@ -820,6 +845,7 @@ function render(birthday, nickname, birthtime, birthplace, opts = {}) {
     trueName: ti.identity.name, trueKana: ti.identity.kana || "", trueCatch: ti.identity.catch,
     element, polarity, stemKanji: stem.kanji, identities, shrine,
     power: POWER_STONES[stem.element][stem.yang ? "yang" : "yin"],
+    sukuyo: sk ? sk.name : "", kyusei: ky ? ky.name : "",
   };
   document.getElementById("insta-share").addEventListener("click", () =>
     shareToInstagram(shareData, document.getElementById("insta-preview"), instaText + "\n" + shareUrl));
