@@ -8,7 +8,7 @@ eval(fs.readFileSync(site + "/js/true-identity-a.js", "utf8") + fs.readFileSync(
 const SKIP_FILES = ["Descendants_of_Izanami_alone.svg", "Gongenyama_Mt_Kimotsuki_Kagoshima.jpg", "Mayoiga_8086294422_ff2f173cf1_k.jpg",
   "Children_born_from_the_Challenge_of_Amaterasu_and_Susanoo.svg", "Sol_de_Mayo-Bandera_de_Argentina.svg", "Kinkaku-ji_04.jpg"];
 // 記事の画像が別のキャラのものなので、絵を出さない名前（ハイドラの記事の画像はダゴン）
-const SKIP_NAMES = ["ハイドラ"];
+const SKIP_NAMES = [];
 // Wikipedia の記事の画像が使えない・合わないときに、Commons の画像を名前ごとに指定する
 const PICK_FILES = {
   "鳳凰": "Yu_Sheng_-_Fenghuang_-_18th-century.jpg",
@@ -88,6 +88,7 @@ const LOCAL_IMAGES = {
   "ガタノトーア": { src: "img/true/ghatanothoa.jpg", credit: AI_CREDIT },
   "イースの大いなる種族": { src: "img/true/yith.jpg", credit: AI_CREDIT },
   "酒呑童子": { src: "img/true/shutendoji.jpg", credit: AI_CREDIT },
+  "ハイドラ": { src: "img/true/hydra.jpg", credit: AI_CREDIT },
 };
 const commonsThumb = (file) => {
   const f = file.replace(/ /g, "_"), h = require("crypto").createHash("md5").update(f).digest("hex");
