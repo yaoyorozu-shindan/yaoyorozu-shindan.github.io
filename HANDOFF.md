@@ -170,4 +170,5 @@ CLAUDE.md / AGENTS.md  AI向けの約束ごと（片方を変えたらもう片�
 | A8.net：電話占いセラの提携審査 | 承認されたら A8 の「広告リンク作成」でテキスト広告の href と計測用 pixel を取り、`js/config.js` の `consult` に足す（「お金の相談」は否認条件なので金運の欄のそばに置かない） |
 | もしも（Amazon）：10月下旬に本人が提携申請 | 承認後、どこでもリンクの a_id を `moshimoAmazonAid` に入れる。リンクの p_id=170・pc_id=185・pl_id=4062 が実際のリンクと同じか確認 |
 | Search Console のサイトマップ（「取得できませんでした」のまま） | 数日たっても変わらなければ削除して再送信。誤って送った `/sitemp.xml` は本人に削除をお願い済み |
+| 別の世界の絵52体＋酒呑童子の差し替え（運営者が ChatGPT で作成中。お願い文は `tools/ai-image-prompts.md` の末尾） | 届いたら900px幅のJPEGで `img/true/保存名.jpg` に置き、`tools/fetch-images.js` の `LOCAL_IMAGES` に登録 → `node --dns-result-order=ipv4first tools/fetch-images.js .`。酒呑童子は正体なのでXカード（`-Kind true -Only 番号`）と相性カード（`-Kind compat`）も作り直す |
 | A8.net の「広告掲載URL管理」への届け出 | 本人が実施したか未確認。ココナラの条件なので、まだなら本人にお願いする |
