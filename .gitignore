@@ -2,3 +2,9 @@
 tools/.ogp-cache/
 tools/ogp-manifest.json
 tools/ogp-compat-manifest.json
+
+# 運営メモ（非公開の置き場 yaoyorozu-notes で管理）
+notes/
+CLAUDE.md
+AGENTS.md
+HANDOFF.md
