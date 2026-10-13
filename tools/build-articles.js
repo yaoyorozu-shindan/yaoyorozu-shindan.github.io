@@ -12,8 +12,8 @@ const PUBLISHED = "2026-10-11";
 // サイトのデータを読み込む
 const src = ["js/config.js", "js/fortune-data.js", "js/images.js", "js/true-identity-a.js", "js/true-identity-b.js", "js/true-identity-c.js", "js/places.js", "js/compat-stems.js"]
   .map((f) => fs.readFileSync(path.join(ROOT, f), "utf8")).join("\n");
-const D = new Function(src + "; return { amazonLink, SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES, PLACES, sjisPercent, STEM_PAIRS, ASPECT_TEXT, LEGEND_PAIRS, POWER_SPOTS };")();
-const { amazonLink, SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES, PLACES, sjisPercent, STEM_PAIRS, ASPECT_TEXT, LEGEND_PAIRS, POWER_SPOTS } = D;
+const D = new Function(src + "; return { amazonLink, valueCommercePixel, SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES, PLACES, sjisPercent, STEM_PAIRS, ASPECT_TEXT, LEGEND_PAIRS, POWER_SPOTS };")();
+const { amazonLink, valueCommercePixel, SITE_CONFIG, ELEMENTS, CATEGORIES, RESULTS, BIRTHSTONES, POWER_STONES, IMAGES, TRUE_IDENTITIES, PLACES, sjisPercent, STEM_PAIRS, ASPECT_TEXT, LEGEND_PAIRS, POWER_SPOTS } = D;
 const ORDER = ["wood", "fire", "earth", "metal", "water"];
 const VERSION = (fs.readFileSync(path.join(ROOT, "index.html"), "utf8").match(/style\.css\?v=(\d+)/) || [])[1] || "1";
 
@@ -41,7 +41,7 @@ function travelButtons(s) {
   return `<p class="travel-title">🏨 ${s.stay}周辺の宿を探す</p>
     <div class="aff-btns">
       <a class="aff-btn rakuten" href="${rakuten(rUrl)}" target="_blank" rel="${relFor(rid)}">楽天トラベル</a>
-      <a class="aff-btn jalan" href="${jHref}" target="_blank" rel="${relFor(vcSid && vcPid)}">じゃらん</a>
+      <a class="aff-btn jalan" href="${jHref}" target="_blank" rel="${relFor(vcSid && vcPid)}">${valueCommercePixel()}じゃらん</a>
     </div>`;
 }
 

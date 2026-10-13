@@ -194,7 +194,7 @@ function travelLinks(shrine) {
     <p class="travel-title">🏨 ${shrine.stay}周辺の宿を探す</p>
     <div class="aff-btns">
       <a class="aff-btn rakuten" href="${rakutenHref}" target="_blank" rel="${rid ? "sponsored " : ""}noopener">楽天トラベル</a>
-      <a class="aff-btn jalan" href="${jalanHref}" target="_blank" rel="${sid && pid ? "sponsored " : ""}noopener">じゃらん</a>
+      <a class="aff-btn jalan" href="${jalanHref}" target="_blank" rel="${sid && pid ? "sponsored " : ""}noopener">${valueCommercePixel()}じゃらん</a>
     </div>
   </div>`;
 }
@@ -217,7 +217,7 @@ function powerSpotCard(elKey, element) {
       <div class="aff-btns">
         <a class="map-btn" href="${map}" target="_blank" rel="noopener">地図</a>
         <a class="aff-btn rakuten" href="${rakutenHref}" target="_blank" rel="${rid ? "sponsored " : ""}noopener">楽天トラベル</a>
-        <a class="aff-btn jalan" href="${jalanHref}" target="_blank" rel="${sid && pid ? "sponsored " : ""}noopener">じゃらん</a>
+        <a class="aff-btn jalan" href="${jalanHref}" target="_blank" rel="${sid && pid ? "sponsored " : ""}noopener">${valueCommercePixel()}じゃらん</a>
       </div>
     </li>`;
   }).join("");

@@ -16,8 +16,8 @@ const SITE_CONFIG = {
 
   // じゃらん（バリューコマース経由）。バリューコマースでじゃらんnetと提携後、
   // 「MyLink」の広告タグに含まれる sid と pid の数字を入れます。
-  valueCommerceSid: "",
-  valueCommercePid: "",
+  valueCommerceSid: "3784267",
+  valueCommercePid: "892725651",
 
   // Google アナリティクス 4 の測定ID（"G-" で始まる）。入れると全ページでアクセス解析が始まる（js/analytics.js）
   gaMeasurementId: "G-XZ1V9NZ8WF",
@@ -31,6 +31,13 @@ const SITE_CONFIG = {
       href: "https://px.a8.net/svt/ejp?a8mat=4BEESZ+A9Q7G2+2PEO+1BPGPE", pixel: "https://www14.a8.net/0.gif?a8mat=4BEESZ+A9Q7G2+2PEO+1BPGPE" },
   ],
 };
+
+// MyLink原文に含まれる表示計測画像。設定がない場合は外部へ送信しない。
+function valueCommercePixel() {
+  const { valueCommerceSid: sid, valueCommercePid: pid } = SITE_CONFIG;
+  if (!sid || !pid) return "";
+  return `<img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=${sid}&pid=${pid}" height="1" width="0" alt="">`;
+}
 
 // Amazonのリンク先（url）を、設定に合わせてアフィリエイトリンクにする（サイトと記事の両方で使う）
 // もしも：p_id=170・pc_id=185・pl_id=4062 は「もしも」の Amazon 用の番号
