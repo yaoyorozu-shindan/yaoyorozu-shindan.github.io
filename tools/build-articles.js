@@ -86,7 +86,7 @@ const ARTICLES = [
   {"file":"eki.html","title":"今日の易の読み方｜64卦・爻・変爻をやさしく解説","short":"☯ 今日の易の読み方","desc":"6本の線でできた卦と、金色に表示される変爻の読み方を解説。問いの立て方と、一日一回の易を振り返る具体例を紹介します。"},
   { file: "places.html", title: "神話・妖怪のゆかりの地めぐり｜日本と世界の伝説の場所と、近くの宿", short: "📍 神話・妖怪のゆかりの地めぐり",
     desc: "河童の遠野、天狗の鞍馬山、九尾の狐の殺生石から、ギリシャのデルフォイ、エジプトのフィラエ神殿まで。神話・妖怪・都市伝説の伝説の場所を、地域別に紹介します。" },
-  { file: "true-identities.html", title: "本当の正体図鑑 — 100を超える正体｜神・霊獣・妖怪の性格と恋愛・仕事の傾向", short: "🌟 本当の正体図鑑 — 100を超える正体",
+  { file: "true-identities.html", title: "本当の正体図鑑 — 100を超える正体｜神話・伝承の存在を一覧で紹介", short: "🌟 本当の正体図鑑 — 100を超える正体",
     desc: "八百万診断に登場する100を超える正体を、日干（甲〜癸）ごとに紹介。スサノオ、女媧、アヌビスなど、世界の神話の神や霊獣・妖怪の本質、長所・短所、恋愛、仕事の向き不向きがわかります。" },
   ...ORDER.map((el) => ({
     file: `element-${el}.html`,
@@ -795,7 +795,7 @@ TRUE_IDENTITIES.forEach((t, i) => {
   <meta name="description" content="${desc}">
   <link rel="canonical" href="${url}">
   <meta property="og:title" content="${title}">
-  <meta property="og:description" content="あなたの正体は神か、妖怪か。生年月日で無料診断。">
+  <meta property="og:description" content="あなたの正体は、何者か。神か、怪異か、それとも…。生年月日で無料診断。">
   <meta property="og:type" content="article">
   <meta property="og:url" content="${url}">
   <meta property="og:site_name" content="八百万診断">

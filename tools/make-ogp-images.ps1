@@ -135,7 +135,8 @@ foreach ($item in $items) {
   $fs = New-Object System.Drawing.Font($sans, 28, [System.Drawing.FontStyle]::Bold, [System.Drawing.GraphicsUnit]::Pixel)
   $g.DrawString("⛩ 八百万診断", $fs, $goldBrush, $tx, 478)
   $fs2 = New-Object System.Drawing.Font($sans, 24, [System.Drawing.FontStyle]::Regular, [System.Drawing.GraphicsUnit]::Pixel)
-  $g.DrawString("あなたの正体は神か、妖怪か。生年月日で無料診断", $fs2, $soft, $tx, 518)
+  $g.DrawString("あなたの正体は、何者か。生年月日で無料診断", $fs2, $soft, $tx, 518)
+  $g.DrawString("神か、怪異か、それとも…。", $fs2, $soft, $tx, 550)
   # 画像のクレジット（作者・ライセンス）
   if ($item.credit) {
     $fcr = New-Object System.Drawing.Font($sans, 15, [System.Drawing.FontStyle]::Regular, [System.Drawing.GraphicsUnit]::Pixel)

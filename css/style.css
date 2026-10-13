@@ -40,6 +40,7 @@ a { color: var(--accent); }
 .hero { text-align: center; margin: 12px 0 24px; }
 .hero h1 { font-size: 1.5rem; line-height: 1.5; margin: 0 0 8px; }
 .hero p { color: var(--muted); margin: 0; font-size: 0.95rem; }
+.hero .hero-teaser { color: var(--accent); margin: 0 0 12px; font-size: 1.05rem; font-weight: 700; letter-spacing: 0.06em; }
 
 .card {
   background: var(--card);
