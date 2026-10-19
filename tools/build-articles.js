@@ -30,7 +30,7 @@ function priceButtons(keyword) {
   const amazon = amazonLink(`https://www.amazon.co.jp/s?k=${q}`);
   return `<div class="price-btns">
       <a class="aff-btn rakuten" href="${rakuten(`https://search.rakuten.co.jp/search/mall/${q}/`)}" target="_blank" rel="${relFor(rid)}">楽天で現在の価格を見る</a>
-      <a class="aff-btn amazon" href="${amazon.href}" target="_blank" rel="${relFor(amazon.isAd)}">Amazonで現在の価格を見る</a>
+      <a class="aff-btn amazon" href="${amazon.href}" ${amazon.attributes} target="_blank" rel="${relFor(amazon.isAd)}">${amazon.pixel}Amazonで現在の価格を見る</a>
     </div>`;
 }
 

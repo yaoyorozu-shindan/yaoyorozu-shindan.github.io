@@ -169,7 +169,7 @@ function affiliateLinks(keyword, label) {
   const links = [];
   const amazon = amazonLink(`https://www.amazon.co.jp/s?k=${q}`);
   if (amazon.isAd) {
-    links.push(`<a class="aff-btn amazon" href="${amazon.href}" target="_blank" rel="sponsored noopener">Amazonで${label}</a>`);
+    links.push(`<a class="aff-btn amazon" href="${amazon.href}" ${amazon.attributes} target="_blank" rel="sponsored noopener">${amazon.pixel}Amazonで${label}</a>`);
   }
   if (SITE_CONFIG.rakutenAffiliateId) {
     const target = encodeURIComponent(`https://search.rakuten.co.jp/search/mall/${q}/`);
@@ -245,10 +245,10 @@ function fortuneBooksCard() {
     const amazon = amazonLink(`https://www.amazon.co.jp/s?k=${encodeURIComponent(kw)}&i=stripbooks`);
     return `<li><span>${label}</span><div class="aff-btns">
       <a class="aff-btn rakuten" href="${rakuten(kw)}" target="_blank" rel="${rid ? "sponsored " : ""}noopener">楽天ブックス</a>
-      ${amazon.isAd ? `<a class="aff-btn amazon" href="${amazon.href}" target="_blank" rel="sponsored noopener">Amazon</a>` : ""}
+      ${amazon.isAd ? `<a class="aff-btn amazon" href="${amazon.href}" ${amazon.attributes} target="_blank" rel="sponsored noopener">${amazon.pixel}Amazon</a>` : ""}
     </div></li>`;
   }).join("");
-  return `<div class="card books-card">${rid ? '<span class="pr">PR</span>' : ""}
+  return `<div class="card books-card">${rid || amazonLink('https://www.amazon.co.jp/').isAd ? '<span class="pr">PR</span>' : ""}
       <h3>📚 占いをもっと知りたい人へ</h3>
       <p class="note">この診断で使っている占いの、入門書や解説書を探せます。</p>
       <ul class="book-list">${rows}</ul>
@@ -293,7 +293,7 @@ function priceLinks(keyword) {
   const rakutenHref = rid ? `https://hb.afl.rakuten.co.jp/hgc/${rid}/?pc=${encodeURIComponent(rakutenUrl)}` : rakutenUrl;
   return `<div class="price-btns">
     <a class="aff-btn rakuten" href="${rakutenHref}" target="_blank" rel="${rid ? "sponsored " : ""}noopener">楽天で現在の価格を見る</a>
-    <a class="aff-btn amazon" href="${amazon.href}" target="_blank" rel="${amazon.isAd ? "sponsored " : ""}noopener">Amazonで現在の価格を見る</a>
+    <a class="aff-btn amazon" href="${amazon.href}" ${amazon.attributes} target="_blank" rel="${amazon.isAd ? "sponsored " : ""}noopener">${amazon.pixel}Amazonで現在の価格を見る</a>
   </div>`;
 }
 

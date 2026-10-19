@@ -6,7 +6,7 @@ const SITE_CONFIG = {
 
   // Amazon（もしもアフィリエイト経由）。もしもで Amazon と提携できたら、
   // 「どこでもリンク」などで作ったリンクの中の a_id=〇〇〇 の数字を入れます。入れると全部のAmazonリンクがもしも経由になります。
-  moshimoAmazonAid: "",
+  moshimoAmazonAid: "5849668",
 
   // Amazonアソシエイトに直接登録した場合のトラッキングタグ（例: "yourname-22"）。もしもを使うなら空のままでOK
   amazonTag: "",
@@ -43,7 +43,12 @@ function valueCommercePixel() {
 // もしも：p_id=170・pc_id=185・pl_id=4062 は「もしも」の Amazon 用の番号
 function amazonLink(url) {
   const { moshimoAmazonAid: aid, amazonTag: tag } = SITE_CONFIG;
-  if (aid) return { href: `https://af.moshimo.com/af/c/click?a_id=${aid}&p_id=170&pc_id=185&pl_id=4062&url=${encodeURIComponent(url)}`, isAd: true };
-  if (tag) return { href: url + (url.includes("?") ? "&" : "?") + "tag=" + encodeURIComponent(tag), isAd: true };
-  return { href: url, isAd: false };
+  if (aid) return {
+    href: `https://af.moshimo.com/af/c/click?a_id=${aid}&p_id=170&pc_id=185&pl_id=4062&url=${encodeURIComponent(url)}`,
+    isAd: true,
+    attributes: 'referrerpolicy="no-referrer-when-downgrade" attributionsrc',
+    pixel: `<img src="https://i.moshimo.com/af/i/impression?a_id=${aid}&p_id=170&pc_id=185&pl_id=4062" width="1" height="1" style="border:none;" alt="" loading="lazy">`,
+  };
+  if (tag) return { href: url + (url.includes("?") ? "&" : "?") + "tag=" + encodeURIComponent(tag), isAd: true, attributes: "", pixel: "" };
+  return { href: url, isAd: false, attributes: "", pixel: "" };
 }
