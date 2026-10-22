@@ -806,8 +806,7 @@ function render(birthday, nickname, birthtime, birthplace, opts = {}) {
         <dt>フード</dt><dd>${daily.luckyFood}</dd>
         <dt>アイテム</dt><dd>${daily.luckyItem}</dd>
       </dl>
-      <p class="section-sub">コンビニやスーパー、ドラッグストア、100円ショップなどで探せる身近なもの。家にあるものでも楽しめます。</p>
-      <p class="section-sub">フードはアレルギーや体調に合わせ、無理のない範囲でどうぞ。品ぞろえはお店によって異なります。</p>
+      <p class="section-sub">フードはアレルギーや体調に合わせ、無理のない範囲でどうぞ。</p>
       <p class="advice">💡 ${daily.advice}</p>
     </div>
 
