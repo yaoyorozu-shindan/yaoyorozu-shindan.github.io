@@ -64,7 +64,29 @@ function dailyFortune(birthday, dateStr) {
   const texts = {};
   for (const key in scores) texts[key] = pick(MESSAGES[key][scores[key]]);
 
-  return { scores, texts, luckyColor: pick(LUCKY_COLORS), luckyItem: pick(LUCKY_ITEMS), advice: pick(ADVICE) };
+  const luckyColor = pick(LUCKY_COLORS);
+  rand(); // 旧アイテム抽選の1回分を維持し、運勢・カラー・アドバイスは変えない。
+  const advice = pick(ADVICE);
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const dayNumber = Math.floor(Date.UTC(year, month - 1, day) / 86400000);
+  // 生年月日別に並べ替えた候補を日ごとに巡る。同じ日の再診断で変わらず、翌日は別候補になる。
+  const pickDaily = (pool, key) => {
+    const shuffled = [...pool];
+    const random = seededRandom(hashString(birthday + "|lucky|" + key));
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled[((dayNumber % pool.length) + pool.length) % pool.length];
+  };
+  const monthNumber = year * 12 + month - 1;
+  const monthlyItem = MONTHLY_LUCKY_ITEMS[(hashString(birthday + "|monthly-item") + monthNumber) % MONTHLY_LUCKY_ITEMS.length];
+  return {
+    scores, texts, luckyColor, advice,
+    luckyFood: pickDaily(DAILY_LUCKY_FOODS, "food"),
+    luckyItem: pickDaily(DAILY_LUCKY_ITEMS, "item"),
+    monthlyItem,
+  };
 }
 
 // Xの投稿の長さ（日本語などは1文字を2、英数字は1と数える。上限280、リンクは23＋区切り1）
@@ -781,11 +803,20 @@ function render(birthday, nickname, birthtime, birthplace, opts = {}) {
       <h3>今日のラッキー</h3>
       <dl>
         <dt>カラー</dt><dd>${daily.luckyColor}</dd>
-        <dt>アイテム</dt><dd>${daily.luckyItem.name}</dd>
+        <dt>フード</dt><dd>${daily.luckyFood}</dd>
+        <dt>アイテム</dt><dd>${daily.luckyItem}</dd>
       </dl>
-      <p class="lucky-shop">🛍️ 今日のラッキーアイテム「${daily.luckyItem.name}」を通販で探す</p>
-      ${affiliateLinks(daily.luckyItem.keyword, "探す")}
+      <p class="section-sub">コンビニやスーパー、ドラッグストア、100円ショップなどで探せる身近なもの。家にあるものでも楽しめます。</p>
+      <p class="section-sub">フードはアレルギーや体調に合わせ、無理のない範囲でどうぞ。品ぞろえはお店によって異なります。</p>
       <p class="advice">💡 ${daily.advice}</p>
+    </div>
+
+    <div class="card lucky">
+      <h3>今月のラッキーアイテム</h3>
+      <p class="section-sub">${todayString().slice(0, 7).replace("-", "年")}月のアイテム。同じ生年月日なら、今月中は同じ結果です。</p>
+      <dl><dt>アイテム</dt><dd>${daily.monthlyItem.name}</dd></dl>
+      <p class="lucky-shop">🛍️ 「${daily.monthlyItem.name}」を通販で探す</p>
+      ${affiliateLinks(daily.monthlyItem.keyword, "探す")}
     </div>
     `)}
 
